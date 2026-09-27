@@ -1,0 +1,1537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CODEX YASIN | Free Fire Level Up Bot Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-base: #060913;
+            --bg-card: rgba(13, 19, 36, 0.75);
+            --bg-card-hover: rgba(19, 27, 50, 0.9);
+            --border-card: rgba(0, 242, 254, 0.12);
+            --border-hover: rgba(0, 242, 254, 0.4);
+            --accent-cyan: #00f2fe;
+            --accent-blue: #4facfe;
+            --accent-purple: #7f00ff;
+            --accent-green: #00ff88;
+            --accent-red: #ff3366;
+            --accent-amber: #ffaa00;
+            --accent-pink: #ff2d95;
+            --text-main: #f0f4fc;
+            --text-muted: #8e9bb5;
+            --glass-glow: 0 8px 32px 0 rgba(0, 242, 254, 0.08);
+            --glass-glow-strong: 0 8px 40px 0 rgba(0, 242, 254, 0.22);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            width: 100%;
+            overflow-x: hidden;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(127, 0, 255, 0.16) 0%, transparent 45%),
+                radial-gradient(circle at 85% 85%, rgba(0, 242, 254, 0.14) 0%, transparent 45%),
+                radial-gradient(circle at 50% 50%, rgba(255, 45, 149, 0.06) 0%, transparent 60%),
+                linear-gradient(180deg, #060913 0%, #0a0e1c 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 24px;
+            background-attachment: fixed;
+            position: relative;
+        }
+
+        /* Animated background orbs */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(0, 242, 254, 0.06) 0%, transparent 20%),
+                radial-gradient(circle at 80% 70%, rgba(127, 0, 255, 0.06) 0%, transparent 20%);
+            animation: orb-float 20s infinite linear;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes orb-float {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .container {
+            max-width: 1440px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ============ HEADER ============ */
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 28px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: 20px;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: var(--glass-glow);
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-cyan), var(--accent-purple), transparent);
+            animation: header-scan 4s infinite linear;
+        }
+
+        @keyframes header-scan {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-shrink: 0;
+        }
+
+        .logo-box {
+            width: 52px;
+            height: 52px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple), var(--accent-pink));
+            background-size: 200% 200%;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #fff;
+            box-shadow: 0 0 24px rgba(0, 242, 254, 0.45);
+            animation: pulse-glow 3s infinite alternate, gradient-shift 5s infinite;
+            flex-shrink: 0;
+        }
+
+        @keyframes gradient-shift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 15px rgba(0, 242, 254, 0.35), 0 0 30px rgba(127, 0, 255, 0.15); }
+            100% { box-shadow: 0 0 28px rgba(0, 242, 254, 0.6), 0 0 45px rgba(255, 45, 149, 0.25); }
+        }
+
+        .brand-text h1 {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(90deg, #ffffff, var(--accent-cyan), var(--accent-pink));
+            background-size: 200% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: text-shine 4s infinite linear;
+        }
+
+        @keyframes text-shine {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+
+        .brand-text p {
+            font-size: 13px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 4px;
+            flex-wrap: wrap;
+        }
+
+        .live-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0, 255, 136, 0.12);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            color: var(--accent-green);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .pulse-dot {
+            width: 7px;
+            height: 7px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            animation: blink 1.2s infinite;
+            box-shadow: 0 0 8px var(--accent-green);
+            flex-shrink: 0;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.8); }
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 11px 20px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            outline: none;
+            white-space: nowrap;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+            color: #040914;
+            box-shadow: 0 4px 16px rgba(0, 242, 254, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 242, 254, 0.5);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-card);
+            color: var(--text-main);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--border-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 242, 254, 0.15);
+        }
+
+        /* ============ STATS GRID ============ */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: 18px;
+            padding: 20px;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 100% 0%, rgba(0, 242, 254, 0.08) 0%, transparent 60%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .stat-card:hover::after {
+            opacity: 1;
+        }
+
+        .stat-card:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-4px);
+            box-shadow: var(--glass-glow-strong);
+        }
+
+        .stat-icon {
+            width: 54px;
+            height: 54px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-icon.cyan { background: rgba(0, 242, 254, 0.15); color: var(--accent-cyan); box-shadow: 0 0 20px rgba(0, 242, 254, 0.2) inset; }
+        .stat-icon.green { background: rgba(0, 255, 136, 0.15); color: var(--accent-green); box-shadow: 0 0 20px rgba(0, 255, 136, 0.2) inset; }
+        .stat-icon.purple { background: rgba(127, 0, 255, 0.15); color: #c084fc; box-shadow: 0 0 20px rgba(127, 0, 255, 0.2) inset; }
+        .stat-icon.amber { background: rgba(255, 170, 0, 0.15); color: var(--accent-amber); box-shadow: 0 0 20px rgba(255, 170, 0, 0.2) inset; }
+
+        .stat-content {
+            position: relative;
+            z-index: 1;
+            min-width: 0;
+        }
+
+        .stat-content h3 {
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: #fff;
+            line-height: 1.1;
+            word-break: break-word;
+        }
+
+        .stat-content p {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-top: 2px;
+        }
+
+        /* ============ MAIN LAYOUT ============ */
+        .dashboard-main {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        .card-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: 20px;
+            padding: 24px;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .box-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .box-title {
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .accounts-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* ============ ACCOUNT CARD ============ */
+        .account-card {
+            background: linear-gradient(135deg, rgba(10, 15, 30, 0.85) 0%, rgba(15, 22, 45, 0.85) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 16px;
+            padding: 20px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .account-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--accent-cyan), var(--accent-purple));
+            opacity: 0.6;
+        }
+
+        .account-card:hover {
+            background: linear-gradient(135deg, rgba(19, 27, 50, 0.95) 0%, rgba(25, 35, 65, 0.95) 100%);
+            border-color: var(--border-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 32px rgba(0, 242, 254, 0.15);
+        }
+
+        .account-card.target-reached::before {
+            background: linear-gradient(180deg, var(--accent-green), #00cc6a);
+        }
+
+        .acc-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .acc-profile {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            min-width: 0;
+            flex: 1;
+        }
+
+        .acc-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 13px;
+            background: linear-gradient(135deg, #1e293b, #334155);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 17px;
+            color: var(--accent-cyan);
+            border: 1px solid rgba(0, 242, 254, 0.25);
+            flex-shrink: 0;
+            box-shadow: 0 0 18px rgba(0, 242, 254, 0.15);
+        }
+
+        .acc-info {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .acc-info h4 {
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .region-badge {
+            background: rgba(165, 180, 252, 0.15);
+            color: #a5b4fc;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            border: 1px solid rgba(165, 180, 252, 0.25);
+        }
+
+        .acc-info span {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+            display: block;
+            margin-top: 2px;
+            word-break: break-all;
+        }
+
+        .acc-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 5px 12px;
+            border-radius: 20px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .status-online {
+            background: rgba(0, 255, 136, 0.12);
+            color: var(--accent-green);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+        }
+
+        .status-match {
+            background: rgba(0, 242, 254, 0.15);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(0, 242, 254, 0.4);
+            animation: pulse-border 1.5s infinite alternate;
+        }
+
+        .status-target {
+            background: rgba(255, 170, 0, 0.15);
+            color: var(--accent-amber);
+            border: 1px solid rgba(255, 170, 0, 0.4);
+        }
+
+        .status-complete {
+            background: rgba(0, 255, 136, 0.2);
+            color: var(--accent-green);
+            border: 1px solid rgba(0, 255, 136, 0.5);
+            box-shadow: 0 0 12px rgba(0, 255, 136, 0.3);
+        }
+
+        @keyframes pulse-border {
+            0% { border-color: rgba(0, 242, 254, 0.3); }
+            100% { border-color: rgba(0, 242, 254, 0.9); }
+        }
+
+        /* ============ EXP BOX ============ */
+        .exp-box {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 14px 16px;
+            border-radius: 12px;
+            margin-bottom: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .exp-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 0;
+        }
+
+        .exp-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .exp-val {
+            font-size: 15px;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            color: #fff;
+            word-break: break-word;
+        }
+
+        .exp-gained {
+            color: var(--accent-green) !important;
+        }
+
+        .gained-badge {
+            background: rgba(0, 255, 136, 0.16);
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            display: inline-block;
+        }
+
+        /* ============ LEVEL PROGRESS ============ */
+        .level-progress {
+            margin-bottom: 14px;
+        }
+
+        .level-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            margin-bottom: 8px;
+            font-weight: 600;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .level-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0, 242, 254, 0.1);
+            color: var(--accent-cyan);
+            padding: 3px 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            border: 1px solid rgba(0, 242, 254, 0.25);
+        }
+
+        .target-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 170, 0, 0.1);
+            color: var(--accent-amber);
+            padding: 3px 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            border: 1px solid rgba(255, 170, 0, 0.25);
+        }
+
+        .progress-bar-bg {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-green), var(--accent-cyan));
+            background-size: 200% 100%;
+            border-radius: 10px;
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: progress-shine 3s infinite linear;
+            box-shadow: 0 0 12px rgba(0, 242, 254, 0.5);
+        }
+
+        @keyframes progress-shine {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+
+        /* ============ ACCOUNT ACTIONS ============ */
+        .acc-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 12px;
+            color: var(--text-muted);
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .icon-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-card);
+            color: var(--text-muted);
+            width: 34px;
+            height: 34px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 13px;
+        }
+
+        .icon-btn:hover {
+            background: rgba(0, 242, 254, 0.15);
+            color: var(--accent-cyan);
+            border-color: var(--accent-cyan);
+            transform: translateY(-2px);
+        }
+
+        .icon-btn.danger:hover {
+            background: rgba(255, 51, 102, 0.15);
+            color: var(--accent-red);
+            border-color: var(--accent-red);
+        }
+
+        /* ============ LOGS ============ */
+        .logs-box {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .log-stream {
+            flex: 1;
+            min-height: 480px;
+            max-height: 640px;
+            background: #03060f;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 14px;
+            padding: 14px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .log-stream::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .log-stream::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .log-stream::-webkit-scrollbar-thumb {
+            background: rgba(0, 242, 254, 0.25);
+            border-radius: 3px;
+        }
+
+        .log-stream::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 242, 254, 0.45);
+        }
+
+        .log-item {
+            line-height: 1.5;
+            word-break: break-word;
+            padding: 3px 0;
+        }
+
+        .log-time { color: #64748b; margin-right: 6px; }
+        .log-info { color: #38bdf8; }
+        .log-success { color: #4ade80; }
+        .log-warning { color: #fbbf24; }
+        .log-error { color: #f87171; }
+
+        /* ============ MODAL ============ */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(3, 6, 15, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.active { display: flex; }
+
+        .modal-card {
+            background: linear-gradient(135deg, #0c1224 0%, #101830 100%);
+            border: 1px solid var(--border-card);
+            border-radius: 22px;
+            width: 100%;
+            max-width: 500px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 40px rgba(0, 242, 254, 0.1);
+            position: relative;
+            overflow: hidden;
+            animation: modal-in 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes modal-in {
+            0% { opacity: 0; transform: translateY(20px) scale(0.95); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .modal-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-cyan), var(--accent-pink), transparent);
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 22px;
+        }
+
+        .modal-header h3 {
+            font-size: 19px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 7px;
+            letter-spacing: 0.3px;
+        }
+
+        .form-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 11px;
+            padding: 12px 15px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .form-input:focus {
+            border-color: var(--accent-cyan);
+            background: rgba(0, 242, 254, 0.05);
+            box-shadow: 0 0 0 3px rgba(0, 242, 254, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: rgba(142, 155, 181, 0.5);
+        }
+
+        textarea.form-input {
+            resize: vertical;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            min-height: 80px;
+        }
+
+        .target-level-wrap {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .target-level-input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 11px;
+            padding: 12px 15px;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 700;
+            outline: none;
+            transition: all 0.2s;
+            font-family: 'JetBrains Mono', monospace;
+            text-align: center;
+        }
+
+        .target-level-input:focus {
+            border-color: var(--accent-amber);
+            background: rgba(255, 170, 0, 0.05);
+            box-shadow: 0 0 0 3px rgba(255, 170, 0, 0.12);
+        }
+
+        .level-hint {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .level-hint i {
+            color: var(--accent-amber);
+        }
+
+        .quick-levels {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .quick-level-btn {
+            flex: 1;
+            min-width: 55px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-muted);
+            padding: 8px 12px;
+            border-radius: 9px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .quick-level-btn:hover {
+            background: rgba(255, 170, 0, 0.12);
+            color: var(--accent-amber);
+            border-color: rgba(255, 170, 0, 0.4);
+        }
+
+        .quick-level-btn.active {
+            background: linear-gradient(135deg, var(--accent-amber), #ff8800);
+            color: #040914;
+            border-color: transparent;
+            box-shadow: 0 4px 12px rgba(255, 170, 0, 0.3);
+        }
+
+        /* ============ EMPTY STATE ============ */
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 14px;
+            color: rgba(255, 255, 255, 0.08);
+        }
+
+        .empty-state p {
+            font-size: 14px;
+        }
+
+        /* ============ TABLET ============ */
+        @media (max-width: 1024px) {
+            .dashboard-main {
+                grid-template-columns: 1fr;
+            }
+            .log-stream {
+                min-height: 400px;
+                max-height: 500px;
+            }
+        }
+
+        /* ============ MOBILE ============ */
+        @media (max-width: 768px) {
+            body {
+                padding: 12px;
+            }
+
+            header {
+                padding: 16px;
+                border-radius: 16px;
+                margin-bottom: 16px;
+            }
+
+            .logo-box {
+                width: 44px;
+                height: 44px;
+                font-size: 20px;
+            }
+
+            .brand-text h1 {
+                font-size: 16px;
+            }
+
+            .brand-text p {
+                font-size: 11px;
+            }
+
+            .header-actions {
+                width: 100%;
+            }
+
+            .header-actions .btn {
+                flex: 1;
+                padding: 10px 14px;
+                font-size: 13px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+                margin-bottom: 16px;
+            }
+
+            .stat-card {
+                padding: 14px;
+                border-radius: 14px;
+                gap: 12px;
+            }
+
+            .stat-icon {
+                width: 42px;
+                height: 42px;
+                font-size: 17px;
+                border-radius: 12px;
+            }
+
+            .stat-content h3 {
+                font-size: 18px;
+            }
+
+            .stat-content p {
+                font-size: 11px;
+            }
+
+            .card-box {
+                padding: 16px;
+                border-radius: 16px;
+            }
+
+            .box-title {
+                font-size: 15px;
+            }
+
+            .account-card {
+                padding: 16px;
+                border-radius: 14px;
+            }
+
+            .acc-avatar {
+                width: 42px;
+                height: 42px;
+                font-size: 15px;
+            }
+
+            .acc-info h4 {
+                font-size: 14px;
+            }
+
+            .acc-info span {
+                font-size: 11px;
+            }
+
+            .exp-box {
+                padding: 12px;
+                gap: 8px;
+            }
+
+            .exp-val {
+                font-size: 13px;
+            }
+
+            .exp-label {
+                font-size: 9px;
+            }
+
+            .log-stream {
+                min-height: 320px;
+                max-height: 420px;
+                padding: 12px;
+                font-size: 11px;
+            }
+
+            .modal-card {
+                padding: 22px 18px;
+                border-radius: 18px;
+            }
+
+            .modal-header h3 {
+                font-size: 16px;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .brand-text p span:not(.live-tag) {
+                display: none;
+            }
+        }
+
+        /* ============ SCROLLBAR ============ */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 242, 254, 0.25);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 242, 254, 0.45);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="brand">
+                <div class="logo-box">
+                    <i class="fa-solid fa-bolt"></i>
+                </div>
+                <div class="brand-text">
+                    <h1>CODEX YASIN <span style="font-weight:400; color:var(--text-muted); font-size:14px;">| LEVEL UP BOT</span></h1>
+                    <p>
+                        <span class="live-tag"><span class="pulse-dot"></span> System Live</span>
+                        <span>• Target Level Auto-Stop Engine</span>
+                    </p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-secondary" onclick="fetchStats()"><i class="fa-solid fa-rotate"></i> Refresh</button>
+                <button class="btn btn-primary" onclick="openAddModal()"><i class="fa-solid fa-plus"></i> Add Account</button>
+            </div>
+        </header>
+
+        <!-- Stats Bar -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon cyan"><i class="fa-solid fa-users"></i></div>
+                <div class="stat-content">
+                    <h3 id="stat-total-accounts">0</h3>
+                    <p>Active Accounts</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon green"><i class="fa-solid fa-angles-up"></i></div>
+                <div class="stat-content">
+                    <h3 id="stat-total-exp" style="color:var(--accent-green)">+0 EXP</h3>
+                    <p>Total EXP Gained</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon purple"><i class="fa-solid fa-gamepad"></i></div>
+                <div class="stat-content">
+                    <h3 id="stat-total-matches">0</h3>
+                    <p>Matches Completed</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon amber"><i class="fa-solid fa-shield-halved"></i></div>
+                <div class="stat-content">
+                    <h3 id="stat-uptime">00:00:00</h3>
+                    <p>Bot Uptime</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Dashboard -->
+        <div class="dashboard-main">
+            <!-- Accounts List -->
+            <div class="card-box">
+                <div class="box-header">
+                    <div class="box-title">
+                        <i class="fa-solid fa-user-astronaut" style="color:var(--accent-cyan)"></i>
+                        <span>Live Accounts & Target Monitor</span>
+                    </div>
+                </div>
+                <div class="accounts-list" id="accounts-container">
+                    <div class="empty-state">
+                        <i class="fa-solid fa-circle-notch fa-spin"></i>
+                        <p>Loading active accounts...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Real-time Logs -->
+            <div class="card-box logs-box">
+                <div class="box-header">
+                    <div class="box-title">
+                        <i class="fa-solid fa-terminal" style="color:var(--accent-green)"></i>
+                        <span>Live Match & Bot Logs</span>
+                    </div>
+                    <span style="font-size:12px; color:var(--text-muted);">Real-time</span>
+                </div>
+                <div class="log-stream" id="log-stream">
+                    <!-- Logs inserted dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Account Modal -->
+    <div class="modal-overlay" id="add-modal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-user-plus" style="color:var(--accent-cyan); margin-right:8px;"></i> Add New Account</h3>
+                <button class="icon-btn" onclick="closeAddModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="add-acc-form" onsubmit="submitAddAccount(event)">
+                <div class="form-group">
+                    <label>Account Type</label>
+                    <select class="form-input" id="acc-type" onchange="toggleFormType()">
+                        <option value="guest">Guest Account (UID + Password)</option>
+                        <option value="token">Access Token</option>
+                    </select>
+                </div>
+
+                <div id="guest-fields">
+                    <div class="form-group">
+                        <label>Guest UID</label>
+                        <input type="text" class="form-input" id="acc-uid" placeholder="e.g. 7644913583">
+                    </div>
+                    <div class="form-group">
+                        <label>Guest Password / Secret</label>
+                        <input type="text" class="form-input" id="acc-password" placeholder="e.g. ZERO_GRAVITY_4NM38">
+                    </div>
+                </div>
+
+                <div id="token-fields" style="display:none;">
+                    <div class="form-group">
+                        <label>Access Token</label>
+                        <textarea class="form-input" id="acc-token" rows="3" placeholder="Paste access token here..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Target Level -->
+                <div class="form-group">
+                    <label><i class="fa-solid fa-bullseye" style="color:var(--accent-amber); margin-right:6px;"></i> Target Level (3 – 100)</label>
+                    <div class="target-level-wrap">
+                        <input type="number" class="target-level-input" id="acc-target-level"
+                               min="3" max="100" value="10" step="1"
+                               onchange="validateTargetLevel(this)"
+                               oninput="validateTargetLevel(this)">
+                    </div>
+                    <div class="quick-levels">
+                        <button type="button" class="quick-level-btn" data-level="3" onclick="setQuickLevel(3, this)">Lv 3</button>
+                        <button type="button" class="quick-level-btn" data-level="5" onclick="setQuickLevel(5, this)">Lv 5</button>
+                        <button type="button" class="quick-level-btn active" data-level="10" onclick="setQuickLevel(10, this)">Lv 10</button>
+                        <button type="button" class="quick-level-btn" data-level="20" onclick="setQuickLevel(20, this)">Lv 20</button>
+                        <button type="button" class="quick-level-btn" data-level="50" onclick="setQuickLevel(50, this)">Lv 50</button>
+                        <button type="button" class="quick-level-btn" data-level="100" onclick="setQuickLevel(100, this)">Lv 100</button>
+                    </div>
+                    <div class="level-hint">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <span>বট এই লেভেলে পৌঁছালে অটোমেটিক বন্ধ হয়ে যাবে। সর্বনিম্ন ৩, সর্বোচ্চ ১০০।</span>
+                    </div>
+                </div>
+
+                <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:24px; flex-wrap:wrap;">
+                    <button type="button" class="btn btn-secondary" onclick="closeAddModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary"><i class="fa-solid fa-rocket"></i> Save & Start</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Persistent Uptime Storage Logic using localStorage
+        let startTime = localStorage.getItem('bot_start_time');
+        if (!startTime) {
+            startTime = Date.now();
+            localStorage.setItem('bot_start_time', startTime);
+        } else {
+            startTime = parseInt(startTime);
+        }
+
+        function openAddModal() {
+            document.getElementById('add-modal').classList.add('active');
+            // Reset quick level selection
+            document.querySelectorAll('.quick-level-btn').forEach(b => b.classList.remove('active'));
+            const lv10 = document.querySelector('.quick-level-btn[data-level="10"]');
+            if (lv10) lv10.classList.add('active');
+            document.getElementById('acc-target-level').value = 10;
+        }
+
+        function closeAddModal() {
+            document.getElementById('add-modal').classList.remove('active');
+        }
+
+        function toggleFormType() {
+            const type = document.getElementById('acc-type').value;
+            document.getElementById('guest-fields').style.display = type === 'guest' ? 'block' : 'none';
+            document.getElementById('token-fields').style.display = type === 'token' ? 'block' : 'none';
+        }
+
+        function validateTargetLevel(input) {
+            let val = parseInt(input.value);
+            if (isNaN(val)) { input.value = 3; return; }
+            if (val < 3) input.value = 3;
+            else if (val > 100) input.value = 100;
+            else input.value = val;
+
+            // Update quick level buttons
+            document.querySelectorAll('.quick-level-btn').forEach(b => {
+                b.classList.toggle('active', parseInt(b.dataset.level) === parseInt(input.value));
+            });
+        }
+
+        function setQuickLevel(level, btn) {
+            document.getElementById('acc-target-level').value = level;
+            document.querySelectorAll('.quick-level-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        async function submitAddAccount(e) {
+            e.preventDefault();
+            const type = document.getElementById('acc-type').value;
+            const targetLevel = parseInt(document.getElementById('acc-target-level').value) || 10;
+
+            if (targetLevel < 3 || targetLevel > 100) {
+                return alert('টার্গেট লেভেল ৩ থেকে ১০০ এর মধ্যে হতে হবে!');
+            }
+
+            let payload = { target_level: targetLevel };
+
+            if (type === 'guest') {
+                const uid = document.getElementById('acc-uid').value.trim();
+                const password = document.getElementById('acc-password').value.trim();
+                if (!uid || !password) return alert('Please enter both UID and Password');
+                payload.uid = uid;
+                payload.password = password;
+            } else {
+                const token = document.getElementById('acc-token').value.trim();
+                if (!token) return alert('Please enter token');
+                payload.token = token;
+            }
+
+            try {
+                const res = await fetch('/api/account/add', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (data.status === 'ok') {
+                    closeAddModal();
+                    document.getElementById('add-acc-form').reset();
+                    document.getElementById('acc-target-level').value = 10;
+                    document.querySelectorAll('.quick-level-btn').forEach(b => b.classList.remove('active'));
+                    const lv10 = document.querySelector('.quick-level-btn[data-level="10"]');
+                    if (lv10) lv10.classList.add('active');
+                    fetchStats();
+                } else {
+                    alert('Error adding account: ' + (data.error || 'Unknown'));
+                }
+            } catch (err) {
+                alert('Request failed: ' + err);
+            }
+        }
+
+        async function deleteAccount(uid) {
+            if (!confirm('আপনি কি নিশ্চিত অ্যাকাউন্ট ' + uid + ' ডিলিট করতে চান?\n\nবট সাথে সাথে অফলাইন হয়ে যাবে এবং অ্যাকাউন্ট পুরোপুরি মুছে যাবে।')) return;
+            try {
+                const res = await fetch('/api/account/delete', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ uid })
+                });
+                fetchStats();
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function refreshAccountInfo(uid) {
+            try {
+                await fetch('/api/account/refresh', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ uid })
+                });
+                fetchStats();
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function fetchStats() {
+            try {
+                const res = await fetch('/api/stats');
+                const data = await res.json();
+
+                document.getElementById('stat-total-accounts').innerText = data.total_accounts;
+                document.getElementById('stat-total-exp').innerText = '+' + (data.total_gained_exp || 0).toLocaleString() + ' EXP';
+                document.getElementById('stat-total-matches').innerText = data.total_matches;
+
+                // Render Accounts
+                const container = document.getElementById('accounts-container');
+                if (!data.accounts || data.accounts.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fa-solid fa-ghost"></i>
+                            <p>No active accounts running. Click "+ Add Account" to start!</p>
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = data.accounts.map(acc => {
+                        const gainedExp = acc.gained_exp || 0;
+                        const targetLevel = acc.target_level || 100;
+                        const currentLevel = acc.level || 1;
+                        const levelReached = currentLevel >= targetLevel;
+
+                        let statusClass = 'status-online';
+                        let statusText = acc.status || 'ONLINE';
+
+                        if (acc.status === 'COMPLETED' || levelReached) {
+                            statusClass = 'status-complete';
+                            statusText = '✓ Target Reached';
+                        } else if (acc.status === 'IN_MATCH') {
+                            statusClass = 'status-match';
+                            statusText = `In Match (${acc.active_matches || 0} active)`;
+                        } else if (acc.status === 'SEARCHING') {
+                            statusClass = 'status-target';
+                            statusText = 'Searching...';
+                        } else if (acc.status === 'ERROR') {
+                            statusClass = 'status-target';
+                            statusText = 'Error';
+                        }
+
+                        // Level progress relative to target
+                        const baseLevel = Math.max(1, targetLevel - 1);
+                        const levelProgress = Math.min(100, Math.max(0,
+                            ((currentLevel - (currentLevel > 1 ? currentLevel - 1 : 0)) / Math.max(1, targetLevel - currentLevel + 1)) * 100
+                        ));
+                        const displayProgress = Math.min(100, Math.max(5, (currentLevel / targetLevel) * 100));
+
+                        return `
+                            <div class="account-card ${levelReached ? 'target-reached' : ''}">
+                                <div class="acc-top">
+                                    <div class="acc-profile">
+                                        <div class="acc-avatar"><i class="fa-solid fa-user"></i></div>
+                                        <div class="acc-info">
+                                            <h4>${escapeHtml(acc.nickname)} <span class="region-badge">${acc.region || 'BD'}</span></h4>
+                                            <span>UID: ${acc.uid}</span>
+                                        </div>
+                                    </div>
+                                    <div class="acc-status ${statusClass}">
+                                        ${!levelReached && acc.status === 'IN_MATCH' ? '<span class="pulse-dot"></span>' : ''}
+                                        <span>${statusText}</span>
+                                    </div>
+                                </div>
+
+                                <div class="exp-box">
+                                    <div class="exp-item">
+                                        <span class="exp-label">Initial EXP</span>
+                                        <span class="exp-val">${(acc.initial_exp || 0).toLocaleString()}</span>
+                                    </div>
+                                    <div class="exp-item">
+                                        <span class="exp-label">Current EXP</span>
+                                        <span class="exp-val">${(acc.current_exp || 0).toLocaleString()}</span>
+                                    </div>
+                                    <div class="exp-item">
+                                        <span class="exp-label">EXP Gained</span>
+                                        <span class="exp-val exp-gained">
+                                            <span class="gained-badge">+${gainedExp.toLocaleString()}</span>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="level-progress">
+                                    <div class="level-labels">
+                                        <span class="level-chip"><i class="fa-solid fa-star"></i> Lv ${currentLevel}</span>
+                                        <span class="target-chip"><i class="fa-solid fa-bullseye"></i> Target Lv ${targetLevel}</span>
+                                        <span style="color:var(--text-muted); font-size:11px;">Matches: ${acc.matches_played || 0}</span>
+                                    </div>
+                                    <div class="progress-bar-bg">
+                                        <div class="progress-bar-fill" style="width: ${displayProgress}%"></div>
+                                    </div>
+                                </div>
+
+                                <div class="acc-actions">
+                                    <span>Last match: ${acc.last_match_time || 'Running...'}</span>
+                                    <div class="action-btns">
+                                        <button class="icon-btn" title="Refresh Profile/EXP" onclick="refreshAccountInfo('${acc.uid}')"><i class="fa-solid fa-rotate"></i></button>
+                                        <button class="icon-btn danger" title="Delete Account" onclick="deleteAccount('${acc.uid}')"><i class="fa-solid fa-trash"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+
+                // Render Logs
+                const logContainer = document.getElementById('log-stream');
+                if (data.logs && data.logs.length > 0) {
+                    logContainer.innerHTML = data.logs.map(log => {
+                        return `<div class="log-item"><span class="log-time">[${log.time}]</span><span class="log-${log.level}">${escapeHtml(log.message)}</span></div>`;
+                    }).join('');
+                    logContainer.scrollTop = logContainer.scrollHeight;
+                }
+
+            } catch (err) {
+                console.error("Failed to fetch stats:", err);
+            }
+        }
+
+        function escapeHtml(text) {
+            if (text === null || text === undefined) return '';
+            return String(text)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        // Uptime counter
+        setInterval(() => {
+            const sec = Math.floor((Date.now() - startTime) / 1000);
+            const h = String(Math.floor(sec / 3600)).padStart(2, '0');
+            const m = String(Math.floor((sec % 3600) / 60)).padStart(2, '0');
+            const s = String(sec % 60).padStart(2, '0');
+            document.getElementById('stat-uptime').innerText = `${h}:${m}:${s}`;
+        }, 1000);
+
+        // Close modal on overlay click
+        document.getElementById('add-modal').addEventListener('click', function(e) {
+            if (e.target === this) closeAddModal();
+        });
+
+        // Live Poll every 2.5s
+        fetchStats();
+        setInterval(fetchStats, 2500);
+    </script>
+</body>
+</html>

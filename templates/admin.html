@@ -1,0 +1,1524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#060913">
+    <title>CODEX YASIN | Admin Control Panel</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-base: #060913;
+            --bg-card: rgba(13, 19, 36, 0.78);
+            --border-card: rgba(0, 242, 254, 0.12);
+            --border-hover: rgba(0, 242, 254, 0.4);
+            --accent-cyan: #00f2fe;
+            --accent-blue: #4facfe;
+            --accent-purple: #7f00ff;
+            --accent-green: #00ff88;
+            --accent-red: #ff3366;
+            --accent-amber: #ffaa00;
+            --accent-pink: #ff2d95;
+            --text-main: #f0f4fc;
+            --text-muted: #8e9bb5;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            width: 100%;
+            overflow-x: hidden;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            background-image:
+                radial-gradient(circle at 15% 15%, rgba(127, 0, 255, 0.16) 0%, transparent 45%),
+                radial-gradient(circle at 85% 85%, rgba(0, 242, 254, 0.14) 0%, transparent 45%),
+                radial-gradient(circle at 50% 50%, rgba(255, 45, 149, 0.06) 0%, transparent 60%),
+                linear-gradient(180deg, #060913 0%, #0a0e1c 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 24px;
+            background-attachment: fixed;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ============ HEADER ============ */
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 28px;
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 51, 102, 0.25);
+            border-radius: 20px;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 8px 32px rgba(255, 51, 102, 0.08);
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-red), var(--accent-pink), transparent);
+            animation: header-scan 4s infinite linear;
+        }
+
+        @keyframes header-scan {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-shrink: 0;
+        }
+
+        .logo-box {
+            width: 52px;
+            height: 52px;
+            background: linear-gradient(135deg, var(--accent-red), var(--accent-pink), var(--accent-purple));
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #fff;
+            box-shadow: 0 0 24px rgba(255, 51, 102, 0.45);
+            animation: pulse-glow 3s infinite alternate;
+            flex-shrink: 0;
+        }
+
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 15px rgba(255, 51, 102, 0.35), 0 0 30px rgba(255, 45, 149, 0.15); }
+            100% { box-shadow: 0 0 28px rgba(255, 51, 102, 0.6), 0 0 45px rgba(255, 45, 149, 0.25); }
+        }
+
+        .brand-text h1 {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(90deg, #ffffff, var(--accent-red), var(--accent-pink));
+            background-size: 200% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .brand-text p {
+            font-size: 13px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 4px;
+            flex-wrap: wrap;
+        }
+
+        .admin-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 51, 102, 0.12);
+            border: 1px solid rgba(255, 51, 102, 0.35);
+            color: var(--accent-red);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .pulse-dot {
+            width: 7px;
+            height: 7px;
+            background: var(--accent-red);
+            border-radius: 50%;
+            animation: blink 1.2s infinite;
+            box-shadow: 0 0 8px var(--accent-red);
+            flex-shrink: 0;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.8); }
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 11px 20px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+            border: none;
+            outline: none;
+            white-space: nowrap;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+            color: #040914;
+            box-shadow: 0 4px 16px rgba(0, 242, 254, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 242, 254, 0.5);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-card);
+            color: var(--text-main);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--border-hover);
+            transform: translateY(-2px);
+        }
+
+        .btn-logout {
+            background: rgba(255, 51, 102, 0.1);
+            border: 1px solid rgba(255, 51, 102, 0.3);
+            color: var(--accent-red);
+            padding: 11px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Outfit', sans-serif;
+            white-space: nowrap;
+        }
+
+        .btn-logout:hover {
+            background: rgba(255, 51, 102, 0.2);
+            border-color: var(--accent-red);
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        /* ============ STATS ============ */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: 18px;
+            padding: 16px 18px;
+            backdrop-filter: blur(14px);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .stat-card:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 32px rgba(0, 242, 254, 0.15);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .stat-icon.cyan { background: rgba(0, 242, 254, 0.15); color: var(--accent-cyan); }
+        .stat-icon.green { background: rgba(0, 255, 136, 0.15); color: var(--accent-green); }
+        .stat-icon.purple { background: rgba(127, 0, 255, 0.15); color: #c084fc; }
+        .stat-icon.amber { background: rgba(255, 170, 0, 0.15); color: var(--accent-amber); }
+
+        .stat-content h3 {
+            font-size: clamp(16px, 2vw, 22px);
+            font-weight: 800;
+            letter-spacing: -0.3px;
+            color: #fff;
+            line-height: 1.2;
+        }
+
+        .stat-content p {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-top: 2px;
+        }
+
+        /* ============ SEARCH BAR ============ */
+        .search-bar {
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: 16px;
+            padding: 14px 18px;
+            margin-bottom: 24px;
+            backdrop-filter: blur(14px);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .search-bar i {
+            color: var(--text-muted);
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .search-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #fff;
+            font-size: 15px;
+            font-family: 'Outfit', sans-serif;
+            min-width: 100px;
+        }
+
+        .search-input::placeholder {
+            color: rgba(142, 155, 181, 0.5);
+        }
+
+        /* ============ MAIN LAYOUT ============ */
+        .card-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: 20px;
+            padding: 24px;
+            backdrop-filter: blur(16px);
+        }
+
+        .box-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .box-title {
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* ============ ADMIN ENTRY CARD ============ */
+        .entry-card {
+            background: linear-gradient(135deg, rgba(10, 15, 30, 0.9) 0%, rgba(15, 22, 45, 0.9) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 16px;
+            padding: 18px;
+            transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .entry-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--accent-cyan), var(--accent-purple));
+            opacity: 0.6;
+        }
+
+        .entry-card:hover {
+            background: linear-gradient(135deg, rgba(19, 27, 50, 0.95) 0%, rgba(25, 35, 65, 0.95) 100%);
+            border-color: var(--border-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 32px rgba(0, 242, 254, 0.15);
+        }
+
+        .entry-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .entry-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .entry-avatar {
+            width: 46px;
+            height: 46px;
+            border-radius: 13px;
+            background: linear-gradient(135deg, #1e293b, #334155);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 17px;
+            color: var(--accent-cyan);
+            border: 1px solid rgba(0, 242, 254, 0.25);
+            flex-shrink: 0;
+        }
+
+        .entry-title-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .entry-title-info h4 {
+            font-size: 15px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 4px;
+            word-break: break-word;
+        }
+
+        .entry-submeta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            font-size: 11px;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .type-badge {
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .type-guest {
+            background: rgba(0, 242, 254, 0.12);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(0, 242, 254, 0.3);
+        }
+
+        .type-token {
+            background: rgba(127, 0, 255, 0.15);
+            color: #c084fc;
+            border: 1px solid rgba(127, 0, 255, 0.4);
+        }
+
+        .entry-actions {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .icon-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-card);
+            color: var(--text-muted);
+            width: 36px;
+            height: 36px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 13px;
+        }
+
+        .icon-btn:hover {
+            background: rgba(0, 242, 254, 0.15);
+            color: var(--accent-cyan);
+            border-color: var(--accent-cyan);
+            transform: translateY(-2px);
+        }
+
+        .icon-btn.danger:hover {
+            background: rgba(255, 51, 102, 0.15);
+            color: var(--accent-red);
+            border-color: var(--accent-red);
+        }
+
+        /* ============ CREDENTIAL ROWS ============ */
+        .cred-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+        }
+
+        .cred-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .cred-label {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            flex-shrink: 0;
+            min-width: 62px;
+            padding-top: 3px;
+        }
+
+        .cred-value {
+            flex: 1;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: #fff;
+            word-break: break-all;
+            user-select: all;
+            -webkit-user-select: all;
+            line-height: 1.5;
+            max-height: 120px;
+            overflow-y: auto;
+            padding-right: 4px;
+            min-width: 0;
+        }
+
+        .cred-value::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .cred-value::-webkit-scrollbar-thumb {
+            background: rgba(0, 242, 254, 0.3);
+            border-radius: 2px;
+        }
+
+        .copy-btn {
+            background: rgba(0, 242, 254, 0.1);
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            color: var(--accent-cyan);
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            flex-shrink: 0;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .copy-btn:hover {
+            background: rgba(0, 242, 254, 0.2);
+            border-color: var(--accent-cyan);
+            transform: translateY(-1px);
+        }
+
+        .copy-btn:active {
+            transform: translateY(0) scale(0.97);
+        }
+
+        .copy-btn.copied {
+            background: rgba(0, 255, 136, 0.2);
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+        }
+
+        /* ============ EMPTY STATE ============ */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 54px;
+            margin-bottom: 14px;
+            color: rgba(255, 255, 255, 0.08);
+        }
+
+        .empty-state p {
+            font-size: 14px;
+        }
+
+        .empty-state small {
+            display: block;
+            margin-top: 8px;
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        /* ============ MODAL ============ */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(3, 6, 15, 0.85);
+            backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.active { display: flex; }
+
+        .modal-card {
+            background: linear-gradient(135deg, #0c1224 0%, #101830 100%);
+            border: 1px solid var(--border-card);
+            border-radius: 22px;
+            width: 100%;
+            max-width: 480px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+            position: relative;
+            animation: modal-in 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes modal-in {
+            0% { opacity: 0; transform: translateY(20px) scale(0.95); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .modal-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-cyan), var(--accent-pink), transparent);
+            border-radius: 22px 22px 0 0;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 22px;
+        }
+
+        .modal-header h3 {
+            font-size: 19px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 7px;
+            letter-spacing: 0.3px;
+        }
+
+        .form-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 11px;
+            padding: 12px 15px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .form-input:focus {
+            border-color: var(--accent-cyan);
+            background: rgba(0, 242, 254, 0.05);
+            box-shadow: 0 0 0 3px rgba(0, 242, 254, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: rgba(142, 155, 181, 0.5);
+        }
+
+        textarea.form-input {
+            resize: vertical;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            min-height: 80px;
+        }
+
+        /* ============ LOGIN MODAL ============ */
+        .login-modal-card {
+            max-width: 400px;
+        }
+
+        .login-logo {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, var(--accent-red), var(--accent-pink));
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: #fff;
+            box-shadow: 0 0 30px rgba(255, 51, 102, 0.45);
+            margin: 0 auto 16px;
+            animation: pulse-glow 3s infinite alternate;
+        }
+
+        .login-title {
+            text-align: center;
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 6px;
+            background: linear-gradient(90deg, #fff, var(--accent-red), var(--accent-pink));
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .login-subtitle {
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+
+        .alert-error {
+            background: rgba(255, 51, 102, 0.12);
+            border: 1px solid rgba(255, 51, 102, 0.35);
+            color: var(--accent-red);
+            padding: 12px 14px;
+            border-radius: 11px;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 16px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* ============ TOAST ============ */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.95), rgba(0, 200, 100, 0.95));
+            color: #040914;
+            padding: 12px 22px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            box-shadow: 0 8px 30px rgba(0, 255, 136, 0.4);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            pointer-events: none;
+            max-width: 90vw;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* ============ MOBILE ============ */
+        @media (max-width: 768px) {
+            body {
+                padding: 12px;
+            }
+
+            header {
+                padding: 16px;
+                border-radius: 16px;
+                margin-bottom: 16px;
+            }
+
+            .logo-box {
+                width: 44px;
+                height: 44px;
+                font-size: 20px;
+            }
+
+            .brand-text h1 {
+                font-size: 16px;
+            }
+
+            .brand-text p {
+                font-size: 11px;
+            }
+
+            .header-actions {
+                width: 100%;
+            }
+
+            .header-actions .btn {
+                flex: 1;
+                padding: 10px 14px;
+                font-size: 13px;
+            }
+
+            .btn-logout {
+                padding: 10px 12px;
+                font-size: 13px;
+                flex: 0 0 auto;
+            }
+
+            .btn-logout span {
+                display: none;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+                margin-bottom: 16px;
+            }
+
+            .stat-card {
+                padding: 12px;
+                border-radius: 14px;
+                gap: 10px;
+            }
+
+            .stat-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 16px;
+                border-radius: 10px;
+            }
+
+            .stat-content h3 {
+                font-size: 15px;
+            }
+
+            .stat-content p {
+                font-size: 10px;
+            }
+
+            .card-box {
+                padding: 16px;
+                border-radius: 16px;
+            }
+
+            .box-title {
+                font-size: 15px;
+            }
+
+            .entry-card {
+                padding: 14px;
+                border-radius: 14px;
+            }
+
+            .entry-avatar {
+                width: 40px;
+                height: 40px;
+                font-size: 15px;
+            }
+
+            .entry-title-info h4 {
+                font-size: 13px;
+            }
+
+            .entry-submeta {
+                font-size: 10px;
+            }
+
+            .search-bar {
+                padding: 12px 14px;
+                border-radius: 14px;
+            }
+
+            .modal-card {
+                padding: 22px 18px;
+                border-radius: 18px;
+            }
+
+            .modal-header h3 {
+                font-size: 16px;
+            }
+
+            .cred-row {
+                padding: 8px 10px;
+                gap: 8px;
+            }
+
+            .cred-label {
+                min-width: 54px;
+                font-size: 9px;
+            }
+
+            .cred-value {
+                font-size: 12px;
+            }
+
+            .copy-btn {
+                padding: 5px 9px;
+                font-size: 10px;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 242, 254, 0.25);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 242, 254, 0.45);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Login Modal (first shown) -->
+    <div class="modal-overlay active" id="admin-login-modal">
+        <div class="modal-card login-modal-card">
+            <div class="login-logo">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <h2 class="login-title">ADMIN ACCESS</h2>
+            <p class="login-subtitle">Enter admin password to continue</p>
+
+            <div class="alert-error" id="login-error">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span id="login-error-msg">Wrong password!</span>
+            </div>
+
+            <form onsubmit="submitAdminLogin(event)">
+                <div class="form-group">
+                    <label>Admin Password</label>
+                    <input type="password" class="form-input" id="admin-password"
+                           placeholder="Enter password" autocomplete="current-password" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:100%; padding:14px; font-size:15px; margin-top:6px;">
+                    <i class="fa-solid fa-unlock"></i> Unlock Admin Panel
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="brand">
+                <div class="logo-box">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <div class="brand-text">
+                    <h1>ADMIN CONTROL PANEL</h1>
+                    <p>
+                        <span class="admin-tag"><span class="pulse-dot"></span> ADMIN MODE</span>
+                        <span>• Permanent Account Storage</span>
+                    </p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-secondary" onclick="fetchEntries()"><i class="fa-solid fa-rotate"></i> Refresh</button>
+                <button class="btn btn-primary" onclick="openAddModal()"><i class="fa-solid fa-plus"></i> Add Entry</button>
+                <button class="btn-logout" onclick="adminLogout()" title="Lock Panel">
+                    <i class="fa-solid fa-lock"></i>
+                    <span>Lock</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon cyan"><i class="fa-solid fa-database"></i></div>
+                <div class="stat-content">
+                    <h3 id="stat-total">0</h3>
+                    <p>Total Entries</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon green"><i class="fa-solid fa-user"></i></div>
+                <div class="stat-content">
+                    <h3 id="stat-guest" style="color:var(--accent-green)">0</h3>
+                    <p>UID + Password</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon purple"><i class="fa-solid fa-key"></i></div>
+                <div class="stat-content">
+                    <h3 id="stat-token" style="color:#c084fc">0</h3>
+                    <p>Access Tokens</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon amber"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                <div class="stat-content">
+                    <h3 id="stat-latest" style="color:var(--accent-amber); font-size:16px;">—</h3>
+                    <p>Latest Added</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-bar">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" class="search-input" id="search-input"
+                   placeholder="Search by UID, Token, or Nickname..."
+                   oninput="filterEntries()">
+        </div>
+
+        <!-- Entries List -->
+        <div class="card-box">
+            <div class="box-header">
+                <div class="box-title">
+                    <i class="fa-solid fa-list-check" style="color:var(--accent-cyan)"></i>
+                    <span>Permanent Account Storage</span>
+                </div>
+                <span style="font-size:12px; color:var(--text-muted);" id="entry-count-label">0 entries</span>
+            </div>
+            <div id="entries-container">
+                <div class="empty-state">
+                    <i class="fa-solid fa-circle-notch fa-spin"></i>
+                    <p>Loading entries...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Entry Modal -->
+    <div class="modal-overlay" id="add-modal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-plus" style="color:var(--accent-cyan); margin-right:8px;"></i> Add New Entry</h3>
+                <button class="icon-btn" onclick="closeAddModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="add-entry-form" onsubmit="submitAddEntry(event)">
+                <div class="form-group">
+                    <label>Entry Type</label>
+                    <select class="form-input" id="entry-type" onchange="toggleEntryFields()">
+                        <option value="guest">UID + Password</option>
+                        <option value="token">Access Token</option>
+                    </select>
+                </div>
+
+                <div id="guest-fields">
+                    <div class="form-group">
+                        <label>UID</label>
+                        <input type="text" class="form-input" id="entry-uid" placeholder="e.g. 1234567890">
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="text" class="form-input" id="entry-password" placeholder="e.g. YASIN_6767">
+                    </div>
+                    <div class="form-group">
+                        <label>Nickname (Optional)</label>
+                        <input type="text" class="form-input" id="entry-nickname" placeholder="e.g. Player One">
+                    </div>
+                </div>
+
+                <div id="token-fields" style="display:none;">
+                    <div class="form-group">
+                        <label>Access Token</label>
+                        <textarea class="form-input" id="entry-token" rows="3" placeholder="Paste access token here..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Nickname (Optional)</label>
+                        <input type="text" class="form-input" id="entry-nickname-token" placeholder="e.g. Player One">
+                    </div>
+                </div>
+
+                <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:22px; flex-wrap:wrap;">
+                    <button type="button" class="btn btn-secondary" onclick="closeAddModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Save Entry</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <i class="fa-solid fa-circle-check"></i>
+        <span id="toast-msg">Copied!</span>
+    </div>
+
+    <script>
+        // ========== ADMIN AUTH ==========
+        const ADMIN_PASSWORD = 'YASIN-6767';
+        let adminAuthenticated = false;
+        let cachedEntries = [];
+        let adminPwd = '';
+
+        if (sessionStorage.getItem('admin_authed') === '1' && sessionStorage.getItem('admin_pwd')) {
+            adminAuthenticated = true;
+            adminPwd = sessionStorage.getItem('admin_pwd');
+            document.getElementById('admin-login-modal').classList.remove('active');
+            setTimeout(initAdmin, 50);
+        }
+
+        function submitAdminLogin(e) {
+            e.preventDefault();
+            const pwd = document.getElementById('admin-password').value.trim();
+            const err = document.getElementById('login-error');
+            const errMsg = document.getElementById('login-error-msg');
+
+            if (pwd === ADMIN_PASSWORD) {
+                adminAuthenticated = true;
+                adminPwd = pwd;
+                sessionStorage.setItem('admin_authed', '1');
+                sessionStorage.setItem('admin_pwd', pwd);
+                err.style.display = 'none';
+                document.getElementById('admin-login-modal').classList.remove('active');
+                document.getElementById('admin-password').value = '';
+                initAdmin();
+            } else {
+                errMsg.innerText = 'Wrong password! Access denied.';
+                err.style.display = 'flex';
+                document.getElementById('admin-password').value = '';
+            }
+        }
+
+        function adminLogout() {
+            if (!confirm('Lock the admin panel? You will need the password again.')) return;
+            adminAuthenticated = false;
+            adminPwd = '';
+            sessionStorage.removeItem('admin_authed');
+            sessionStorage.removeItem('admin_pwd');
+            location.reload();
+        }
+
+        function initAdmin() {
+            fetchEntries();
+            setInterval(fetchEntries, 5000);
+        }
+
+        function adminHeaders() {
+            return {
+                'Content-Type': 'application/json',
+                'X-Admin-Password': adminPwd
+            };
+        }
+
+        // ========== TOAST ==========
+        let toastTimer = null;
+        function showToast(msg, isError) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-msg');
+            const icon = toast.querySelector('i');
+
+            toastMsg.innerText = msg;
+
+            if (isError) {
+                toast.style.background = 'linear-gradient(135deg, rgba(255, 51, 102, 0.95), rgba(200, 0, 60, 0.95))';
+                toast.style.boxShadow = '0 8px 30px rgba(255, 51, 102, 0.4)';
+                toast.style.color = '#fff';
+                icon.className = 'fa-solid fa-circle-xmark';
+            } else {
+                toast.style.background = 'linear-gradient(135deg, rgba(0, 255, 136, 0.95), rgba(0, 200, 100, 0.95))';
+                toast.style.boxShadow = '0 8px 30px rgba(0, 255, 136, 0.4)';
+                toast.style.color = '#040914';
+                icon.className = 'fa-solid fa-circle-check';
+            }
+
+            toast.classList.add('show');
+            if (toastTimer) clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 1800);
+        }
+
+        // ========== COPY TO CLIPBOARD ==========
+        async function copyText(text, btnEl) {
+            if (!text) {
+                showToast('Nothing to copy', true);
+                return;
+            }
+            try {
+                if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(text);
+                } else {
+                    const ta = document.createElement('textarea');
+                    ta.value = text;
+                    ta.style.position = 'fixed';
+                    ta.style.top = '-9999px';
+                    ta.style.left = '-9999px';
+                    document.body.appendChild(ta);
+                    ta.focus();
+                    ta.select();
+                    try {
+                        document.execCommand('copy');
+                    } catch (e) {
+                        throw e;
+                    }
+                    document.body.removeChild(ta);
+                }
+                showToast('Copied to clipboard!', false);
+                if (btnEl) {
+                    btnEl.classList.add('copied');
+                    const orig = btnEl.innerHTML;
+                    btnEl.innerHTML = '<i class="fa-solid fa-check"></i> Copied';
+                    setTimeout(() => {
+                        btnEl.classList.remove('copied');
+                        btnEl.innerHTML = orig;
+                    }, 1500);
+                }
+            } catch (err) {
+                showToast('Copy failed: ' + err, true);
+            }
+        }
+
+        // ========== ENTRY MANAGEMENT ==========
+        function openAddModal() {
+            if (!adminAuthenticated) return;
+            document.getElementById('add-modal').classList.add('active');
+        }
+
+        function closeAddModal() {
+            document.getElementById('add-modal').classList.remove('active');
+            document.getElementById('add-entry-form').reset();
+            toggleEntryFields();
+        }
+
+        function toggleEntryFields() {
+            const type = document.getElementById('entry-type').value;
+            document.getElementById('guest-fields').style.display = type === 'guest' ? 'block' : 'none';
+            document.getElementById('token-fields').style.display = type === 'token' ? 'block' : 'none';
+        }
+
+        async function submitAddEntry(e) {
+            e.preventDefault();
+            if (!adminAuthenticated) return;
+
+            const type = document.getElementById('entry-type').value;
+            const payload = { type };
+
+            if (type === 'guest') {
+                const uid = document.getElementById('entry-uid').value.trim();
+                const password = document.getElementById('entry-password').value.trim();
+                const nickname = document.getElementById('entry-nickname').value.trim();
+                if (!uid || !password) return alert('UID and Password are required!');
+                payload.uid = uid;
+                payload.password = password;
+                payload.nickname = nickname;
+            } else {
+                const token = document.getElementById('entry-token').value.trim();
+                const nickname = document.getElementById('entry-nickname-token').value.trim();
+                if (!token) return alert('Access token is required!');
+                payload.token = token;
+                payload.nickname = nickname;
+            }
+
+            try {
+                const res = await fetch('/api/admin/add', {
+                    method: 'POST',
+                    headers: adminHeaders(),
+                    body: JSON.stringify(payload)
+                });
+                if (res.status === 401) {
+                    alert('Admin session expired. Please reload and login again.');
+                    sessionStorage.removeItem('admin_authed');
+                    sessionStorage.removeItem('admin_pwd');
+                    location.reload();
+                    return;
+                }
+                const data = await res.json();
+                if (data.status === 'ok') {
+                    closeAddModal();
+                    showToast('Entry added successfully!', false);
+                    fetchEntries();
+                } else {
+                    showToast(data.error || 'Unknown error', true);
+                }
+            } catch (err) {
+                showToast('Request failed: ' + err, true);
+            }
+        }
+
+        async function deleteEntry(id) {
+            if (!adminAuthenticated) return;
+            if (!confirm('Permanently delete this entry?\n\nThe bot will be stopped immediately and the account will be removed from all user dashboards.\n\nThis action cannot be undone.')) return;
+
+            try {
+                const res = await fetch('/api/admin/delete', {
+                    method: 'POST',
+                    headers: adminHeaders(),
+                    body: JSON.stringify({ id })
+                });
+                if (res.status === 401) {
+                    alert('Admin session expired. Please reload and login again.');
+                    sessionStorage.removeItem('admin_authed');
+                    sessionStorage.removeItem('admin_pwd');
+                    location.reload();
+                    return;
+                }
+                const data = await res.json();
+                if (data.status === 'ok') {
+                    showToast('Entry deleted!', false);
+                    fetchEntries();
+                } else {
+                    showToast(data.error || 'Unknown error', true);
+                }
+            } catch (err) {
+                showToast('Request failed: ' + err, true);
+            }
+        }
+
+        function escapeHtml(text) {
+            if (text === null || text === undefined) return '';
+            return String(text)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function jsEscape(text) {
+            if (text === null || text === undefined) return '';
+            return String(text)
+                .replace(/\\/g, '\\\\')
+                .replace(/'/g, "\\'")
+                .replace(/"/g, '\\"')
+                .replace(/\n/g, '\\n')
+                .replace(/\r/g, '\\r');
+        }
+
+        async function fetchEntries() {
+            if (!adminAuthenticated) return;
+            try {
+                const res = await fetch('/api/admin/list', {
+                    method: 'GET',
+                    headers: adminHeaders()
+                });
+                if (res.status === 401) {
+                    adminAuthenticated = false;
+                    sessionStorage.removeItem('admin_authed');
+                    sessionStorage.removeItem('admin_pwd');
+                    location.reload();
+                    return;
+                }
+                const data = await res.json();
+                cachedEntries = data.entries || [];
+                renderEntries();
+            } catch (err) {
+                console.error('Failed to fetch entries:', err);
+            }
+        }
+
+        function filterEntries() {
+            renderEntries();
+        }
+
+        function renderEntries() {
+            const container = document.getElementById('entries-container');
+            const q = (document.getElementById('search-input').value || '').trim().toLowerCase();
+
+            let entries = cachedEntries.slice();
+
+            // Stats
+            const total = entries.length;
+            const guestCount = entries.filter(e => e.type === 'guest').length;
+            const tokenCount = entries.filter(e => e.type === 'token').length;
+
+            document.getElementById('stat-total').innerText = total;
+            document.getElementById('stat-guest').innerText = guestCount;
+            document.getElementById('stat-token').innerText = tokenCount;
+
+            if (entries.length > 0) {
+                let latest = entries.reduce((a, b) =>
+                    (a.created_at || 0) > (b.created_at || 0) ? a : b
+                );
+                const d = new Date((latest.created_at || 0) * 1000);
+                document.getElementById('stat-latest').innerText =
+                    d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }) + ' ' +
+                    d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+            } else {
+                document.getElementById('stat-latest').innerText = '—';
+            }
+
+            // Search filter
+            if (q) {
+                entries = entries.filter(e => {
+                    const hay = [
+                        e.uid || '',
+                        e.token || '',
+                        e.nickname || ''
+                    ].join(' ').toLowerCase();
+                    return hay.includes(q);
+                });
+            }
+
+            document.getElementById('entry-count-label').innerText =
+                entries.length + ' ' + (entries.length === 1 ? 'entry' : 'entries');
+
+            if (entries.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fa-solid fa-database"></i>
+                        <p>${q ? 'No matching entries found.' : 'No entries yet. Click "Add Entry" to add the first account.'}</p>
+                        <small>Entries added by users are automatically saved here.</small>
+                    </div>
+                `;
+                return;
+            }
+
+            // Sort by created_at desc
+            entries.sort((a, b) => (b.created_at || 0) - (a.created_at || 0));
+
+            container.innerHTML = entries.map(entry => {
+                const isGuest = entry.type === 'guest';
+                const avatarIcon = isGuest ? 'fa-user' : 'fa-key';
+                const typeClass = isGuest ? 'type-guest' : 'type-token';
+                const typeLabel = isGuest ? 'UID+PASS' : 'TOKEN';
+
+                let metaLine = '';
+                if (entry.created_at) {
+                    const d = new Date(entry.created_at * 1000);
+                    metaLine = `Added: ${d.toLocaleDateString('en-GB')} ${d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}`;
+                }
+                if (entry.first_owner) {
+                    metaLine += (metaLine ? ' • ' : '') + `First Owner: ${escapeHtml(entry.first_owner.substring(0, 8))}...`;
+                }
+
+                // Build credential rows
+                let credsHtml = '';
+                if (isGuest) {
+                    const uidEsc = jsEscape(entry.uid);
+                    const passEsc = jsEscape(entry.password);
+                    credsHtml += `
+                        <div class="cred-row">
+                            <span class="cred-label">UID</span>
+                            <span class="cred-value">${escapeHtml(entry.uid)}</span>
+                            <button class="copy-btn" onclick="copyText('${uidEsc}', this)">
+                                <i class="fa-solid fa-copy"></i> Copy
+                            </button>
+                        </div>
+                        <div class="cred-row">
+                            <span class="cred-label">Password</span>
+                            <span class="cred-value">${escapeHtml(entry.password)}</span>
+                            <button class="copy-btn" onclick="copyText('${passEsc}', this)">
+                                <i class="fa-solid fa-copy"></i> Copy
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    const tokenEsc = jsEscape(entry.token);
+                    const preview = entry.token || '';
+                    credsHtml += `
+                        <div class="cred-row">
+                            <span class="cred-label">Token</span>
+                            <span class="cred-value">${escapeHtml(preview)}</span>
+                            <button class="copy-btn" onclick="copyText('${tokenEsc}', this)">
+                                <i class="fa-solid fa-copy"></i> Copy
+                            </button>
+                        </div>
+                    `;
+                }
+
+                return `
+                    <div class="entry-card">
+                        <div class="entry-top">
+                            <div class="entry-profile">
+                                <div class="entry-avatar"><i class="fa-solid ${avatarIcon}"></i></div>
+                                <div class="entry-title-info">
+                                    <h4>${escapeHtml(entry.nickname || (isGuest ? 'UID ' + entry.uid : 'Token Account'))}</h4>
+                                    <div class="entry-submeta">
+                                        <span class="type-badge ${typeClass}">${typeLabel}</span>
+                                        <span>${metaLine}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="entry-actions">
+                                <button class="icon-btn danger" title="Delete Permanently"
+                                        onclick="deleteEntry('${entry.id}')">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="entry-creds">
+                            ${credsHtml}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        document.getElementById('add-modal').addEventListener('click', function(e) {
+            if (e.target === this) closeAddModal();
+        });
+
+        document.getElementById('search-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') e.preventDefault();
+        });
+    </script>
+</body>
+</html>

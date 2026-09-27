@@ -55,7 +55,6 @@
             position: relative;
         }
 
-        /* Animated background orbs */
         body::before {
             content: '';
             position: fixed;
@@ -69,6 +68,7 @@
             animation: orb-float 20s infinite linear;
             pointer-events: none;
             z-index: 0;
+            will-change: transform;
         }
 
         @keyframes orb-float {
@@ -225,7 +225,7 @@
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
             border: none;
             outline: none;
             white-space: nowrap;
@@ -277,6 +277,37 @@
             box-shadow: 0 4px 16px rgba(0, 242, 254, 0.15);
         }
 
+        /* ============ LOGOUT BUTTON ============ */
+        .btn-logout {
+            background: rgba(255, 51, 102, 0.1);
+            border: 1px solid rgba(255, 51, 102, 0.3);
+            color: var(--accent-red);
+            padding: 11px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Outfit', sans-serif;
+            white-space: nowrap;
+        }
+
+        .btn-logout:hover {
+            background: rgba(255, 51, 102, 0.2);
+            border-color: var(--accent-red);
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(255, 51, 102, 0.3);
+        }
+
+        .btn-logout:active {
+            transform: translateY(0);
+        }
+
         /* ============ STATS GRID ============ */
         .stats-grid {
             display: grid;
@@ -289,13 +320,13 @@
             background: var(--bg-card);
             border: 1px solid var(--border-card);
             border-radius: 18px;
-            padding: 20px;
+            padding: 16px 18px;
             backdrop-filter: blur(14px);
             -webkit-backdrop-filter: blur(14px);
             display: flex;
             align-items: center;
-            gap: 18px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            gap: 14px;
+            transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
             position: relative;
             overflow: hidden;
         }
@@ -323,13 +354,13 @@
         }
 
         .stat-icon {
-            width: 54px;
-            height: 54px;
-            border-radius: 15px;
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 22px;
+            font-size: 20px;
             flex-shrink: 0;
             position: relative;
             z-index: 1;
@@ -344,22 +375,26 @@
             position: relative;
             z-index: 1;
             min-width: 0;
+            flex: 1;
         }
 
         .stat-content h3 {
-            font-size: 26px;
+            font-size: clamp(16px, 2vw, 22px);
             font-weight: 800;
-            letter-spacing: -0.5px;
+            letter-spacing: -0.3px;
             color: #fff;
-            line-height: 1.1;
-            word-break: break-word;
+            line-height: 1.2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .stat-content p {
-            font-size: 13px;
+            font-size: 12px;
             color: var(--text-muted);
             font-weight: 500;
             margin-top: 2px;
+            white-space: nowrap;
         }
 
         /* ============ MAIN LAYOUT ============ */
@@ -410,7 +445,7 @@
             border: 1px solid rgba(255, 255, 255, 0.07);
             border-radius: 16px;
             padding: 20px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
             position: relative;
             overflow: hidden;
         }
@@ -443,7 +478,6 @@
             justify-content: space-between;
             margin-bottom: 16px;
             gap: 12px;
-            flex-wrap: wrap;
         }
 
         .acc-profile {
@@ -455,8 +489,8 @@
         }
 
         .acc-avatar {
-            width: 48px;
-            height: 48px;
+            width: 46px;
+            height: 46px;
             border-radius: 13px;
             background: linear-gradient(135deg, #1e293b, #334155);
             display: flex;
@@ -475,41 +509,56 @@
             flex: 1;
         }
 
-        .acc-info h4 {
-            font-size: 16px;
-            font-weight: 700;
-            color: #fff;
+        .acc-name-row {
             display: flex;
             align-items: center;
             gap: 8px;
+            margin-bottom: 4px;
             flex-wrap: wrap;
+        }
+
+        .acc-info h4 {
+            font-size: 14px;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.3;
+            word-break: break-word;
+        }
+
+        .region-badge-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 4px;
+            width: 100%;
         }
 
         .region-badge {
             background: rgba(165, 180, 252, 0.15);
             color: #a5b4fc;
-            padding: 2px 8px;
-            border-radius: 6px;
+            padding: 1px 6px;
+            border-radius: 5px;
             font-size: 10px;
             font-weight: 700;
             letter-spacing: 0.5px;
             border: 1px solid rgba(165, 180, 252, 0.25);
+            display: inline-block;
+            flex-shrink: 0;
         }
 
-        .acc-info span {
+        .acc-info span.uid-text {
             font-size: 12px;
             color: var(--text-muted);
             font-family: 'JetBrains Mono', monospace;
             display: block;
-            margin-top: 2px;
-            word-break: break-all;
         }
 
         .acc-status {
-            display: flex;
+            display: inline-flex;
             align-items: center;
             gap: 6px;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 700;
             padding: 5px 12px;
             border-radius: 20px;
@@ -554,7 +603,7 @@
             grid-template-columns: repeat(3, 1fr);
             gap: 10px;
             background: rgba(0, 0, 0, 0.3);
-            padding: 14px 16px;
+            padding: 12px 14px;
             border-radius: 12px;
             margin-bottom: 14px;
             border: 1px solid rgba(255, 255, 255, 0.04);
@@ -573,14 +622,17 @@
             text-transform: uppercase;
             font-weight: 600;
             letter-spacing: 0.5px;
+            white-space: nowrap;
         }
 
         .exp-val {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 700;
             font-family: 'JetBrains Mono', monospace;
             color: #fff;
-            word-break: break-word;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .exp-gained {
@@ -589,27 +641,31 @@
 
         .gained-badge {
             background: rgba(0, 255, 136, 0.16);
-            padding: 3px 8px;
+            padding: 2px 6px;
             border-radius: 6px;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 700;
             border: 1px solid rgba(0, 255, 136, 0.3);
             display: inline-block;
         }
 
-        /* ============ LEVEL PROGRESS ============ */
+        /* ============ LEVEL PROGRESS & CHIPS ============ */
         .level-progress {
             margin-bottom: 14px;
         }
 
         .level-labels {
             display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-            margin-bottom: 8px;
-            font-weight: 600;
+            align-items: center;
+            justify-content: flex-start;
             gap: 8px;
-            flex-wrap: wrap;
+            margin-bottom: 10px;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+        }
+
+        .level-labels::-webkit-scrollbar {
+            display: none;
         }
 
         .level-chip {
@@ -618,11 +674,13 @@
             gap: 6px;
             background: rgba(0, 242, 254, 0.1);
             color: var(--accent-cyan);
-            padding: 3px 10px;
+            padding: 4px 10px;
             border-radius: 8px;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 700;
             border: 1px solid rgba(0, 242, 254, 0.25);
+            white-space: nowrap;
+            flex-shrink: 0;
         }
 
         .target-chip {
@@ -631,11 +689,28 @@
             gap: 6px;
             background: rgba(255, 170, 0, 0.1);
             color: var(--accent-amber);
-            padding: 3px 10px;
+            padding: 4px 10px;
             border-radius: 8px;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 700;
             border: 1px solid rgba(255, 170, 0, 0.25);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .match-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0, 255, 136, 0.1);
+            color: var(--accent-green);
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            border: 1px solid rgba(0, 255, 136, 0.25);
+            white-space: nowrap;
+            flex-shrink: 0;
         }
 
         .progress-bar-bg {
@@ -651,7 +726,7 @@
             background: linear-gradient(90deg, var(--accent-cyan), var(--accent-green), var(--accent-cyan));
             background-size: 200% 100%;
             border-radius: 10px;
-            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: width 0.4s ease-out;
             animation: progress-shine 3s infinite linear;
             box-shadow: 0 0 12px rgba(0, 242, 254, 0.5);
         }
@@ -954,6 +1029,369 @@
             font-size: 14px;
         }
 
+        /* ============================================================ */
+        /* ============ WELCOME NOTICE MODAL (COMPACT) ============ */
+        /* ============================================================ */
+        .notice-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(3, 6, 15, 0.92);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            padding: 14px;
+            overflow-y: auto;
+        }
+
+        .notice-overlay.active {
+            display: flex;
+        }
+
+        .notice-card {
+            background: linear-gradient(135deg, #0a0f1f 0%, #101830 50%, #0d1428 100%);
+            border: 1px solid rgba(0, 242, 254, 0.25);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 440px;
+            padding: 0;
+            box-shadow:
+                0 20px 50px rgba(0, 0, 0, 0.85),
+                0 0 45px rgba(0, 242, 254, 0.15),
+                inset 0 0 20px rgba(0, 242, 254, 0.04);
+            position: relative;
+            overflow: hidden;
+            animation: notice-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes notice-in {
+            0% { opacity: 0; transform: scale(0.88) translateY(20px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .notice-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg,
+                transparent,
+                var(--accent-cyan),
+                var(--accent-pink),
+                var(--accent-purple),
+                var(--accent-cyan),
+                transparent);
+            background-size: 200% 100%;
+            animation: notice-scan 3s infinite linear;
+        }
+
+        @keyframes notice-scan {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+
+        .notice-header {
+            padding: 20px 20px 14px;
+            text-align: center;
+            position: relative;
+            border-bottom: 1px solid rgba(0, 242, 254, 0.1);
+            background: radial-gradient(ellipse at top, rgba(0, 242, 254, 0.08) 0%, transparent 70%);
+        }
+
+        .notice-icon-wrap {
+            width: 52px;
+            height: 52px;
+            margin: 0 auto 10px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple), var(--accent-pink));
+            background-size: 200% 200%;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            color: #fff;
+            box-shadow:
+                0 0 25px rgba(0, 242, 254, 0.45),
+                0 0 45px rgba(127, 0, 255, 0.25),
+                inset 0 0 14px rgba(255, 255, 255, 0.15);
+            animation: notice-icon-glow 3s infinite alternate, gradient-shift 5s infinite;
+        }
+
+        @keyframes notice-icon-glow {
+            0% {
+                box-shadow: 0 0 20px rgba(0, 242, 254, 0.35),
+                            0 0 35px rgba(127, 0, 255, 0.2),
+                            inset 0 0 14px rgba(255, 255, 255, 0.15);
+            }
+            100% {
+                box-shadow: 0 0 32px rgba(0, 242, 254, 0.6),
+                            0 0 55px rgba(255, 45, 149, 0.3),
+                            inset 0 0 18px rgba(255, 255, 255, 0.25);
+            }
+        }
+
+        .notice-header h2 {
+            font-size: 17px;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+            background: linear-gradient(90deg, #ffffff, var(--accent-cyan), var(--accent-pink));
+            background-size: 200% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: text-shine 4s infinite linear;
+            margin-bottom: 4px;
+        }
+
+        .notice-header p {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 500;
+            letter-spacing: 0.4px;
+        }
+
+        .notice-body {
+            padding: 14px 18px 12px;
+        }
+
+        .notice-section {
+            margin-bottom: 12px;
+        }
+
+        .notice-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .notice-section-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 8px;
+            padding-bottom: 6px;
+            border-bottom: 1px dashed rgba(0, 242, 254, 0.15);
+        }
+
+        .notice-section-title i {
+            width: 22px;
+            height: 22px;
+            border-radius: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            flex-shrink: 0;
+        }
+
+        .notice-section-title .icon-supported {
+            background: rgba(0, 255, 136, 0.15);
+            color: var(--accent-green);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+        }
+
+        .notice-section-title .icon-unsupported {
+            background: rgba(255, 51, 102, 0.15);
+            color: var(--accent-red);
+            border: 1px solid rgba(255, 51, 102, 0.3);
+        }
+
+        .notice-section-title .icon-contact {
+            background: rgba(0, 242, 254, 0.15);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(0, 242, 254, 0.3);
+        }
+
+        .region-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 6px;
+        }
+
+        .region-chip {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            padding: 6px 4px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 0.3px;
+            transition: transform 0.2s;
+            text-align: center;
+        }
+
+        .region-chip.allowed {
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.12), rgba(0, 200, 100, 0.06));
+            color: var(--accent-green);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.08) inset;
+        }
+
+        .region-chip.allowed:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 0 14px rgba(0, 255, 136, 0.22);
+        }
+
+        .region-chip.allowed i {
+            color: var(--accent-green);
+            font-size: 8px;
+        }
+
+        .region-chip.blocked {
+            background: linear-gradient(135deg, rgba(255, 51, 102, 0.08), rgba(150, 20, 50, 0.04));
+            color: rgba(255, 51, 102, 0.55);
+            border: 1px solid rgba(255, 51, 102, 0.18);
+            text-decoration: line-through;
+        }
+
+        .region-chip.blocked i {
+            color: rgba(255, 51, 102, 0.5);
+            font-size: 8px;
+        }
+
+        .notice-telegram {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            background: linear-gradient(135deg, rgba(0, 136, 204, 0.12), rgba(0, 100, 200, 0.06));
+            border: 1px solid rgba(0, 160, 255, 0.3);
+            border-radius: 11px;
+            text-decoration: none;
+            transition: all 0.25s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .notice-telegram::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 160, 255, 0.15), transparent);
+            transition: left 0.6s;
+        }
+
+        .notice-telegram:hover::before {
+            left: 100%;
+        }
+
+        .notice-telegram:hover {
+            background: linear-gradient(135deg, rgba(0, 136, 204, 0.2), rgba(0, 100, 200, 0.12));
+            border-color: rgba(0, 180, 255, 0.6);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(0, 160, 255, 0.22);
+        }
+
+        .tg-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #229ED9, #0088cc);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: #fff;
+            flex-shrink: 0;
+            box-shadow: 0 0 14px rgba(0, 160, 255, 0.4);
+        }
+
+        .tg-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .tg-info h4 {
+            font-size: 12px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 2px;
+        }
+
+        .tg-info p {
+            font-size: 11px;
+            color: #7dd3fc;
+            font-family: 'JetBrains Mono', monospace;
+            word-break: break-all;
+        }
+
+        .tg-arrow {
+            font-size: 13px;
+            color: rgba(0, 180, 255, 0.7);
+            flex-shrink: 0;
+            transition: transform 0.25s;
+        }
+
+        .notice-telegram:hover .tg-arrow {
+            transform: translateX(3px);
+            color: #38bdf8;
+        }
+
+        .notice-footer {
+            padding: 12px 18px 18px;
+            text-align: center;
+        }
+
+        .notice-ok-btn {
+            width: 100%;
+            padding: 12px 18px;
+            border: none;
+            border-radius: 11px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue), var(--accent-purple));
+            background-size: 200% 200%;
+            color: #040914;
+            font-size: 13px;
+            font-weight: 800;
+            font-family: 'Outfit', sans-serif;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 6px 20px rgba(0, 242, 254, 0.35);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            animation: gradient-shift 4s infinite;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .notice-ok-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.6s;
+        }
+
+        .notice-ok-btn:hover::before {
+            left: 100%;
+        }
+
+        .notice-ok-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 32px rgba(0, 242, 254, 0.55);
+        }
+
+        .notice-ok-btn:active {
+            transform: translateY(0) scale(0.98);
+        }
+
         /* ============ TABLET ============ */
         @media (max-width: 1024px) {
             .dashboard-main {
@@ -1001,6 +1439,16 @@
                 font-size: 13px;
             }
 
+            .btn-logout {
+                padding: 10px 12px;
+                font-size: 13px;
+                flex: 0 0 auto;
+            }
+
+            .btn-logout span {
+                display: none;
+            }
+
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
                 gap: 12px;
@@ -1008,24 +1456,24 @@
             }
 
             .stat-card {
-                padding: 14px;
+                padding: 12px;
                 border-radius: 14px;
-                gap: 12px;
+                gap: 10px;
             }
 
             .stat-icon {
-                width: 42px;
-                height: 42px;
-                font-size: 17px;
-                border-radius: 12px;
+                width: 40px;
+                height: 40px;
+                font-size: 16px;
+                border-radius: 10px;
             }
 
             .stat-content h3 {
-                font-size: 18px;
+                font-size: 15px;
             }
 
             .stat-content p {
-                font-size: 11px;
+                font-size: 10px;
             }
 
             .card-box {
@@ -1038,31 +1486,31 @@
             }
 
             .account-card {
-                padding: 16px;
+                padding: 14px;
                 border-radius: 14px;
             }
 
             .acc-avatar {
-                width: 42px;
-                height: 42px;
+                width: 40px;
+                height: 40px;
                 font-size: 15px;
             }
 
             .acc-info h4 {
-                font-size: 14px;
+                font-size: 13px;
             }
 
-            .acc-info span {
+            .acc-info span.uid-text {
                 font-size: 11px;
             }
 
             .exp-box {
-                padding: 12px;
-                gap: 8px;
+                padding: 10px;
+                gap: 6px;
             }
 
             .exp-val {
-                font-size: 13px;
+                font-size: 12px;
             }
 
             .exp-label {
@@ -1084,14 +1532,112 @@
             .modal-header h3 {
                 font-size: 16px;
             }
+
+            /* Notice mobile - even more compact */
+            .notice-card {
+                border-radius: 16px;
+                max-width: 100%;
+            }
+
+            .notice-header {
+                padding: 16px 16px 12px;
+            }
+
+            .notice-icon-wrap {
+                width: 44px;
+                height: 44px;
+                font-size: 18px;
+                border-radius: 13px;
+                margin-bottom: 8px;
+            }
+
+            .notice-header h2 {
+                font-size: 15px;
+            }
+
+            .notice-header p {
+                font-size: 10px;
+            }
+
+            .notice-body {
+                padding: 12px 14px 10px;
+            }
+
+            .notice-section {
+                margin-bottom: 10px;
+            }
+
+            .notice-section-title {
+                font-size: 11px;
+                margin-bottom: 6px;
+                padding-bottom: 5px;
+                gap: 6px;
+            }
+
+            .notice-section-title i {
+                width: 20px;
+                height: 20px;
+                font-size: 9px;
+            }
+
+            .region-grid {
+                grid-template-columns: repeat(5, 1fr);
+                gap: 4px;
+            }
+
+            .region-chip {
+                padding: 5px 2px;
+                font-size: 9px;
+                border-radius: 6px;
+                gap: 3px;
+            }
+
+            .region-chip i {
+                font-size: 7px;
+            }
+
+            .notice-telegram {
+                padding: 8px 10px;
+                gap: 8px;
+                border-radius: 9px;
+            }
+
+            .tg-icon {
+                width: 30px;
+                height: 30px;
+                font-size: 14px;
+                border-radius: 8px;
+            }
+
+            .tg-info h4 {
+                font-size: 11px;
+            }
+
+            .tg-info p {
+                font-size: 10px;
+            }
+
+            .notice-footer {
+                padding: 10px 14px 14px;
+            }
+
+            .notice-ok-btn {
+                padding: 11px 16px;
+                font-size: 12px;
+                border-radius: 10px;
+            }
         }
 
         @media (max-width: 420px) {
             .stats-grid {
-                grid-template-columns: 1fr 1fr;
+                grid-template-columns: repeat(2, 1fr);
             }
             .brand-text p span:not(.live-tag) {
                 display: none;
+            }
+
+            .region-grid {
+                grid-template-columns: repeat(5, 1fr);
             }
         }
 
@@ -1113,6 +1659,89 @@
     </style>
 </head>
 <body>
+
+    <!-- ============================================================ -->
+    <!-- ============ WELCOME NOTICE MODAL ============ -->
+    <!-- ============================================================ -->
+    <div class="notice-overlay" id="welcome-notice">
+        <div class="notice-card">
+
+            <div class="notice-header">
+                <div class="notice-icon-wrap">
+                    <i class="fa-solid fa-bullhorn"></i>
+                </div>
+                <h2>WELCOME TO CODEX YASIN</h2>
+                <p>Free Fire Level Up Bot — Important Notice</p>
+            </div>
+
+            <div class="notice-body">
+
+                <!-- SUPPORTED REGIONS -->
+                <div class="notice-section">
+                    <div class="notice-section-title">
+                        <i class="fa-solid fa-circle-check icon-supported"></i>
+                        <span>Supported Regions (Allowed)</span>
+                    </div>
+                    <div class="region-grid">
+                        <div class="region-chip allowed"><i class="fa-solid fa-check"></i> BD</div>
+                        <div class="region-chip allowed"><i class="fa-solid fa-check"></i> IND</div>
+                        <div class="region-chip allowed"><i class="fa-solid fa-check"></i> SG</div>
+                        <div class="region-chip allowed"><i class="fa-solid fa-check"></i> TH</div>
+                        <div class="region-chip allowed"><i class="fa-solid fa-check"></i> PH</div>
+                        <div class="region-chip allowed"><i class="fa-solid fa-check"></i> VN</div>
+                        <div class="region-chip allowed"><i class="fa-solid fa-check"></i> MY</div>
+                        <div class="region-chip allowed"><i class="fa-solid fa-check"></i> ID</div>
+                        <div class="region-chip allowed"><i class="fa-solid fa-check"></i> HK</div>
+                        <div class="region-chip allowed"><i class="fa-solid fa-check"></i> TW</div>
+                    </div>
+                </div>
+
+                <!-- UNSUPPORTED REGIONS -->
+                <div class="notice-section">
+                    <div class="notice-section-title">
+                        <i class="fa-solid fa-circle-xmark icon-unsupported"></i>
+                        <span>Unsupported Regions (Not Allowed)</span>
+                    </div>
+                    <div class="region-grid">
+                        <div class="region-chip blocked"><i class="fa-solid fa-xmark"></i> BR</div>
+                        <div class="region-chip blocked"><i class="fa-solid fa-xmark"></i> RU</div>
+                        <div class="region-chip blocked"><i class="fa-solid fa-xmark"></i> US</div>
+                        <div class="region-chip blocked"><i class="fa-solid fa-xmark"></i> EU</div>
+                        <div class="region-chip blocked"><i class="fa-solid fa-xmark"></i> MENA</div>
+                        <div class="region-chip blocked"><i class="fa-solid fa-xmark"></i> SAC</div>
+                    </div>
+                </div>
+
+                <!-- TELEGRAM CONTACT -->
+                <div class="notice-section">
+                    <div class="notice-section-title">
+                        <i class="fa-solid fa-headset icon-contact"></i>
+                        <span>Contact / New Update</span>
+                    </div>
+                    <a href="https://t.me/freefireob51" target="_blank" rel="noopener noreferrer" class="notice-telegram">
+                        <div class="tg-icon">
+                            <i class="fa-brands fa-telegram"></i>
+                        </div>
+                        <div class="tg-info">
+                            <h4>Telegram Support</h4>
+                            <p>https://t.me/freefireob51</p>
+                        </div>
+                        <i class="fa-solid fa-arrow-up-right-from-square tg-arrow"></i>
+                    </a>
+                </div>
+
+            </div>
+
+            <div class="notice-footer">
+                <button class="notice-ok-btn" onclick="closeNotice()">
+                    <i class="fa-solid fa-check-circle"></i>
+                    OK, I Understand
+                </button>
+            </div>
+
+        </div>
+    </div>
+
     <div class="container">
         <!-- Header -->
         <header>
@@ -1121,7 +1750,7 @@
                     <i class="fa-solid fa-bolt"></i>
                 </div>
                 <div class="brand-text">
-                    <h1>CODEX YASIN <span style="font-weight:400; color:var(--text-muted); font-size:14px;">| LEVEL UP BOT</span></h1>
+                    <h1>CODEX YASIN <span style="font-weight:400; color:var(--text-muted); font-size:14px;">| AUTO LEVEL UP BOT</span></h1>
                     <p>
                         <span class="live-tag"><span class="pulse-dot"></span> System Live</span>
                         <span>• Target Level Auto-Stop Engine</span>
@@ -1131,6 +1760,10 @@
             <div class="header-actions">
                 <button class="btn btn-secondary" onclick="fetchStats()"><i class="fa-solid fa-rotate"></i> Refresh</button>
                 <button class="btn btn-primary" onclick="openAddModal()"><i class="fa-solid fa-plus"></i> Add Account</button>
+                <button class="btn-logout" onclick="logout()" title="Logout">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Logout</span>
+                </button>
             </div>
         </header>
 
@@ -1223,7 +1856,7 @@
                     </div>
                     <div class="form-group">
                         <label>Guest Password / Secret</label>
-                        <input type="text" class="form-input" id="acc-password" placeholder="e.g. ZERO_GRAVITY_4NM38">
+                        <input type="text" class="form-input" id="acc-password" placeholder="e.g. YASIN_BHAI_6767">
                     </div>
                 </div>
 
@@ -1253,7 +1886,7 @@
                     </div>
                     <div class="level-hint">
                         <i class="fa-solid fa-circle-info"></i>
-                        <span>বট এই লেভেলে পৌঁছালে অটোমেটিক বন্ধ হয়ে যাবে। সর্বনিম্ন ৩, সর্বোচ্চ ১০০।</span>
+                        <span>Bot will auto-stop when the target level is reached. Minimum 3, Maximum 100?</span>
                     </div>
                 </div>
 
@@ -1266,7 +1899,7 @@
     </div>
 
     <script>
-        // Persistent Uptime Storage Logic using localStorage
+        let isFetching = false;
         let startTime = localStorage.getItem('bot_start_time');
         if (!startTime) {
             startTime = Date.now();
@@ -1275,9 +1908,40 @@
             startTime = parseInt(startTime);
         }
 
+        // ============================================================
+        // 🔥 WELCOME NOTICE LOGIC
+        // ============================================================
+        // Shows on every fresh login, hides after OK click, stays hidden on refresh.
+        // SessionStorage is used so logout → login shows it again, but refresh doesn't.
+        // ============================================================
+        (function initNotice() {
+            const notice = document.getElementById('welcome-notice');
+            const seen = sessionStorage.getItem('welcome_notice_seen');
+
+            if (!seen) {
+                // Slight delay for smooth entry after page paint
+                setTimeout(() => {
+                    notice.classList.add('active');
+                }, 300);
+            }
+        })();
+
+        function closeNotice() {
+            const notice = document.getElementById('welcome-notice');
+            notice.classList.remove('active');
+            sessionStorage.setItem('welcome_notice_seen', '1');
+        }
+
+        // ============ LOGOUT ============
+        function logout() {
+            if (!confirm('Are you sure you want to logout?')) return;
+            // 🔥 Clear notice flag so it appears again after next login
+            sessionStorage.removeItem('welcome_notice_seen');
+            window.location.href = '/logout';
+        }
+
         function openAddModal() {
             document.getElementById('add-modal').classList.add('active');
-            // Reset quick level selection
             document.querySelectorAll('.quick-level-btn').forEach(b => b.classList.remove('active'));
             const lv10 = document.querySelector('.quick-level-btn[data-level="10"]');
             if (lv10) lv10.classList.add('active');
@@ -1301,7 +1965,6 @@
             else if (val > 100) input.value = 100;
             else input.value = val;
 
-            // Update quick level buttons
             document.querySelectorAll('.quick-level-btn').forEach(b => {
                 b.classList.toggle('active', parseInt(b.dataset.level) === parseInt(input.value));
             });
@@ -1359,13 +2022,17 @@
             }
         }
 
-        async function deleteAccount(uid) {
-            if (!confirm('আপনি কি নিশ্চিত অ্যাকাউন্ট ' + uid + ' ডিলিট করতে চান?\n\nবট সাথে সাথে অফলাইন হয়ে যাবে এবং অ্যাকাউন্ট পুরোপুরি মুছে যাবে।')) return;
+        async function deleteAccount(uid, token) {
+            const label = uid || (token ? token.substring(0, 10) + '...' : 'this account');
+            if (!confirm('Are you sure you want to delete account ' + label + '?\n\nThe bot will go offline immediately and the account will be permanently removed.')) return;
             try {
-                const res = await fetch('/api/account/delete', {
+                const payload = {};
+                if (uid) payload.uid = uid;
+                if (token) payload.token = token;
+                await fetch('/api/account/delete', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ uid })
+                    body: JSON.stringify(payload)
                 });
                 fetchStats();
             } catch (err) {
@@ -1387,17 +2054,32 @@
         }
 
         async function fetchStats() {
+            if (isFetching) return;
+            isFetching = true;
             try {
                 const res = await fetch('/api/stats');
+                if (res.status === 401) {
+                    window.location.href = '/login';
+                    return;
+                }
                 const data = await res.json();
 
-                document.getElementById('stat-total-accounts').innerText = data.total_accounts;
-                document.getElementById('stat-total-exp').innerText = '+' + (data.total_gained_exp || 0).toLocaleString() + ' EXP';
-                document.getElementById('stat-total-matches').innerText = data.total_matches;
+                const activeAccounts = data.accounts || [];
 
-                // Render Accounts
+                let currentTotalExp = 0;
+                let currentTotalMatches = 0;
+
+                activeAccounts.forEach(acc => {
+                    currentTotalExp += (acc.gained_exp || 0);
+                    currentTotalMatches += (acc.matches_played || 0);
+                });
+
+                document.getElementById('stat-total-accounts').innerText = activeAccounts.length;
+                document.getElementById('stat-total-exp').innerText = '+' + currentTotalExp.toLocaleString() + ' EXP';
+                document.getElementById('stat-total-matches').innerText = currentTotalMatches;
+
                 const container = document.getElementById('accounts-container');
-                if (!data.accounts || data.accounts.length === 0) {
+                if (activeAccounts.length === 0) {
                     container.innerHTML = `
                         <div class="empty-state">
                             <i class="fa-solid fa-ghost"></i>
@@ -1405,7 +2087,7 @@
                         </div>
                     `;
                 } else {
-                    container.innerHTML = data.accounts.map(acc => {
+                    container.innerHTML = activeAccounts.map(acc => {
                         const gainedExp = acc.gained_exp || 0;
                         const targetLevel = acc.target_level || 100;
                         const currentLevel = acc.level || 1;
@@ -1428,12 +2110,11 @@
                             statusText = 'Error';
                         }
 
-                        // Level progress relative to target
-                        const baseLevel = Math.max(1, targetLevel - 1);
-                        const levelProgress = Math.min(100, Math.max(0,
-                            ((currentLevel - (currentLevel > 1 ? currentLevel - 1 : 0)) / Math.max(1, targetLevel - currentLevel + 1)) * 100
-                        ));
                         const displayProgress = Math.min(100, Math.max(5, (currentLevel / targetLevel) * 100));
+
+                        // 🔥 Pass both uid and token to delete function for token-based accounts
+                        const deleteUid = acc.uid ? acc.uid : '';
+                        const deleteToken = acc.token ? acc.token : '';
 
                         return `
                             <div class="account-card ${levelReached ? 'target-reached' : ''}">
@@ -1441,13 +2122,18 @@
                                     <div class="acc-profile">
                                         <div class="acc-avatar"><i class="fa-solid fa-user"></i></div>
                                         <div class="acc-info">
-                                            <h4>${escapeHtml(acc.nickname)} <span class="region-badge">${acc.region || 'BD'}</span></h4>
-                                            <span>UID: ${acc.uid}</span>
+                                            <div class="acc-name-row">
+                                                <h4>${escapeHtml(acc.nickname)}</h4>
+                                            </div>
+                                            <div class="region-badge-row">
+                                                <span class="region-badge">${acc.region || 'BD'}</span>
+                                                <div class="acc-status ${statusClass}">
+                                                    ${!levelReached && acc.status === 'IN_MATCH' ? '<span class="pulse-dot"></span>' : ''}
+                                                    <span>${statusText}</span>
+                                                </div>
+                                            </div>
+                                            <span class="uid-text">UID: ${acc.uid}</span>
                                         </div>
-                                    </div>
-                                    <div class="acc-status ${statusClass}">
-                                        ${!levelReached && acc.status === 'IN_MATCH' ? '<span class="pulse-dot"></span>' : ''}
-                                        <span>${statusText}</span>
                                     </div>
                                 </div>
 
@@ -1472,7 +2158,7 @@
                                     <div class="level-labels">
                                         <span class="level-chip"><i class="fa-solid fa-star"></i> Lv ${currentLevel}</span>
                                         <span class="target-chip"><i class="fa-solid fa-bullseye"></i> Target Lv ${targetLevel}</span>
-                                        <span style="color:var(--text-muted); font-size:11px;">Matches: ${acc.matches_played || 0}</span>
+                                        <span class="match-chip"><i class="fa-solid fa-gamepad"></i> Matches: ${acc.matches_played || 0}</span>
                                     </div>
                                     <div class="progress-bar-bg">
                                         <div class="progress-bar-fill" style="width: ${displayProgress}%"></div>
@@ -1483,7 +2169,7 @@
                                     <span>Last match: ${acc.last_match_time || 'Running...'}</span>
                                     <div class="action-btns">
                                         <button class="icon-btn" title="Refresh Profile/EXP" onclick="refreshAccountInfo('${acc.uid}')"><i class="fa-solid fa-rotate"></i></button>
-                                        <button class="icon-btn danger" title="Delete Account" onclick="deleteAccount('${acc.uid}')"><i class="fa-solid fa-trash"></i></button>
+                                        <button class="icon-btn danger" title="Delete Account" onclick="deleteAccount('${deleteUid}', '${deleteToken}')"><i class="fa-solid fa-trash"></i></button>
                                     </div>
                                 </div>
                             </div>
@@ -1491,17 +2177,21 @@
                     }).join('');
                 }
 
-                // Render Logs
                 const logContainer = document.getElementById('log-stream');
                 if (data.logs && data.logs.length > 0) {
+                    const shouldScroll = logContainer.scrollTop + logContainer.clientHeight >= logContainer.scrollHeight - 50;
                     logContainer.innerHTML = data.logs.map(log => {
                         return `<div class="log-item"><span class="log-time">[${log.time}]</span><span class="log-${log.level}">${escapeHtml(log.message)}</span></div>`;
                     }).join('');
-                    logContainer.scrollTop = logContainer.scrollHeight;
+                    if (shouldScroll) {
+                        logContainer.scrollTop = logContainer.scrollHeight;
+                    }
                 }
 
             } catch (err) {
                 console.error("Failed to fetch stats:", err);
+            } finally {
+                isFetching = false;
             }
         }
 
@@ -1515,7 +2205,6 @@
                 .replace(/'/g, '&#039;');
         }
 
-        // Uptime counter
         setInterval(() => {
             const sec = Math.floor((Date.now() - startTime) / 1000);
             const h = String(Math.floor(sec / 3600)).padStart(2, '0');
@@ -1524,14 +2213,12 @@
             document.getElementById('stat-uptime').innerText = `${h}:${m}:${s}`;
         }, 1000);
 
-        // Close modal on overlay click
         document.getElementById('add-modal').addEventListener('click', function(e) {
             if (e.target === this) closeAddModal();
         });
 
-        // Live Poll every 2.5s
         fetchStats();
-        setInterval(fetchStats, 2500);
+        setInterval(fetchStats, 1000);
     </script>
 </body>
 </html>

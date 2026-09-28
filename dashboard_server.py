@@ -24,6 +24,9 @@ os.makedirs(USER_DATA_DIR, exist_ok=True)
 
 ADMIN_PASSWORD = "YASIN-6767"
 
+# 🔥 ব্লক持续时间 (秒) — ৫ মিনিট
+BLOCK_DURATION_SECONDS = 300
+
 
 # ==================== PER-USER BOT STATE ====================
 class BotState:
@@ -213,6 +216,7 @@ class UserManager:
                 with open(path, "r", encoding="utf-8") as f:
                     data = json.load(f)
                     if isinstance(data, dict):
+                        # backward compat: "blocked" may be list of strings
                         return data
             except Exception:
                 pass
@@ -243,20 +247,87 @@ class UserManager:
             return True
         return False
 
+    # ============================================================
+    # 🔥 TEMPORARY BLOCK (5 minutes) — NOT PERMANENT
+    # ============================================================
+    def _normalize_blocked_list(self, data: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """Ensure 'blocked' is a list of dicts: {id, blocked_at}."""
+        blocked = data.get("blocked", [])
+        normalized = []
+        for item in blocked:
+            if isinstance(item, dict) and "id" in item:
+                normalized.append({
+                    "id": str(item["id"]),
+                    "blocked_at": float(item.get("blocked_at", 0))
+                })
+            elif isinstance(item, str):
+                # backward compat: old string entries → treat as blocked now
+                normalized.append({"id": item, "blocked_at": time.time()})
+        return normalized
+
     def mark_account_blocked(self, user_id: str, identifier: str):
-        """🔥 Mark account as blocked after 3 login failures."""
+        """🔥 Mark account as TEMPORARILY blocked (5 min) after 3 login failures."""
         data = self.load_deleted_accounts(user_id)
-        if identifier not in data["blocked"]:
-            data["blocked"].append(identifier)
+        blocked_list = self._normalize_blocked_list(data)
+
+        # remove existing entry for this identifier
+        blocked_list = [b for b in blocked_list if b["id"] != identifier]
+        blocked_list.append({
+            "id": identifier,
+            "blocked_at": time.time()
+        })
+        data["blocked"] = blocked_list
         self.save_deleted_accounts(user_id, data)
-        # Also add to state's blocked set
+
+        # also add to state's blocked set
         state = self.get_state(user_id)
         state.blocked_accounts.add(identifier)
 
     def is_account_blocked(self, user_id: str, identifier: str) -> bool:
-        """Check if account is blocked due to repeated login failures."""
+        """
+        🔥 Check if account is TEMPORARILY blocked.
+        Auto-unblocks after BLOCK_DURATION_SECONDS.
+        """
         data = self.load_deleted_accounts(user_id)
-        return identifier in data.get("blocked", [])
+        blocked_list = self._normalize_blocked_list(data)
+
+        now = time.time()
+        still_blocked = False
+        updated_list = []
+        removed = False
+
+        for b in blocked_list:
+            if b["id"] == identifier:
+                if now - b["blocked_at"] < BLOCK_DURATION_SECONDS:
+                    still_blocked = True
+                    updated_list.append(b)
+                else:
+                    # 🔥 expired → remove
+                    removed = True
+            else:
+                updated_list.append(b)
+
+        if removed:
+            data["blocked"] = updated_list
+            self.save_deleted_accounts(user_id, data)
+            # remove from state's set
+            state = self.get_state(user_id)
+            state.blocked_accounts.discard(identifier)
+            state.login_failures.pop(identifier, None)
+
+        return still_blocked
+
+    def get_blocked_remaining_seconds(self, user_id: str, identifier: str) -> int:
+        """Return remaining seconds of block, or 0 if not blocked."""
+        data = self.load_deleted_accounts(user_id)
+        blocked_list = self._normalize_blocked_list(data)
+        now = time.time()
+        for b in blocked_list:
+            if b["id"] == identifier:
+                elapsed = now - b["blocked_at"]
+                remaining = BLOCK_DURATION_SECONDS - elapsed
+                return max(0, int(remaining))
+        return 0
 
     @staticmethod
     def _user_profile_file(user_id: str) -> str:
@@ -520,10 +591,8 @@ async def handle_get_stats(request: web.Request) -> web.Response:
 async def handle_add_account(request: web.Request) -> web.Response:
     """
     User-side add account.
-    🔥 FIXED: 
-    - If account was deleted by this user, it can be re-added (deleted list cleared).
-    - If account is blocked (3 login failures), cannot be added.
-    - 🔥 CRITICAL: Admin panel entry is NOT created here. Only created after SUCCESSFUL login.
+    🔥 TEMPORARY BLOCK: If blocked (3 login failures), returns remaining minutes.
+    Auto-unblocks after 5 minutes.
     """
     try:
         user_id = request["user_id"]
@@ -545,11 +614,15 @@ async def handle_add_account(request: web.Request) -> web.Response:
             if not uid or not pwd:
                 return web.json_response({"status": "error", "error": "UID and Password are required"})
 
-            # 🔥 Check if blocked (3 login failures)
-            if user_manager.is_account_blocked(user_id, f"uid_{uid}"):
+            block_key = f"uid_{uid}"
+
+            # 🔥 Check if TEMPORARILY blocked
+            if user_manager.is_account_blocked(user_id, block_key):
+                remaining = user_manager.get_blocked_remaining_seconds(user_id, block_key)
+                mins = max(1, (remaining + 59) // 60)
                 return web.json_response({
                     "status": "error",
-                    "error": "This UID is blocked due to 3 consecutive login failures. Cannot re-add."
+                    "error": f"This UID is temporarily blocked for {mins} more minute(s) due to 3 consecutive login failures. Please try again later."
                 })
 
             # 🔥 If previously deleted by this user, remove from deleted list (allow re-add)
@@ -558,33 +631,33 @@ async def handle_add_account(request: web.Request) -> web.Response:
                 deleted_data["uids"].remove(uid)
                 user_manager.save_deleted_accounts(user_id, deleted_data)
 
-            # 🔥 REMOVED: _admin_add_guest() call here — admin entry is created only after successful login
-            # The login process (account_loop_guest) will call _admin_add_guest after success.
-
             existing = user_manager.load_user_accounts(user_id)
             existing = [acc for acc in existing if str(acc.get("uid")) != uid]
             existing.append({
                 "uid": uid,
                 "password": pwd,
                 "target_level": target_level
-                # admin_id will be added after successful login
             })
             user_manager.save_user_accounts(user_id, existing)
 
             state.set_target_level(uid, target_level)
-            # Reset login failure counter
-            state.login_failures.pop(f"uid_{uid}", None)
+            # Reset login failure counter on new add
+            state.login_failures.pop(block_key, None)
 
         elif "token" in data:
             token = str(data["token"]).strip()
             if not token:
                 return web.json_response({"status": "error", "error": "Token is required"})
 
-            # 🔥 Check if blocked (3 login failures)
-            if user_manager.is_account_blocked(user_id, f"tok_{token[:20]}"):
+            block_key = f"tok_{token[:20]}"
+
+            # 🔥 Check if TEMPORARILY blocked
+            if user_manager.is_account_blocked(user_id, block_key):
+                remaining = user_manager.get_blocked_remaining_seconds(user_id, block_key)
+                mins = max(1, (remaining + 59) // 60)
                 return web.json_response({
                     "status": "error",
-                    "error": "This token is blocked due to 3 consecutive login failures. Cannot re-add."
+                    "error": f"This token is temporarily blocked for {mins} more minute(s) due to 3 consecutive login failures. Please try again later."
                 })
 
             # 🔥 If previously deleted by this user, remove from deleted list (allow re-add)
@@ -593,19 +666,16 @@ async def handle_add_account(request: web.Request) -> web.Response:
                 deleted_data["tokens"].remove(token)
                 user_manager.save_deleted_accounts(user_id, deleted_data)
 
-            # 🔥 REMOVED: _admin_add_token() call here — admin entry is created only after successful login
-
             existing = user_manager.load_user_accounts(user_id)
             existing = [acc for acc in existing if acc.get("token") != token]
             existing.append({
                 "token": token,
                 "target_level": target_level
-                # admin_id will be added after successful login
             })
             user_manager.save_user_accounts(user_id, existing)
 
             state.set_target_level(token[:10], target_level)
-            state.login_failures.pop(f"tok_{token[:20]}", None)
+            state.login_failures.pop(block_key, None)
         else:
             return web.json_response({"status": "error", "error": "Invalid payload"})
 

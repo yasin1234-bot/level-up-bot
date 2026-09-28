@@ -2180,19 +2180,30 @@ async def run_account_worker(account_data: Dict, label: str, target_level: int =
                     pass
 
 
+# ============================================================
+# 🔥 account_loop_guest — TEMPORARY BLOCK (5 min) after 3 failures
+# ============================================================
 async def account_loop_guest(uid: str, password: str, target_level: int = 100, user_id: str = ""):
     state = user_manager.get_state(user_id)
     failure_key = f"uid_{uid}"
 
     while True:
-        # 🔥 CRITICAL FIX: Check deleted/blocked at the TOP of every iteration
+        # 🔥 CRITICAL FIX: Check deleted at the TOP of every iteration
         if user_manager.is_account_deleted(user_id, uid=uid):
             print_warning(f"[DELETED] Guest UID {uid} was deleted by user → stopping loop.", user_id)
             return
 
+        # 🔥 Check TEMPORARY block
         if user_manager.is_account_blocked(user_id, failure_key):
-            print_error(f"[BLOCKED] Guest UID {uid} is blocked due to {MAX_LOGIN_FAILURES} login failures → stopping loop.", user_id)
-            return
+            remaining = user_manager.get_blocked_remaining_seconds(user_id, failure_key)
+            mins = max(1, (remaining + 59) // 60)
+            print_error(
+                f"[BLOCKED] Guest UID {uid} is temporarily blocked for {mins} more minute(s). "
+                f"Loop will sleep and retry after block expires.",
+                user_id
+            )
+            await asyncio.sleep(remaining + 5)
+            continue
 
         try:
             print_info(f"[LOGIN] Starting login for Guest UID: {uid} (Target Lv {target_level})...", user_id)
@@ -2210,17 +2221,22 @@ async def account_loop_guest(uid: str, password: str, target_level: int = 100, u
                 print_error(f"Login failed for UID: {uid} ({fail_count}/{MAX_LOGIN_FAILURES})", user_id)
 
                 if fail_count >= MAX_LOGIN_FAILURES:
-                    print_error(f"[BLOCKED] UID {uid} reached {MAX_LOGIN_FAILURES} failures → permanently blocked.", user_id)
+                    # 🔥 TEMPORARY BLOCK (5 minutes)
+                    print_error(
+                        f"[TEMP-BLOCK] UID {uid} reached {MAX_LOGIN_FAILURES} failures → "
+                        f"temporarily blocked for 5 minutes.",
+                        user_id
+                    )
                     user_manager.mark_account_blocked(user_id, failure_key)
                     try:
                         state.update_status(str(uid), "BLOCKED")
                     except Exception:
                         pass
-                    # 🔥 Remove from user accounts file — no more login requests
-                    existing = user_manager.load_user_accounts(user_id)
-                    existing = [acc for acc in existing if str(acc.get("uid")) != uid]
-                    user_manager.save_user_accounts(user_id, existing)
-                    return
+                    # Sleep until block expires, then continue
+                    await asyncio.sleep(305)
+                    # reset failure count so we can retry fresh
+                    state.login_failures.pop(failure_key, None)
+                    continue
 
                 try:
                     state.update_status(str(uid), "ERROR")
@@ -2262,8 +2278,14 @@ async def account_loop_guest(uid: str, password: str, target_level: int = 100, u
                 return
 
             if user_manager.is_account_blocked(user_id, failure_key):
-                print_error(f"[BLOCKED] Guest UID {uid} is blocked → breaking loop.", user_id)
-                return
+                # temporary block — sleep and continue
+                remaining = user_manager.get_blocked_remaining_seconds(user_id, failure_key)
+                print_error(
+                    f"[BLOCKED] Guest UID {uid} is temporarily blocked for {max(1,(remaining+59)//60)} more minute(s).",
+                    user_id
+                )
+                await asyncio.sleep(remaining + 5)
+                continue
 
             if state.is_target_reached(acc_id):
                 print_success(f"🎯 Target reached for {acc_id} → stopping loop.", user_id)
@@ -2284,20 +2306,31 @@ async def account_loop_guest(uid: str, password: str, target_level: int = 100, u
             await asyncio.sleep(10)
 
 
+# ============================================================
+# 🔥 account_loop_token — TEMPORARY BLOCK (5 min) after 3 failures
+# ============================================================
 async def account_loop_token(token: str, target_level: int = 100, user_id: str = ""):
     token_label = token[:10]
     state = user_manager.get_state(user_id)
     failure_key = f"tok_{token[:20]}"
 
     while True:
-        # 🔥 CRITICAL FIX: Check deleted/blocked at the TOP of every iteration
+        # 🔥 CRITICAL FIX: Check deleted at the TOP of every iteration
         if user_manager.is_account_deleted(user_id, token=token):
             print_warning(f"[DELETED] Token {token_label} was deleted by user → stopping loop.", user_id)
             return
 
+        # 🔥 Check TEMPORARY block
         if user_manager.is_account_blocked(user_id, failure_key):
-            print_error(f"[BLOCKED] Token {token_label} is blocked due to {MAX_LOGIN_FAILURES} login failures → stopping loop.", user_id)
-            return
+            remaining = user_manager.get_blocked_remaining_seconds(user_id, failure_key)
+            mins = max(1, (remaining + 59) // 60)
+            print_error(
+                f"[BLOCKED] Token {token_label} is temporarily blocked for {mins} more minute(s). "
+                f"Loop will sleep and retry after block expires.",
+                user_id
+            )
+            await asyncio.sleep(remaining + 5)
+            continue
 
         try:
             print_info(f"[LOGIN] Starting login with Access Token... (Target Lv {target_level})", user_id)
@@ -2310,13 +2343,17 @@ async def account_loop_token(token: str, target_level: int = 100, user_id: str =
                 print_error(f"Login failed for Token {token_label} ({fail_count}/{MAX_LOGIN_FAILURES})", user_id)
 
                 if fail_count >= MAX_LOGIN_FAILURES:
-                    print_error(f"[BLOCKED] Token {token_label} reached {MAX_LOGIN_FAILURES} failures → permanently blocked.", user_id)
+                    # 🔥 TEMPORARY BLOCK (5 minutes)
+                    print_error(
+                        f"[TEMP-BLOCK] Token {token_label} reached {MAX_LOGIN_FAILURES} failures → "
+                        f"temporarily blocked for 5 minutes.",
+                        user_id
+                    )
                     user_manager.mark_account_blocked(user_id, failure_key)
-                    # 🔥 Remove from user accounts file — no more login requests
-                    existing = user_manager.load_user_accounts(user_id)
-                    existing = [acc for acc in existing if acc.get("token") != token]
-                    user_manager.save_user_accounts(user_id, existing)
-                    return
+                    # Sleep until block expires, then continue
+                    await asyncio.sleep(305)
+                    state.login_failures.pop(failure_key, None)
+                    continue
 
                 await asyncio.sleep(15)
                 continue
@@ -2354,8 +2391,13 @@ async def account_loop_token(token: str, target_level: int = 100, user_id: str =
                 return
 
             if user_manager.is_account_blocked(user_id, failure_key):
-                print_error(f"[BLOCKED] Token {token_label} is blocked → breaking loop.", user_id)
-                return
+                remaining = user_manager.get_blocked_remaining_seconds(user_id, failure_key)
+                print_error(
+                    f"[BLOCKED] Token {token_label} is temporarily blocked for {max(1,(remaining+59)//60)} more minute(s).",
+                    user_id
+                )
+                await asyncio.sleep(remaining + 5)
+                continue
 
             if state.is_target_reached(acc_id):
                 print_success(f"🎯 Target reached for {acc_id} → stopping loop.", user_id)
@@ -2395,7 +2437,7 @@ async def main():
     print_info(f"Priority Regions: {PRIORITY_REGIONS}")
     print_info("Device System: 1 ID = 1 Persistent Device ID (per-user devices.json)")
     print_info("Target Level Auto-Stop: ON (min 3, max 100)")
-    print_info(f"Max Login Failures: {MAX_LOGIN_FAILURES} (then permanently blocked)")
+    print_info(f"Max Login Failures: {MAX_LOGIN_FAILURES} (temporary block 5 min)")
     print_colored("=" * 60, Colors.CYAN)
 
     try:
@@ -2467,7 +2509,7 @@ async def main():
     get_state_with_callbacks("default")
 
     # ==================== LOAD EXISTING USER ACCOUNTS ====================
-    # 🔥 FIX: Skip accounts that were deleted or blocked by the user
+    # 🔥 FIX: Skip accounts that were deleted or currently blocked
     if os.path.exists(USER_DATA_DIR):
         for fname in os.listdir(USER_DATA_DIR):
             if not fname.endswith("_accounts.json"):
@@ -2494,25 +2536,37 @@ async def main():
 
                 if "token" in acc and acc["token"]:
                     token = acc["token"]
-                    # 🔥 Skip if deleted or blocked
+                    # 🔥 Skip if deleted
                     if token in deleted_data.get("tokens", []):
                         print_warning(f"[SKIP] Token {token[:10]} was deleted by user {user_id} → not starting.", user_id)
                         continue
-                    if f"tok_{token[:20]}" in deleted_data.get("blocked", []):
-                        print_warning(f"[SKIP] Token {token[:10]} is blocked (login failures) for user {user_id}.", user_id)
-                        continue
+                    # 🔥 If currently blocked, still start loop — loop itself will wait
+                    block_key = f"tok_{token[:20]}"
+                    if user_manager.is_account_blocked(user_id, block_key):
+                        remaining = user_manager.get_blocked_remaining_seconds(user_id, block_key)
+                        print_warning(
+                            f"[SKIP-START] Token {token[:10]} is temporarily blocked for "
+                            f"{max(1,(remaining+59)//60)} more minute(s) for user {user_id} → starting loop which will wait.",
+                            user_id
+                        )
                     t = asyncio.create_task(account_loop_token(token, target_level=tgt, user_id=user_id))
                     state.account_workers[token[:10]] = t
 
                 elif "uid" in acc and "password" in acc and acc["uid"]:
                     u = str(acc["uid"])
-                    # 🔥 Skip if deleted or blocked
+                    # 🔥 Skip if deleted
                     if u in deleted_data.get("uids", []):
                         print_warning(f"[SKIP] UID {u} was deleted by user {user_id} → not starting.", user_id)
                         continue
-                    if f"uid_{u}" in deleted_data.get("blocked", []):
-                        print_warning(f"[SKIP] UID {u} is blocked (login failures) for user {user_id}.", user_id)
-                        continue
+                    # 🔥 If currently blocked, still start loop — loop itself will wait
+                    block_key = f"uid_{u}"
+                    if user_manager.is_account_blocked(user_id, block_key):
+                        remaining = user_manager.get_blocked_remaining_seconds(user_id, block_key)
+                        print_warning(
+                            f"[SKIP-START] UID {u} is temporarily blocked for "
+                            f"{max(1,(remaining+59)//60)} more minute(s) for user {user_id} → starting loop which will wait.",
+                            user_id
+                        )
                     t = asyncio.create_task(account_loop_guest(u, acc["password"], target_level=tgt, user_id=user_id))
                     state.account_workers[u] = t
 

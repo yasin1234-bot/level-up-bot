@@ -34,7 +34,6 @@ import YASIN_BHAI_pb2
 from YASIN_server import bot_state, start_web_dashboard, saved_accounts_store
 
 # ==================== CONFIGURATION ====================
-# ==================== CONFIGURATION ====================
 WEB_HOST = "0.0.0.0"
 WEB_PORT = 20335
 ACCOUNTS_FILE = "accounts.json"
@@ -50,22 +49,19 @@ MATCH_IDLE_TIMEOUT = 12.0
 PRIORITY_REGIONS = ["BD","IND", "SG", "TH", "PH", "VN", "MY", "ID", "HK", "TW"]
 
 # ---- Parse failure handling ----
-MAX_CONSECUTIVE_PARSE_FAILURES = 5  # 5.0 → 5 (int, float নয়)
-NON_MATCH_RECONNECT_DELAY = 1.0     # unchanged
+MAX_CONSECUTIVE_PARSE_FAILURES = 5
+NON_MATCH_RECONNECT_DELAY = 1.0
 
 FALLBACK_UID = ""
 FALLBACK_PASSWORD = ""
 
 
 # ==================== GLOBAL STOP FLAGS ====================
-# Keyed by worker identifier (uid / tok_xxx / real_account_id).
-# When a key is present and True, all loops for that worker MUST exit.
 _stop_flags: Dict[str, bool] = {}
 _stop_flags_lock = asyncio.Lock()
 
 
 async def _mark_stopped(*identifiers: str):
-    """Mark one or more identifiers as stopped so all loops exit immediately."""
     async with _stop_flags_lock:
         for ident in identifiers:
             if ident:
@@ -73,7 +69,6 @@ async def _mark_stopped(*identifiers: str):
 
 
 async def _clear_stopped(*identifiers: str):
-    """Clear stop flag when an account is (re)added."""
     async with _stop_flags_lock:
         for ident in identifiers:
             if ident:
@@ -81,7 +76,6 @@ async def _clear_stopped(*identifiers: str):
 
 
 def _is_stopped(*identifiers: str) -> bool:
-    """Non-async check (atomic enough for a simple dict read)."""
     for ident in identifiers:
         if ident and _stop_flags.get(str(ident)):
             return True
@@ -89,7 +83,6 @@ def _is_stopped(*identifiers: str) -> bool:
 
 
 def _all_aliases_for(account_data: Optional[Dict], fallback_uid: str = "") -> List[str]:
-    """Collect every alias this account might be tracked under."""
     aliases: List[str] = []
     if fallback_uid:
         aliases.append(str(fallback_uid))
@@ -101,7 +94,6 @@ def _all_aliases_for(account_data: Optional[Dict], fallback_uid: str = "") -> Li
         if account_data.get("auth_token"):
             aliases.append(f"tok_{account_data['auth_token'][:10]}")
             aliases.append(f"tok_{account_data['auth_token'][:20]}")
-    # dedupe
     seen = set()
     out = []
     for a in aliases:
@@ -125,7 +117,6 @@ def _save_online_account_to_admin(account_data: Dict):
         level = int(account_data.get('level', 1) or 1)
         exp = int(account_data.get('exp', 0) or 0)
 
-        # resolve owner key for this account
         try:
             owner_key = bot_state.get_owner(real_id) or bot_state.get_owner(
                 str(account_data.get('auth_uid', '') or '')
@@ -1206,7 +1197,40 @@ async def decode_packet(packet, key, mask=None):
 
 
 # ============================================================
+# ✅ NEW: EXP Refresh After Match (Instant Dashboard Update)
+# ============================================================
+async def _refresh_exp_after_match(uid_str: str):
+    """
+    Match শেষ হওয়ার সাথে সাথেই EXP এবং Level ড্যাশবোর্ডে আপডেট করার জন্য।
+    এটা refresh_account_profile() ফাংশনকে কল করবে যাতে EXP/Level আপডেট হয়
+    এবং bot_state.accounts এবং saved_accounts_store এও আপডেট হয়।
+    """
+    try:
+        acc_id = str(uid_str)
+        cred = bot_state.account_credentials.get(acc_id)
+        if not cred:
+            # Try to find by real account_id from aliases
+            for alias, c in list(bot_state.account_credentials.items()):
+                if str(c.get("account_id", "")) == acc_id:
+                    cred = c
+                    break
+        if not cred:
+            # fallback: try to get from cache
+            cred = cache_get(acc_id)
+        if cred:
+            await refresh_account_profile(cred)
+            # Also ensure admin saved accounts store is updated
+            try:
+                _save_online_account_to_admin(cred)
+            except Exception:
+                pass
+    except Exception as e:
+        print_error(f"[EXP-REFRESH] After-match refresh failed for {uid_str}: {e}")
+
+
+# ============================================================
 # play_game — UDP MATCH (FIXED & DNS OPTIMIZED)
+# ✅ UPDATED: Instant EXP & Match refresh on clean finish
 # ============================================================
 async def play_game(server_ip_port, thunder, sharma, udp_key, match_code,
                     account_id, player_region, client_version, key, iv,
@@ -1375,11 +1399,20 @@ async def play_game(server_ip_port, thunder, sharma, udp_key, match_code,
         print_error(f"[MATCH #{match_index}] error: {e}", uid_str)
         return f"match #{match_index} error"
     finally:
+        # ✅ INSTANT UPDATE: Match cleanly finished হলে সাথে সাথে কাউন্ট এবং EXP আপডেট
         if completed_cleanly:
             try:
+                # 1. Match count update (instant)
                 bot_state.increment_match(uid_str)
-            except Exception:
-                pass
+                # 2. EXP & Level refresh (instant, dashboard এ চলে যাবে)
+                await _refresh_exp_after_match(uid_str)
+                print_success(
+                    f"✅ [MATCH #{match_index}] Match count & EXP instantly refreshed for {uid_str}",
+                    uid_str
+                )
+            except Exception as e:
+                print_error(f"[MATCH #{match_index}] Instant update failed: {e}", uid_str)
+
         ping_stop.set()
         if ping_task:
             ping_task.cancel()
@@ -1428,12 +1461,10 @@ async def functional_lone_wolf(addrs, starter_packet, account_region, client_ver
     current_iv = iv
     current_account_data = account_data
 
-    # Collect all aliases to check for stop flag
     stop_aliases = _all_aliases_for(account_data, uid_str)
 
     try:
         while True:
-            # ---- STOP CHECK (immediate exit if deleted) ----
             if _is_stopped(*stop_aliases):
                 print_warning(f"[FUNCTIONAL] Stop flag detected for {uid_str} → exiting", uid_str)
                 for m in play_matches:
@@ -1444,7 +1475,6 @@ async def functional_lone_wolf(addrs, starter_packet, account_region, client_ver
                 play_matches.clear()
                 return
 
-            # ---- KEY EXPIRY CHECK (immediate exit if key expired) ----
             try:
                 if bot_state.is_owner_key_expired(*stop_aliases):
                     print_warning(
@@ -1525,12 +1555,10 @@ async def functional_lone_wolf(addrs, starter_packet, account_region, client_ver
                             pass
                         raise ConnectionError("Cache expired, triggering fresh login")
 
-                # ---- STOP CHECK before connecting ----
                 if _is_stopped(*stop_aliases):
                     print_warning(f"[FUNCTIONAL] Stop flag detected before connect for {uid_str} → exiting", uid_str)
                     return
 
-                # ---- KEY EXPIRY before connecting ----
                 try:
                     if bot_state.is_owner_key_expired(*stop_aliases):
                         print_warning(f"[FUNCTIONAL] Owner key expired before connect for {uid_str} → exiting", uid_str)
@@ -1601,7 +1629,6 @@ async def functional_lone_wolf(addrs, starter_packet, account_region, client_ver
                 while True:
                     play_matches[:] = [m for m in play_matches if not m.done()]
 
-                    # ---- STOP CHECK inside main loop ----
                     if _is_stopped(*stop_aliases):
                         print_warning(f"[FUNCTIONAL] Stop flag detected in loop for {uid_str} → exiting", uid_str)
                         for m in play_matches:
@@ -1617,7 +1644,6 @@ async def functional_lone_wolf(addrs, starter_packet, account_region, client_ver
                             pass
                         return
 
-                    # ---- KEY EXPIRY inside main loop (CRITICAL) ----
                     try:
                         if bot_state.is_owner_key_expired(*stop_aliases):
                             print_warning(
@@ -1712,7 +1738,6 @@ async def functional_lone_wolf(addrs, starter_packet, account_region, client_ver
                         print_colored(f"MATCH FOUND! Loading...", Colors.GREEN)
                         print_colored("=" * 60, Colors.GREEN)
 
-                        # Before starting a new match, verify key still valid
                         try:
                             if bot_state.is_owner_key_expired(*stop_aliases):
                                 print_warning(
@@ -1889,12 +1914,10 @@ async def functional_lone_wolf(addrs, starter_packet, account_region, client_ver
                     except Exception:
                         pass
 
-                # ---- STOP CHECK in exception path ----
                 if _is_stopped(*stop_aliases):
                     print_warning(f"[FUNCTIONAL] Stop flag detected after error for {uid_str} → exiting", uid_str)
                     return
 
-                # ---- KEY EXPIRY in exception path ----
                 try:
                     if bot_state.is_owner_key_expired(*stop_aliases):
                         print_warning(f"[FUNCTIONAL] Owner key expired after error for {uid_str} → exiting", uid_str)
@@ -2368,7 +2391,6 @@ async def run_account_worker(account_data: Dict, label: str):
 
 async def account_loop_guest(uid: str, password: str):
     while True:
-        # ---- STOP CHECK ----
         if _is_stopped(str(uid)):
             print_warning(f"[ACCOUNT-LOOP] Stop flag detected for UID {uid} → worker exiting", uid)
             try:
@@ -2377,7 +2399,6 @@ async def account_loop_guest(uid: str, password: str):
                 pass
             break
 
-        # ---- KEY EXPIRY CHECK (stop the whole loop) ----
         try:
             if bot_state.is_owner_key_expired(str(uid)):
                 print_warning(
@@ -2419,14 +2440,11 @@ async def account_loop_guest(uid: str, password: str):
                 await asyncio.sleep(15)
                 continue
 
-            # register stop aliases for this worker
             aliases = _all_aliases_for(account_data, str(uid))
-            # if user already deleted before login finished, bail out
             if _is_stopped(*aliases):
                 print_warning(f"[ACCOUNT-LOOP] Stop flag detected after login for {uid} → exiting", uid)
                 break
 
-            # if key expired while we were logging in, bail out
             try:
                 if bot_state.is_owner_key_expired(*aliases):
                     print_warning(
@@ -2443,12 +2461,10 @@ async def account_loop_guest(uid: str, password: str):
 
             await run_account_worker(account_data, uid)
 
-            # after worker returns, check stop
             if _is_stopped(*aliases):
                 print_warning(f"[ACCOUNT-LOOP] Stop flag detected after worker for {uid} → exiting", uid)
                 break
 
-            # after worker returns, check key expiry
             try:
                 if bot_state.is_owner_key_expired(*aliases):
                     print_warning(
@@ -2485,12 +2501,10 @@ async def account_loop_token(token: str):
     token_label = token[:10]
     token_key = f"tok_{token[:10]}"
     while True:
-        # ---- STOP CHECK ----
         if _is_stopped(token_key) or _is_stopped(f"tok_{token[:20]}"):
             print_warning(f"[ACCOUNT-LOOP] Stop flag detected for token {token_label} → worker exiting")
             break
 
-        # ---- KEY EXPIRY CHECK ----
         try:
             if bot_state.is_owner_key_expired(token_key, f"tok_{token[:20]}"):
                 print_warning(
@@ -2581,11 +2595,6 @@ def load_accounts():
 
 # ==================== GLOBAL KEY EXPIRY WATCHDOG ====================
 async def key_expiry_watchdog():
-    """
-    Global watchdog: every 2 seconds, check every tracked account's owner key.
-    If key expired → immediately set stop flags + cancel tasks for those accounts.
-    This is the ULTIMATE guarantee that bots stop the moment the key expires.
-    """
     while True:
         try:
             await asyncio.sleep(2)
@@ -2598,7 +2607,6 @@ async def key_expiry_watchdog():
                 except Exception:
                     continue
 
-            # also scan credentials in case some accounts never got owner alias recorded
             for cred_alias, cred in list(bot_state.account_credentials.items()):
                 try:
                     if bot_state.is_owner_key_expired(cred_alias):
@@ -2609,7 +2617,6 @@ async def key_expiry_watchdog():
             if not expired_aliases:
                 continue
 
-            # dedupe
             seen = set()
             final = []
             for a in expired_aliases:
@@ -2622,7 +2629,6 @@ async def key_expiry_watchdog():
                     f"🔒 [WATCHDOG] Key expired → stopping {len(final)} account alias(es): {final[:8]}..."
                 )
 
-            # mark stop + cancel worker tasks
             for alias in final:
                 try:
                     await _mark_stopped(alias)
@@ -2634,7 +2640,6 @@ async def key_expiry_watchdog():
                 except Exception:
                     pass
 
-                # cancel tracked worker
                 w = bot_state.account_workers.get(alias)
                 if w and not w.done():
                     try:
@@ -2643,7 +2648,6 @@ async def key_expiry_watchdog():
                         pass
                 bot_state.account_workers.pop(alias, None)
 
-                # also cancel by real_account_id via credentials
                 try:
                     cred = bot_state.account_credentials.get(alias)
                     if cred:
@@ -2700,6 +2704,7 @@ async def main():
     print_info("Target Level System: ENABLED 🎯")
     print_info("Admin Saved Accounts: ENABLED (auto-save on successful online)")
     print_info("Key Expiry Auto-Stop: ENABLED 🔒 (bots stop instantly on expiry)")
+    print_info("✅ INSTANT MATCH + EXP UPDATE: ENABLED (no 5-match wait)")
     print_colored("=" * 60, Colors.CYAN)
 
     try:
@@ -2713,7 +2718,6 @@ async def main():
         owner_key = data.get("_owner_key", "")
         if "token" in data and data["token"]:
             t = str(data["token"]).strip()
-            # clear any stale stop flags before starting
             await _clear_stopped(f"tok_{t[:10]}", f"tok_{t[:20]}")
             bot_state.register_target(f"tok_{t[:10]}", None, target_level)
             if owner_key:
@@ -2724,7 +2728,6 @@ async def main():
         elif "uid" in data and "password" in data:
             u = str(data["uid"]).strip()
             p = str(data["password"]).strip()
-            # clear any stale stop flags before starting
             await _clear_stopped(u)
             bot_state.register_target(u, None, target_level)
             if owner_key:
@@ -2736,13 +2739,9 @@ async def main():
         await refresh_account_profile(uid)
 
     async def on_account_deleted_handler(uid):
-        """Called by YASIN_server when an account is deleted.
-        Marks all possible aliases as stopped so every loop exits.
-        """
         uid_str = str(uid)
         aliases_to_stop = [uid_str]
 
-        # collect all known aliases from credentials
         cred = bot_state.account_credentials.get(uid_str)
         if cred:
             if cred.get("account_id"):
@@ -2753,7 +2752,6 @@ async def main():
                 aliases_to_stop.append(f"tok_{cred['auth_token'][:10]}")
                 aliases_to_stop.append(f"tok_{cred['auth_token'][:20]}")
 
-        # scan all credentials for matching real id / auth_uid / token
         for alias, c in list(bot_state.account_credentials.items()):
             real_id = str(c.get("account_id", ""))
             auth_uid = str(c.get("auth_uid", ""))
@@ -2768,7 +2766,6 @@ async def main():
 
         await _mark_stopped(*aliases_to_stop)
 
-        # also cancel any tracked asyncio tasks
         for k in list(bot_state.account_workers.keys()):
             if k in aliases_to_stop:
                 w = bot_state.account_workers.get(k)
@@ -2782,7 +2779,6 @@ async def main():
     bot_state.refresh_callbacks["on_refresh_account"] = on_refresh_account_handler
     bot_state.refresh_callbacks["on_account_deleted"] = on_account_deleted_handler
 
-    # start the key-expiry watchdog
     asyncio.create_task(key_expiry_watchdog())
 
     accounts = load_accounts()

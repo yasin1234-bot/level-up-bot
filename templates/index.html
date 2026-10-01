@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CODEX YASIN | Free Fire Level Up Bot Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>YASIN BAHI | FreeFire Level Up Bot Dashboard</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -21,11 +21,9 @@
             --accent-green: #00ff88;
             --accent-red: #ff3366;
             --accent-amber: #ffaa00;
-            --accent-pink: #ff2d95;
             --text-main: #f0f4fc;
             --text-muted: #8e9bb5;
-            --glass-glow: 0 8px 32px 0 rgba(0, 242, 254, 0.08);
-            --glass-glow-strong: 0 8px 40px 0 rgba(0, 242, 254, 0.22);
+            --glass-glow: 0 4px 20px 0 rgba(0, 242, 254, 0.06);
         }
 
         * {
@@ -37,205 +35,293 @@
         }
 
         html, body {
-            width: 100%;
             overflow-x: hidden;
+            width: 100%;
         }
 
         body {
-            background-color: var(--bg-base);
+            background-color: #ffffff;
             background-image: 
-                radial-gradient(circle at 15% 15%, rgba(127, 0, 255, 0.16) 0%, transparent 45%),
-                radial-gradient(circle at 85% 85%, rgba(0, 242, 254, 0.14) 0%, transparent 45%),
-                radial-gradient(circle at 50% 50%, rgba(255, 45, 149, 0.06) 0%, transparent 60%),
+                radial-gradient(circle at 15% 15%, rgba(127, 0, 255, 0.14) 0%, transparent 45%),
+                radial-gradient(circle at 85% 85%, rgba(0, 242, 254, 0.12) 0%, transparent 45%),
                 linear-gradient(180deg, #060913 0%, #0a0e1c 100%);
+            background-attachment: fixed;
             color: var(--text-main);
             min-height: 100vh;
-            padding: 24px;
-            background-attachment: fixed;
-            position: relative;
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: 
-                radial-gradient(circle at 20% 30%, rgba(0, 242, 254, 0.06) 0%, transparent 20%),
-                radial-gradient(circle at 80% 70%, rgba(127, 0, 255, 0.06) 0%, transparent 20%);
-            animation: orb-float 20s infinite linear;
-            pointer-events: none;
-            z-index: 0;
-            will-change: transform;
-        }
-
-        @keyframes orb-float {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            padding: 12px;
+            overflow-x: hidden;
         }
 
         .container {
-            max-width: 1440px;
+            max-width: 1400px;
             margin: 0 auto;
-            position: relative;
-            z-index: 1;
+            width: 100%;
         }
 
-        /* ============ HEADER ============ */
+        /* Header With Animated Rainbow Border Glow */
         header {
+            position: relative;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 20px 28px;
+            padding: 12px 16px;
             background: var(--bg-card);
-            border: 1px solid var(--border-card);
-            border-radius: 20px;
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            box-shadow: var(--glass-glow);
-            margin-bottom: 24px;
-            position: relative;
-            overflow: hidden;
-            gap: 16px;
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            border-radius: 14px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 0 25px rgba(0, 242, 254, 0.15);
+            margin-bottom: 12px;
+            gap: 10px;
             flex-wrap: wrap;
+            overflow: hidden;
         }
 
         header::before {
             content: '';
             position: absolute;
             top: 0;
-            left: 0;
-            right: 0;
+            left: -100%;
+            width: 200%;
             height: 2px;
-            background: linear-gradient(90deg, transparent, var(--accent-cyan), var(--accent-purple), transparent);
-            animation: header-scan 4s infinite linear;
+            background: linear-gradient(90deg, transparent, var(--accent-cyan), var(--accent-purple), var(--accent-green), transparent);
+            animation: border-slide 3s linear infinite;
         }
 
-        @keyframes header-scan {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
+        @keyframes border-slide {
+            0% { left: -100%; }
+            100% { left: 100%; }
         }
 
         .brand {
             display: flex;
             align-items: center;
-            gap: 16px;
-            flex-shrink: 0;
+            gap: 12px;
+            min-width: 0;
+            flex: 1;
         }
 
         .logo-box {
-            width: 52px;
-            height: 52px;
-            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple), var(--accent-pink));
-            background-size: 200% 200%;
-            border-radius: 15px;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
+            font-size: 18px;
             color: #fff;
-            box-shadow: 0 0 24px rgba(0, 242, 254, 0.45);
-            animation: pulse-glow 3s infinite alternate, gradient-shift 5s infinite;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.4);
+            animation: pulse-glow 2.5s infinite alternate;
             flex-shrink: 0;
         }
 
-        @keyframes gradient-shift {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
+        @keyframes pulse-glow {
+            0% { 
+                box-shadow: 0 0 10px rgba(0, 242, 254, 0.3), 0 0 20px rgba(0, 242, 254, 0.2); 
+                transform: scale(1);
+            }
+            100% { 
+                box-shadow: 0 0 25px rgba(127, 0, 255, 0.7), 0 0 35px rgba(0, 242, 254, 0.5); 
+                transform: scale(1.04);
+            }
         }
 
-        @keyframes pulse-glow {
-            0% { box-shadow: 0 0 15px rgba(0, 242, 254, 0.35), 0 0 30px rgba(127, 0, 255, 0.15); }
-            100% { box-shadow: 0 0 28px rgba(0, 242, 254, 0.6), 0 0 45px rgba(255, 45, 149, 0.25); }
+        .brand-text {
+            min-width: 0;
+            flex: 1;
         }
 
         .brand-text h1 {
-            font-size: 22px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            background: linear-gradient(90deg, #ffffff, var(--accent-cyan), var(--accent-pink));
-            background-size: 200% 100%;
+            position: relative;
+            font-size: 14px;
+            font-weight: 900;
+            letter-spacing: 0.8px;
+            background: linear-gradient(
+                120deg, 
+                #00f2fe 0%, 
+                #ffffff 20%, 
+                #ff007f 40%, 
+                #00ff88 60%, 
+                #7f00ff 80%, 
+                #00f2fe 100%
+            );
+            background-size: 200% auto;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            animation: text-shine 4s infinite linear;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: inline-block;
+            animation: cyber-gradient-shift 3s linear infinite, neon-text-pulse 2s ease-in-out infinite alternate;
         }
 
-        @keyframes text-shine {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 200% 50%; }
+        @keyframes cyber-gradient-shift {
+            0% { background-position: 0% center; }
+            100% { background-position: 200% center; }
+        }
+
+        @keyframes neon-text-pulse {
+            0% {
+                filter: drop-shadow(0 0 2px rgba(0, 242, 254, 0.6)) 
+                        drop-shadow(0 0 8px rgba(0, 242, 254, 0.3));
+                transform: scale(1);
+            }
+            50% {
+                filter: drop-shadow(0 0 5px rgba(255, 0, 127, 0.8)) 
+                        drop-shadow(0 0 15px rgba(255, 0, 127, 0.5));
+            }
+            100% {
+                filter: drop-shadow(0 0 4px rgba(0, 255, 136, 0.9)) 
+                        drop-shadow(0 0 18px rgba(0, 255, 136, 0.6));
+                transform: scale(1.01);
+            }
+        }
+
+        .brand-text h1::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent 0%,
+                rgba(0, 242, 254, 0.2) 30%,
+                rgba(255, 255, 255, 0.8) 50%,
+                rgba(0, 255, 136, 0.2) 70%,
+                transparent 100%
+            );
+            animation: holo-wave 2.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+            pointer-events: none;
+        }
+
+        @keyframes holo-wave {
+            0% { left: -100%; }
+            60%, 100% { left: 100%; }
         }
 
         .brand-text p {
-            font-size: 13px;
+            font-size: 11px;
             color: var(--text-muted);
             display: flex;
             align-items: center;
-            gap: 8px;
-            margin-top: 4px;
-            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .live-tag {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
             background: rgba(0, 255, 136, 0.12);
-            border: 1px solid rgba(0, 255, 136, 0.3);
+            border: 1px solid rgba(0, 255, 136, 0.4);
             color: var(--accent-green);
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            white-space: nowrap;
+            flex-shrink: 0;
+            box-shadow: 0 0 8px rgba(0, 255, 136, 0.2);
         }
 
         .pulse-dot {
-            width: 7px;
-            height: 7px;
+            width: 6px;
+            height: 6px;
             background: var(--accent-green);
             border-radius: 50%;
             animation: blink 1.2s infinite;
-            box-shadow: 0 0 8px var(--accent-green);
             flex-shrink: 0;
         }
 
         @keyframes blink {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.4; transform: scale(0.8); }
+            0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 6px var(--accent-green); }
+            50% { opacity: 0.3; transform: scale(0.8); box-shadow: none; }
+        }
+
+        .key-timer {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(127, 0, 255, 0.15);
+            border: 1px solid rgba(127, 0, 255, 0.45);
+            color: #c084fc;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            white-space: nowrap;
+            flex-shrink: 0;
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 0.3px;
+            box-shadow: 0 0 8px rgba(127, 0, 255, 0.2);
+            animation: key-timer-glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes key-timer-glow {
+            0% { box-shadow: 0 0 8px rgba(127, 0, 255, 0.2); }
+            100% { box-shadow: 0 0 14px rgba(127, 0, 255, 0.5); }
+        }
+
+        .key-timer.warning {
+            background: rgba(255, 170, 0, 0.15);
+            border-color: rgba(255, 170, 0, 0.5);
+            color: var(--accent-amber);
+            box-shadow: 0 0 10px rgba(255, 170, 0, 0.3);
+        }
+
+        .key-timer.danger {
+            background: rgba(255, 51, 102, 0.18);
+            border-color: rgba(255, 51, 102, 0.55);
+            color: var(--accent-red);
+            box-shadow: 0 0 12px rgba(255, 51, 102, 0.45);
+            animation: key-timer-danger-pulse 0.9s ease-in-out infinite alternate;
+        }
+
+        @keyframes key-timer-danger-pulse {
+            0% { box-shadow: 0 0 8px rgba(255, 51, 102, 0.3); }
+            100% { box-shadow: 0 0 16px rgba(255, 51, 102, 0.75); }
+        }
+
+        .key-timer i {
+            font-size: 9px;
         }
 
         .header-actions {
             display: flex;
             align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
+            gap: 8px;
+            flex-shrink: 0;
         }
 
         .btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            padding: 11px 20px;
-            border-radius: 12px;
-            font-size: 14px;
+            gap: 6px;
+            padding: 8px 12px;
+            border-radius: 9px;
+            font-size: 12px;
             font-weight: 600;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+            transition: all 0.25s ease;
             border: none;
             outline: none;
             white-space: nowrap;
-            font-family: 'Outfit', sans-serif;
         }
 
         .btn-primary {
             background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
             color: #040914;
-            box-shadow: 0 4px 16px rgba(0, 242, 254, 0.3);
+            box-shadow: 0 3px 12px rgba(0, 242, 254, 0.2);
             position: relative;
             overflow: hidden;
         }
@@ -247,21 +333,39 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
-            transition: left 0.5s;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(255, 255, 255, 0.5), 
+                transparent);
+            transition: left 0.6s ease;
+            animation: shimmer 2.5s infinite;
         }
 
-        .btn-primary:hover::before {
-            left: 100%;
+        @keyframes shimmer {
+            0% { left: -100%; }
+            50% { left: 100%; }
+            100% { left: 100%; }
         }
 
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0, 242, 254, 0.5);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(0, 242, 254, 0.35);
         }
 
-        .btn-primary:active {
-            transform: translateY(0);
+        .btn-primary .btn-label {
+            position: relative;
+            z-index: 1;
+            display: inline-block;
+            animation: text-glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes text-glow {
+            0% { 
+                text-shadow: 0 0 4px rgba(255, 255, 255, 0.3);
+            }
+            100% { 
+                text-shadow: 0 0 10px rgba(255, 255, 255, 0.9), 0 0 16px rgba(0, 242, 254, 0.6);
+            }
         }
 
         .btn-secondary {
@@ -273,235 +377,160 @@
         .btn-secondary:hover {
             background: rgba(255, 255, 255, 0.1);
             border-color: var(--border-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 16px rgba(0, 242, 254, 0.15);
         }
 
-        /* ============ LOGOUT BUTTON ============ */
-        .btn-logout {
-            background: rgba(255, 51, 102, 0.1);
-            border: 1px solid rgba(255, 51, 102, 0.3);
-            color: var(--accent-red);
-            padding: 11px 16px;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-family: 'Outfit', sans-serif;
-            white-space: nowrap;
-        }
-
-        .btn-logout:hover {
-            background: rgba(255, 51, 102, 0.2);
-            border-color: var(--accent-red);
-            color: #fff;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 16px rgba(255, 51, 102, 0.3);
-        }
-
-        .btn-logout:active {
-            transform: translateY(0);
-        }
-
-        /* ============ STATS GRID ============ */
+        /* Stats Grid */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 18px;
-            margin-bottom: 24px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 12px;
         }
 
         .stat-card {
             background: var(--bg-card);
             border: 1px solid var(--border-card);
-            border-radius: 18px;
-            padding: 16px 18px;
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
+            border-radius: 12px;
+            padding: 10px 12px;
+            backdrop-filter: blur(10px);
             display: flex;
             align-items: center;
-            gap: 14px;
-            transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .stat-card::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 100% 0%, rgba(0, 242, 254, 0.08) 0%, transparent 60%);
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .stat-card:hover::after {
-            opacity: 1;
+            gap: 10px;
+            transition: all 0.3s ease;
+            min-width: 0;
         }
 
         .stat-card:hover {
             border-color: var(--border-hover);
-            transform: translateY(-4px);
-            box-shadow: var(--glass-glow-strong);
+            transform: translateY(-2px);
+            box-shadow: var(--glass-glow);
         }
 
         .stat-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 14px;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 15px;
             flex-shrink: 0;
-            position: relative;
-            z-index: 1;
         }
 
-        .stat-icon.cyan { background: rgba(0, 242, 254, 0.15); color: var(--accent-cyan); box-shadow: 0 0 20px rgba(0, 242, 254, 0.2) inset; }
-        .stat-icon.green { background: rgba(0, 255, 136, 0.15); color: var(--accent-green); box-shadow: 0 0 20px rgba(0, 255, 136, 0.2) inset; }
-        .stat-icon.purple { background: rgba(127, 0, 255, 0.15); color: #c084fc; box-shadow: 0 0 20px rgba(127, 0, 255, 0.2) inset; }
-        .stat-icon.amber { background: rgba(255, 170, 0, 0.15); color: var(--accent-amber); box-shadow: 0 0 20px rgba(255, 170, 0, 0.2) inset; }
+        .stat-icon.cyan { background: rgba(0, 242, 254, 0.15); color: var(--accent-cyan); }
+        .stat-icon.green { background: rgba(0, 255, 136, 0.15); color: var(--accent-green); }
+        .stat-icon.purple { background: rgba(127, 0, 255, 0.15); color: #c084fc; }
+        .stat-icon.amber { background: rgba(255, 170, 0, 0.15); color: var(--accent-amber); }
 
         .stat-content {
-            position: relative;
-            z-index: 1;
             min-width: 0;
             flex: 1;
         }
 
         .stat-content h3 {
-            font-size: clamp(16px, 2vw, 22px);
+            font-size: 16px;
             font-weight: 800;
-            letter-spacing: -0.3px;
+            letter-spacing: -0.5px;
             color: #fff;
-            line-height: 1.2;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
         .stat-content p {
-            font-size: 12px;
+            font-size: 10px;
             color: var(--text-muted);
             font-weight: 500;
-            margin-top: 2px;
             white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        /* ============ MAIN LAYOUT ============ */
+        /* Main Section Layout */
         .dashboard-main {
             display: grid;
             grid-template-columns: 2fr 1fr;
-            gap: 24px;
-            align-items: start;
+            gap: 12px;
         }
 
+        /* Card Box */
         .card-box {
             background: var(--bg-card);
             border: 1px solid var(--border-card);
-            border-radius: 20px;
-            padding: 24px;
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            position: relative;
-            overflow: hidden;
+            border-radius: 14px;
+            padding: 14px;
+            backdrop-filter: blur(12px);
         }
 
         .box-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 20px;
-            gap: 12px;
+            margin-bottom: 12px;
+            gap: 8px;
             flex-wrap: wrap;
         }
 
         .box-title {
-            font-size: 18px;
+            font-size: 14px;
             font-weight: 700;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         .accounts-list {
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 10px;
         }
 
-        /* ============ ACCOUNT CARD ============ */
+        /* ===== ACCOUNT CARD DESIGN (MATCHING THE IMAGE) ===== */
         .account-card {
-            background: linear-gradient(135deg, rgba(10, 15, 30, 0.85) 0%, rgba(15, 22, 45, 0.85) 100%);
+            background: rgba(10, 15, 30, 0.65);
             border: 1px solid rgba(255, 255, 255, 0.07);
-            border-radius: 16px;
-            padding: 20px;
-            transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+            border-radius: 12px;
+            padding: 14px;
+            transition: all 0.25s ease;
             position: relative;
             overflow: hidden;
         }
 
-        .account-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 3px;
-            height: 100%;
-            background: linear-gradient(180deg, var(--accent-cyan), var(--accent-purple));
-            opacity: 0.6;
-        }
-
         .account-card:hover {
-            background: linear-gradient(135deg, rgba(19, 27, 50, 0.95) 0%, rgba(25, 35, 65, 0.95) 100%);
+            background: var(--bg-card-hover);
             border-color: var(--border-hover);
-            transform: translateY(-3px);
-            box-shadow: 0 10px 32px rgba(0, 242, 254, 0.15);
-        }
-
-        .account-card.target-reached::before {
-            background: linear-gradient(180deg, var(--accent-green), #00cc6a);
         }
 
         .acc-top {
             display: flex;
-            align-items: flex-start;
+            align-items: center;
             justify-content: space-between;
-            margin-bottom: 16px;
-            gap: 12px;
+            margin-bottom: 10px;
+            gap: 8px;
+            flex-wrap: wrap;
         }
 
         .acc-profile {
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 10px;
             min-width: 0;
             flex: 1;
         }
 
         .acc-avatar {
-            width: 46px;
-            height: 46px;
-            border-radius: 13px;
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
             background: linear-gradient(135deg, #1e293b, #334155);
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
-            font-size: 17px;
+            font-size: 18px;
             color: var(--accent-cyan);
-            border: 1px solid rgba(0, 242, 254, 0.25);
+            border: 1px solid rgba(0, 242, 254, 0.2);
             flex-shrink: 0;
-            box-shadow: 0 0 18px rgba(0, 242, 254, 0.15);
         }
 
         .acc-info {
@@ -509,67 +538,57 @@
             flex: 1;
         }
 
-        .acc-name-row {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 4px;
-            flex-wrap: wrap;
-        }
-
         .acc-info h4 {
             font-size: 14px;
             font-weight: 700;
             color: #fff;
-            line-height: 1.3;
-            word-break: break-word;
-        }
-
-        .region-badge-row {
             display: flex;
             align-items: center;
-            justify-content: space-between;
             gap: 8px;
-            margin-bottom: 4px;
-            width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 3px;
         }
 
         .region-badge {
-            background: rgba(165, 180, 252, 0.15);
-            color: #a5b4fc;
-            padding: 1px 6px;
+            background: rgba(127, 0, 255, 0.2);
+            color: #c084fc;
+            padding: 2px 7px;
             border-radius: 5px;
             font-size: 10px;
             font-weight: 700;
-            letter-spacing: 0.5px;
-            border: 1px solid rgba(165, 180, 252, 0.25);
-            display: inline-block;
             flex-shrink: 0;
+            border: 1px solid rgba(127, 0, 255, 0.3);
+            text-transform: uppercase;
         }
 
-        .acc-info span.uid-text {
+        .acc-info span {
             font-size: 12px;
             color: var(--text-muted);
             font-family: 'JetBrains Mono', monospace;
             display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .acc-status {
-            display: inline-flex;
+            display: flex;
             align-items: center;
-            gap: 6px;
-            font-size: 11px;
+            gap: 5px;
+            font-size: 10px;
             font-weight: 700;
             padding: 5px 12px;
             border-radius: 20px;
-            white-space: nowrap;
             flex-shrink: 0;
+            white-space: nowrap;
         }
 
         .status-online {
             background: rgba(0, 255, 136, 0.12);
             color: var(--accent-green);
-            border: 1px solid rgba(0, 255, 136, 0.3);
+            border: 1px solid rgba(0, 255, 136, 0.25);
         }
 
         .status-match {
@@ -582,37 +601,30 @@
         .status-target {
             background: rgba(255, 170, 0, 0.15);
             color: var(--accent-amber);
-            border: 1px solid rgba(255, 170, 0, 0.4);
-        }
-
-        .status-complete {
-            background: rgba(0, 255, 136, 0.2);
-            color: var(--accent-green);
-            border: 1px solid rgba(0, 255, 136, 0.5);
-            box-shadow: 0 0 12px rgba(0, 255, 136, 0.3);
+            border: 1px solid rgba(255, 170, 0, 0.45);
+            animation: pulse-border 1.5s infinite alternate;
         }
 
         @keyframes pulse-border {
             0% { border-color: rgba(0, 242, 254, 0.3); }
-            100% { border-color: rgba(0, 242, 254, 0.9); }
+            100% { border-color: rgba(0, 242, 254, 0.8); }
         }
 
-        /* ============ EXP BOX ============ */
+        /* EXP Box */
         .exp-box {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            background: rgba(0, 0, 0, 0.3);
-            padding: 12px 14px;
-            border-radius: 12px;
-            margin-bottom: 14px;
-            border: 1px solid rgba(255, 255, 255, 0.04);
+            gap: 6px;
+            background: rgba(0, 0, 0, 0.28);
+            padding: 10px 12px;
+            border-radius: 10px;
+            margin-bottom: 12px;
         }
 
         .exp-item {
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 3px;
             min-width: 0;
         }
 
@@ -621,12 +633,13 @@
             color: var(--text-muted);
             text-transform: uppercase;
             font-weight: 600;
-            letter-spacing: 0.5px;
             white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .exp-val {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 700;
             font-family: 'JetBrains Mono', monospace;
             color: #fff;
@@ -637,115 +650,96 @@
 
         .exp-gained {
             color: var(--accent-green) !important;
+            display: flex;
+            align-items: center;
+            gap: 3px;
         }
 
         .gained-badge {
             background: rgba(0, 255, 136, 0.16);
-            padding: 2px 6px;
+            padding: 2px 8px;
             border-radius: 6px;
             font-size: 11px;
             font-weight: 700;
-            border: 1px solid rgba(0, 255, 136, 0.3);
+            white-space: nowrap;
             display: inline-block;
         }
 
-        /* ============ LEVEL PROGRESS & CHIPS ============ */
-        .level-progress {
-            margin-bottom: 14px;
-        }
-
-        .level-labels {
+        /* ===== TARGET LEVEL & MATCHES BADGES ===== */
+        .acc-stats-row {
             display: flex;
-            align-items: center;
-            justify-content: flex-start;
+            flex-wrap: wrap;
             gap: 8px;
-            margin-bottom: 10px;
-            flex-wrap: nowrap;
-            overflow-x: auto;
+            margin-bottom: 12px;
+            justify-content: center;
         }
 
-        .level-labels::-webkit-scrollbar {
-            display: none;
-        }
-
-        .level-chip {
+        .stat-badge {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            background: rgba(0, 242, 254, 0.1);
+            gap: 5px;
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .stat-badge.level {
+            background: rgba(0, 242, 254, 0.12);
+            border: 1px solid rgba(0, 242, 254, 0.35);
             color: var(--accent-cyan);
-            padding: 4px 10px;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: 700;
-            border: 1px solid rgba(0, 242, 254, 0.25);
-            white-space: nowrap;
-            flex-shrink: 0;
+            box-shadow: 0 0 8px rgba(0, 242, 254, 0.15);
         }
 
-        .target-chip {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: rgba(255, 170, 0, 0.1);
+        .stat-badge.target {
+            background: rgba(255, 170, 0, 0.12);
+            border: 1px solid rgba(255, 170, 0, 0.35);
             color: var(--accent-amber);
-            padding: 4px 10px;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: 700;
-            border: 1px solid rgba(255, 170, 0, 0.25);
-            white-space: nowrap;
-            flex-shrink: 0;
+            box-shadow: 0 0 8px rgba(255, 170, 0, 0.15);
         }
 
-        .match-chip {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: rgba(0, 255, 136, 0.1);
+        .stat-badge.matches {
+            background: rgba(0, 255, 136, 0.12);
+            border: 1px solid rgba(0, 255, 136, 0.35);
             color: var(--accent-green);
-            padding: 4px 10px;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: 700;
-            border: 1px solid rgba(0, 255, 136, 0.25);
-            white-space: nowrap;
-            flex-shrink: 0;
+            box-shadow: 0 0 8px rgba(0, 255, 136, 0.15);
         }
 
-        .progress-bar-bg {
-            height: 8px;
+        .stat-badge i {
+            font-size: 10px;
+        }
+
+        /* ===== PROGRESS BAR ===== */
+        .progress-bar-container {
+            width: 100%;
+            height: 5px;
             background: rgba(255, 255, 255, 0.08);
-            border-radius: 10px;
+            border-radius: 6px;
+            margin-bottom: 12px;
             overflow: hidden;
-            position: relative;
         }
 
         .progress-bar-fill {
             height: 100%;
-            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-green), var(--accent-cyan));
-            background-size: 200% 100%;
-            border-radius: 10px;
-            transition: width 0.4s ease-out;
-            animation: progress-shine 3s infinite linear;
-            box-shadow: 0 0 12px rgba(0, 242, 254, 0.5);
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-green));
+            border-radius: 6px;
+            transition: width 0.4s ease;
+            box-shadow: 0 0 10px rgba(0, 242, 254, 0.5);
         }
 
-        @keyframes progress-shine {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 200% 50%; }
-        }
-
-        /* ============ ACCOUNT ACTIONS ============ */
+        /* ===== BOTTOM ACTION ROW ===== */
         .acc-actions {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding-top: 12px;
+            padding-top: 10px;
             border-top: 1px solid rgba(255, 255, 255, 0.05);
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-muted);
-            gap: 12px;
+            gap: 8px;
             flex-wrap: wrap;
         }
 
@@ -761,7 +755,7 @@
             color: var(--text-muted);
             width: 34px;
             height: 34px;
-            border-radius: 9px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -774,7 +768,6 @@
             background: rgba(0, 242, 254, 0.15);
             color: var(--accent-cyan);
             border-color: var(--accent-cyan);
-            transform: translateY(-2px);
         }
 
         .icon-btn.danger:hover {
@@ -783,7 +776,7 @@
             border-color: var(--accent-red);
         }
 
-        /* ============ LOGS ============ */
+        /* Live Logs Stream */
         .logs-box {
             display: flex;
             flex-direction: column;
@@ -792,679 +785,535 @@
 
         .log-stream {
             flex: 1;
-            min-height: 480px;
-            max-height: 640px;
+            min-height: 300px;
+            max-height: 480px;
             background: #03060f;
             border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 14px;
-            padding: 14px;
+            border-radius: 10px;
+            padding: 10px;
             font-family: 'JetBrains Mono', monospace;
-            font-size: 12px;
+            font-size: 11px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
         }
 
         .log-stream::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .log-stream::-webkit-scrollbar-track {
-            background: transparent;
+            width: 5px;
         }
 
         .log-stream::-webkit-scrollbar-thumb {
-            background: rgba(0, 242, 254, 0.25);
+            background: rgba(255, 255, 255, 0.1);
             border-radius: 3px;
         }
 
-        .log-stream::-webkit-scrollbar-thumb:hover {
-            background: rgba(0, 242, 254, 0.45);
-        }
-
         .log-item {
-            line-height: 1.5;
-            word-break: break-word;
-            padding: 3px 0;
+            line-height: 1.3;
+            word-break: break-all;
         }
 
-        .log-time { color: #64748b; margin-right: 6px; }
+        .log-time { color: #64748b; margin-right: 5px; }
         .log-info { color: #38bdf8; }
         .log-success { color: #4ade80; }
         .log-warning { color: #fbbf24; }
         .log-error { color: #f87171; }
 
-        /* ============ MODAL ============ */
+        /* Modal (Add Account) */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(3, 6, 15, 0.85);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            background: rgba(3, 6, 15, 0.82);
+            backdrop-filter: blur(8px);
             display: none;
             align-items: center;
             justify-content: center;
             z-index: 100;
-            padding: 20px;
-            overflow-y: auto;
+            padding: 14px;
         }
 
         .modal-overlay.active { display: flex; }
 
         .modal-card {
-            background: linear-gradient(135deg, #0c1224 0%, #101830 100%);
+            background: #0c1224;
             border: 1px solid var(--border-card);
-            border-radius: 22px;
+            border-radius: 14px;
             width: 100%;
-            max-width: 500px;
-            padding: 30px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 40px rgba(0, 242, 254, 0.1);
-            position: relative;
-            overflow: hidden;
-            animation: modal-in 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            max-width: 420px;
+            padding: 18px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
-        @keyframes modal-in {
-            0% { opacity: 0; transform: translateY(20px) scale(0.95); }
-            100% { opacity: 1; transform: translateY(0) scale(1); }
+        .modal-card::-webkit-scrollbar {
+            width: 5px;
         }
 
-        .modal-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--accent-cyan), var(--accent-pink), transparent);
+        .modal-card::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
         }
 
         .modal-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 22px;
+            margin-bottom: 14px;
+            gap: 8px;
         }
 
         .modal-header h3 {
-            font-size: 19px;
+            font-size: 15px;
             font-weight: 700;
-            display: flex;
-            align-items: center;
         }
 
         .form-group {
-            margin-bottom: 18px;
+            margin-bottom: 12px;
         }
 
         .form-group label {
             display: block;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             color: var(--text-muted);
-            margin-bottom: 7px;
-            letter-spacing: 0.3px;
+            margin-bottom: 5px;
         }
 
         .form-input {
             width: 100%;
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 11px;
-            padding: 12px 15px;
+            border-radius: 8px;
+            padding: 9px 12px;
             color: #fff;
-            font-size: 14px;
+            font-size: 13px;
             outline: none;
-            transition: all 0.2s;
-            font-family: 'Outfit', sans-serif;
+            transition: border-color 0.2s;
+            font-family: inherit;
         }
 
         .form-input:focus {
             border-color: var(--accent-cyan);
-            background: rgba(0, 242, 254, 0.05);
-            box-shadow: 0 0 0 3px rgba(0, 242, 254, 0.1);
         }
 
-        .form-input::placeholder {
-            color: rgba(142, 155, 181, 0.5);
+        .form-input option {
+            background: #0c1224;
+            color: #fff;
         }
 
         textarea.form-input {
             resize: vertical;
+            min-height: 60px;
             font-family: 'JetBrains Mono', monospace;
             font-size: 12px;
-            min-height: 80px;
         }
 
-        .target-level-wrap {
+        /* Target Level Range Slider */
+        .range-wrapper {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
 
-        .target-level-input {
+        .range-wrapper input[type="range"] {
             flex: 1;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 11px;
-            padding: 12px 15px;
-            color: #fff;
-            font-size: 16px;
-            font-weight: 700;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 6px;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+            border-radius: 6px;
             outline: none;
-            transition: all 0.2s;
-            font-family: 'JetBrains Mono', monospace;
+            cursor: pointer;
+        }
+
+        .range-wrapper input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: #fff;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 8px rgba(0, 242, 254, 0.6);
+            border: 2px solid var(--accent-cyan);
+        }
+
+        .range-wrapper input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            background: #fff;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 8px rgba(0, 242, 254, 0.6);
+            border: 2px solid var(--accent-cyan);
+        }
+
+        .range-value {
+            min-width: 50px;
             text-align: center;
-        }
-
-        .target-level-input:focus {
-            border-color: var(--accent-amber);
-            background: rgba(255, 170, 0, 0.05);
-            box-shadow: 0 0 0 3px rgba(255, 170, 0, 0.12);
-        }
-
-        .level-hint {
-            font-size: 11px;
-            color: var(--text-muted);
-            margin-top: 6px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .level-hint i {
-            color: var(--accent-amber);
-        }
-
-        .quick-levels {
-            display: flex;
-            gap: 8px;
-            margin-top: 10px;
-            flex-wrap: wrap;
-        }
-
-        .quick-level-btn {
-            flex: 1;
-            min-width: 55px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: var(--text-muted);
-            padding: 8px 12px;
-            border-radius: 9px;
+            font-family: 'JetBrains Mono', monospace;
             font-size: 13px;
             font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent-cyan);
+            background: rgba(0, 242, 254, 0.1);
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            border-radius: 8px;
+            padding: 5px 8px;
         }
 
-        .quick-level-btn:hover {
-            background: rgba(255, 170, 0, 0.12);
-            color: var(--accent-amber);
-            border-color: rgba(255, 170, 0, 0.4);
+        .range-hint {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 4px;
+            font-weight: 600;
         }
 
-        .quick-level-btn.active {
-            background: linear-gradient(135deg, var(--accent-amber), #ff8800);
-            color: #040914;
-            border-color: transparent;
-            box-shadow: 0 4px 12px rgba(255, 170, 0, 0.3);
-        }
-
-        /* ============ EMPTY STATE ============ */
         .empty-state {
             text-align: center;
-            padding: 50px 20px;
+            padding: 30px 15px;
             color: var(--text-muted);
         }
 
         .empty-state i {
-            font-size: 48px;
-            margin-bottom: 14px;
-            color: rgba(255, 255, 255, 0.08);
+            font-size: 36px;
+            margin-bottom: 10px;
+            color: rgba(255, 255, 255, 0.1);
         }
 
         .empty-state p {
-            font-size: 14px;
+            font-size: 13px;
         }
 
-        /* ============================================================ */
-        /* ============ WELCOME NOTICE MODAL (COMPACT) ============ */
-        /* ============================================================ */
-        .notice-overlay {
+        /* ========================================= */
+        /* WELCOME MODAL (NEW LOGIN OVERLAY)         */
+        /* ========================================= */
+        .welcome-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(3, 6, 15, 0.92);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-            display: none;
+            backdrop-filter: blur(12px);
+            display: none; /* Hidden by default */
             align-items: center;
             justify-content: center;
-            z-index: 200;
+            z-index: 9999;
             padding: 14px;
             overflow-y: auto;
         }
 
-        .notice-overlay.active {
+        .welcome-overlay.active {
             display: flex;
         }
 
-        .notice-card {
-            background: linear-gradient(135deg, #0a0f1f 0%, #101830 50%, #0d1428 100%);
-            border: 1px solid rgba(0, 242, 254, 0.25);
+        .welcome-card {
+            background: #0c1224;
+            border: 1px solid rgba(0, 242, 254, 0.3);
             border-radius: 20px;
             width: 100%;
             max-width: 440px;
-            padding: 0;
-            box-shadow:
-                0 20px 50px rgba(0, 0, 0, 0.85),
-                0 0 45px rgba(0, 242, 254, 0.15),
-                inset 0 0 20px rgba(0, 242, 254, 0.04);
+            padding: 24px 20px;
+            box-shadow: 0 0 40px rgba(0, 242, 254, 0.15), 0 10px 30px rgba(0, 0, 0, 0.8);
             position: relative;
             overflow: hidden;
-            animation: notice-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+            animation: welcome-pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        @keyframes notice-in {
-            0% { opacity: 0; transform: scale(0.88) translateY(20px); }
-            100% { opacity: 1; transform: scale(1) translateY(0); }
+        @keyframes welcome-pop {
+            0% { transform: scale(0.85); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
         }
 
-        .notice-card::before {
+        .welcome-card::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg,
-                transparent,
-                var(--accent-cyan),
-                var(--accent-pink),
-                var(--accent-purple),
-                var(--accent-cyan),
-                transparent);
-            background-size: 200% 100%;
-            animation: notice-scan 3s infinite linear;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple), var(--accent-green));
         }
 
-        @keyframes notice-scan {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 200% 50%; }
-        }
-
-        .notice-header {
-            padding: 20px 20px 14px;
+        .welcome-header {
             text-align: center;
-            position: relative;
-            border-bottom: 1px solid rgba(0, 242, 254, 0.1);
-            background: radial-gradient(ellipse at top, rgba(0, 242, 254, 0.08) 0%, transparent 70%);
+            margin-bottom: 20px;
         }
 
-        .notice-icon-wrap {
-            width: 52px;
-            height: 52px;
-            margin: 0 auto 10px;
-            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple), var(--accent-pink));
-            background-size: 200% 200%;
+        .welcome-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
             border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 22px;
+            font-size: 26px;
             color: #fff;
-            box-shadow:
-                0 0 25px rgba(0, 242, 254, 0.45),
-                0 0 45px rgba(127, 0, 255, 0.25),
-                inset 0 0 14px rgba(255, 255, 255, 0.15);
-            animation: notice-icon-glow 3s infinite alternate, gradient-shift 5s infinite;
+            margin: 0 auto 12px;
+            box-shadow: 0 0 25px rgba(127, 0, 255, 0.5);
+            animation: pulse-glow 2s infinite alternate;
         }
 
-        @keyframes notice-icon-glow {
-            0% {
-                box-shadow: 0 0 20px rgba(0, 242, 254, 0.35),
-                            0 0 35px rgba(127, 0, 255, 0.2),
-                            inset 0 0 14px rgba(255, 255, 255, 0.15);
-            }
-            100% {
-                box-shadow: 0 0 32px rgba(0, 242, 254, 0.6),
-                            0 0 55px rgba(255, 45, 149, 0.3),
-                            inset 0 0 18px rgba(255, 255, 255, 0.25);
-            }
-        }
-
-        .notice-header h2 {
-            font-size: 17px;
-            font-weight: 800;
-            letter-spacing: -0.3px;
-            background: linear-gradient(90deg, #ffffff, var(--accent-cyan), var(--accent-pink));
-            background-size: 200% 100%;
+        .welcome-header h2 {
+            font-size: 18px;
+            font-weight: 900;
+            background: linear-gradient(90deg, #ff007f, #7f00ff, #00f2fe);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            animation: text-shine 4s infinite linear;
             margin-bottom: 4px;
+            letter-spacing: 0.5px;
         }
 
-        .notice-header p {
-            font-size: 11px;
+        .welcome-header p {
+            font-size: 12px;
             color: var(--text-muted);
             font-weight: 500;
-            letter-spacing: 0.4px;
         }
 
-        .notice-body {
-            padding: 14px 18px 12px;
+        .region-section {
+            margin-bottom: 16px;
         }
 
-        .notice-section {
-            margin-bottom: 12px;
-        }
-
-        .notice-section:last-child {
-            margin-bottom: 0;
-        }
-
-        .notice-section-title {
-            display: flex;
-            align-items: center;
-            gap: 8px;
+        .region-title {
             font-size: 12px;
             font-weight: 700;
             color: #fff;
             margin-bottom: 8px;
-            padding-bottom: 6px;
-            border-bottom: 1px dashed rgba(0, 242, 254, 0.15);
-        }
-
-        .notice-section-title i {
-            width: 22px;
-            height: 22px;
-            border-radius: 7px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            flex-shrink: 0;
-        }
-
-        .notice-section-title .icon-supported {
-            background: rgba(0, 255, 136, 0.15);
-            color: var(--accent-green);
-            border: 1px solid rgba(0, 255, 136, 0.3);
-        }
-
-        .notice-section-title .icon-unsupported {
-            background: rgba(255, 51, 102, 0.15);
-            color: var(--accent-red);
-            border: 1px solid rgba(255, 51, 102, 0.3);
-        }
-
-        .notice-section-title .icon-contact {
-            background: rgba(0, 242, 254, 0.15);
-            color: var(--accent-cyan);
-            border: 1px solid rgba(0, 242, 254, 0.3);
-        }
-
-        .region-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
             gap: 6px;
         }
 
-        .region-chip {
+        .region-title i {
+            font-size: 12px;
+        }
+
+        .region-grid {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            padding: 6px 4px;
-            border-radius: 8px;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .region-badge-item {
+            padding: 4px 10px;
+            border-radius: 6px;
             font-size: 10px;
             font-weight: 700;
             font-family: 'JetBrains Mono', monospace;
-            letter-spacing: 0.3px;
-            transition: transform 0.2s;
-            text-align: center;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s;
         }
 
-        .region-chip.allowed {
-            background: linear-gradient(135deg, rgba(0, 255, 136, 0.12), rgba(0, 200, 100, 0.06));
-            color: var(--accent-green);
+        .region-badge-item.allowed {
+            background: rgba(0, 255, 136, 0.1);
             border: 1px solid rgba(0, 255, 136, 0.3);
-            box-shadow: 0 0 10px rgba(0, 255, 136, 0.08) inset;
-        }
-
-        .region-chip.allowed:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 0 14px rgba(0, 255, 136, 0.22);
-        }
-
-        .region-chip.allowed i {
             color: var(--accent-green);
+        }
+
+        .region-badge-item.not-allowed {
+            background: rgba(255, 51, 102, 0.1);
+            border: 1px solid rgba(255, 51, 102, 0.3);
+            color: var(--accent-red);
+        }
+
+        .region-badge-item i {
             font-size: 8px;
         }
 
-        .region-chip.blocked {
-            background: linear-gradient(135deg, rgba(255, 51, 102, 0.08), rgba(150, 20, 50, 0.04));
-            color: rgba(255, 51, 102, 0.55);
-            border: 1px solid rgba(255, 51, 102, 0.18);
-            text-decoration: line-through;
+        .contact-section {
+            margin-bottom: 20px;
         }
 
-        .region-chip.blocked i {
-            color: rgba(255, 51, 102, 0.5);
-            font-size: 8px;
-        }
-
-        .notice-telegram {
+        .contact-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 8px;
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 10px 12px;
-            background: linear-gradient(135deg, rgba(0, 136, 204, 0.12), rgba(0, 100, 200, 0.06));
-            border: 1px solid rgba(0, 160, 255, 0.3);
-            border-radius: 11px;
+            gap: 6px;
+        }
+
+        .telegram-link {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 10px 14px;
             text-decoration: none;
-            transition: all 0.25s;
-            position: relative;
-            overflow: hidden;
+            color: inherit;
+            transition: all 0.2s;
+            gap: 10px;
         }
 
-        .notice-telegram::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(0, 160, 255, 0.15), transparent);
-            transition: left 0.6s;
+        .telegram-link:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(0, 242, 254, 0.3);
         }
 
-        .notice-telegram:hover::before {
-            left: 100%;
-        }
-
-        .notice-telegram:hover {
-            background: linear-gradient(135deg, rgba(0, 136, 204, 0.2), rgba(0, 100, 200, 0.12));
-            border-color: rgba(0, 180, 255, 0.6);
-            transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(0, 160, 255, 0.22);
+        .tg-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
         }
 
         .tg-icon {
-            width: 34px;
-            height: 34px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, #229ED9, #0088cc);
+            width: 36px;
+            height: 36px;
+            background: #0088cc;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
+            font-size: 18px;
             color: #fff;
             flex-shrink: 0;
-            box-shadow: 0 0 14px rgba(0, 160, 255, 0.4);
         }
 
         .tg-info {
-            flex: 1;
             min-width: 0;
         }
 
         .tg-info h4 {
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 700;
             color: #fff;
-            margin-bottom: 2px;
         }
 
         .tg-info p {
             font-size: 11px;
-            color: #7dd3fc;
+            color: var(--text-muted);
             font-family: 'JetBrains Mono', monospace;
-            word-break: break-all;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
-        .tg-arrow {
-            font-size: 13px;
-            color: rgba(0, 180, 255, 0.7);
+        .tg-right {
+            color: var(--accent-cyan);
+            font-size: 14px;
             flex-shrink: 0;
-            transition: transform 0.25s;
         }
 
-        .notice-telegram:hover .tg-arrow {
-            transform: translateX(3px);
-            color: #38bdf8;
-        }
-
-        .notice-footer {
-            padding: 12px 18px 18px;
-            text-align: center;
-        }
-
-        .notice-ok-btn {
+        .welcome-btn {
             width: 100%;
-            padding: 12px 18px;
+            padding: 14px;
+            border-radius: 12px;
             border: none;
-            border-radius: 11px;
-            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue), var(--accent-purple));
-            background-size: 200% 200%;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
             color: #040914;
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 800;
-            font-family: 'Outfit', sans-serif;
-            letter-spacing: 0.8px;
-            text-transform: uppercase;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            box-shadow: 0 6px 20px rgba(0, 242, 254, 0.35);
-            display: inline-flex;
+            display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
-            animation: gradient-shift 4s infinite;
-            position: relative;
-            overflow: hidden;
+            transition: all 0.25s;
+            box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .notice-ok-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-            transition: left 0.6s;
-        }
-
-        .notice-ok-btn:hover::before {
-            left: 100%;
-        }
-
-        .notice-ok-btn:hover {
+        .welcome-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 32px rgba(0, 242, 254, 0.55);
+            box-shadow: 0 6px 25px rgba(0, 242, 254, 0.5);
         }
 
-        .notice-ok-btn:active {
-            transform: translateY(0) scale(0.98);
+        .welcome-btn:active {
+            transform: scale(0.97);
         }
 
-        /* ============ TABLET ============ */
+        /* ===== MOBILE RESPONSIVE ===== */
         @media (max-width: 1024px) {
-            .dashboard-main {
-                grid-template-columns: 1fr;
+            .dashboard-main { 
+                grid-template-columns: 1fr; 
             }
             .log-stream {
-                min-height: 400px;
-                max-height: 500px;
+                max-height: 320px;
             }
         }
 
-        /* ============ MOBILE ============ */
         @media (max-width: 768px) {
             body {
-                padding: 12px;
+                padding: 8px;
             }
 
             header {
-                padding: 16px;
-                border-radius: 16px;
-                margin-bottom: 16px;
+                padding: 12px 14px;
+                border-radius: 14px;
+                margin-bottom: 10px;
+                gap: 10px;
+            }
+
+            .brand {
+                gap: 10px;
+                flex: 1;
+                min-width: 0;
             }
 
             .logo-box {
-                width: 44px;
-                height: 44px;
-                font-size: 20px;
+                width: 38px;
+                height: 38px;
+                font-size: 16px;
+                border-radius: 9px;
             }
 
             .brand-text h1 {
-                font-size: 16px;
+                font-size: 12px;
+                letter-spacing: 0.5px;
             }
 
             .brand-text p {
-                font-size: 11px;
+                font-size: 10px;
+                flex-wrap: wrap;
+                gap: 4px;
+            }
+
+            .live-tag {
+                font-size: 9px;
+                padding: 2px 7px;
+            }
+
+            .key-timer {
+                font-size: 9px;
+                padding: 2px 7px;
             }
 
             .header-actions {
+                gap: 6px;
                 width: 100%;
+                justify-content: stretch;
             }
 
             .header-actions .btn {
                 flex: 1;
-                padding: 10px 14px;
-                font-size: 13px;
-            }
-
-            .btn-logout {
-                padding: 10px 12px;
-                font-size: 13px;
-                flex: 0 0 auto;
-            }
-
-            .btn-logout span {
-                display: none;
+                padding: 9px 12px;
+                font-size: 11px;
+                border-radius: 9px;
             }
 
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
-                gap: 12px;
-                margin-bottom: 16px;
+                gap: 8px;
+                margin-bottom: 10px;
             }
 
             .stat-card {
-                padding: 12px;
-                border-radius: 14px;
+                padding: 11px 12px;
                 gap: 10px;
+                border-radius: 12px;
             }
 
             .stat-icon {
-                width: 40px;
-                height: 40px;
-                font-size: 16px;
+                width: 36px;
+                height: 36px;
+                font-size: 15px;
                 border-radius: 10px;
             }
 
@@ -1473,252 +1322,550 @@
             }
 
             .stat-content p {
-                font-size: 10px;
+                font-size: 9px;
             }
 
             .card-box {
-                padding: 16px;
-                border-radius: 16px;
+                padding: 14px;
+                border-radius: 14px;
             }
 
             .box-title {
-                font-size: 15px;
+                font-size: 13px;
             }
 
             .account-card {
                 padding: 14px;
-                border-radius: 14px;
+                border-radius: 13px;
+            }
+
+            .acc-top {
+                gap: 10px;
+                margin-bottom: 12px;
+            }
+
+            .acc-profile {
+                gap: 10px;
             }
 
             .acc-avatar {
                 width: 40px;
                 height: 40px;
-                font-size: 15px;
+                font-size: 16px;
+                border-radius: 10px;
             }
 
             .acc-info h4 {
                 font-size: 13px;
+                gap: 5px;
             }
 
-            .acc-info span.uid-text {
+            .region-badge {
+                font-size: 9px;
+                padding: 2px 6px;
+            }
+
+            .acc-info span {
                 font-size: 11px;
+                margin-top: 2px;
+            }
+
+            .acc-status {
+                font-size: 10px;
+                padding: 4px 10px;
+                border-radius: 16px;
+                gap: 5px;
             }
 
             .exp-box {
-                padding: 10px;
-                gap: 6px;
-            }
-
-            .exp-val {
-                font-size: 12px;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
+                padding: 10px 12px;
+                border-radius: 10px;
+                margin-bottom: 12px;
             }
 
             .exp-label {
                 font-size: 9px;
             }
 
-            .log-stream {
-                min-height: 320px;
-                max-height: 420px;
-                padding: 12px;
-                font-size: 11px;
+            .exp-val {
+                font-size: 12px;
             }
 
-            .modal-card {
-                padding: 22px 18px;
-                border-radius: 18px;
-            }
-
-            .modal-header h3 {
-                font-size: 16px;
-            }
-
-            /* Notice mobile - even more compact */
-            .notice-card {
-                border-radius: 16px;
-                max-width: 100%;
-            }
-
-            .notice-header {
-                padding: 16px 16px 12px;
-            }
-
-            .notice-icon-wrap {
-                width: 44px;
-                height: 44px;
-                font-size: 18px;
-                border-radius: 13px;
-                margin-bottom: 8px;
-            }
-
-            .notice-header h2 {
-                font-size: 15px;
-            }
-
-            .notice-header p {
+            .gained-badge {
                 font-size: 10px;
+                padding: 2px 6px;
             }
 
-            .notice-body {
-                padding: 12px 14px 10px;
-            }
-
-            .notice-section {
-                margin-bottom: 10px;
-            }
-
-            .notice-section-title {
-                font-size: 11px;
-                margin-bottom: 6px;
-                padding-bottom: 5px;
+            .acc-stats-row {
                 gap: 6px;
+                margin-bottom: 12px;
             }
 
-            .notice-section-title i {
-                width: 20px;
-                height: 20px;
+            .stat-badge {
+                font-size: 10px;
+                padding: 4px 9px;
+                border-radius: 7px;
+            }
+
+            .stat-badge i {
                 font-size: 9px;
             }
 
-            .region-grid {
-                grid-template-columns: repeat(5, 1fr);
-                gap: 4px;
+            .acc-actions {
+                font-size: 10px;
+                padding-top: 10px;
             }
 
-            .region-chip {
-                padding: 5px 2px;
-                font-size: 9px;
-                border-radius: 6px;
-                gap: 3px;
-            }
-
-            .region-chip i {
-                font-size: 7px;
-            }
-
-            .notice-telegram {
-                padding: 8px 10px;
+            .action-btns {
                 gap: 8px;
+            }
+
+            .icon-btn {
+                width: 34px;
+                height: 34px;
+                font-size: 13px;
                 border-radius: 9px;
             }
 
-            .tg-icon {
-                width: 30px;
-                height: 30px;
-                font-size: 14px;
+            .log-stream {
+                min-height: 240px;
+                max-height: 300px;
+                font-size: 10px;
+                padding: 10px;
+                border-radius: 10px;
+            }
+
+            .modal-card {
+                padding: 18px;
+                border-radius: 14px;
+                max-width: 100%;
+            }
+
+            .modal-header h3 {
+                font-size: 15px;
+            }
+
+            .form-input {
+                padding: 11px 14px;
+                font-size: 13px;
+                border-radius: 9px;
+            }
+
+            .range-value {
+                min-width: 48px;
+                font-size: 13px;
+            }
+
+            .welcome-card {
+                padding: 20px 16px;
+                border-radius: 18px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 6px;
+            }
+
+            header {
+                padding: 12px;
+                gap: 8px;
+                border-radius: 12px;
+            }
+
+            .logo-box {
+                width: 36px;
+                height: 36px;
+                font-size: 15px;
                 border-radius: 8px;
             }
 
-            .tg-info h4 {
+            .brand-text h1 {
                 font-size: 11px;
+                letter-spacing: 0.3px;
+            }
+
+            .brand-text p {
+                font-size: 9px;
+            }
+
+            .live-tag {
+                font-size: 8px;
+                padding: 2px 6px;
+                gap: 4px;
+            }
+
+            .live-tag .pulse-dot {
+                width: 5px;
+                height: 5px;
+            }
+
+            .key-timer {
+                font-size: 8px;
+                padding: 2px 6px;
+                gap: 4px;
+            }
+
+            .key-timer i {
+                font-size: 8px;
+            }
+
+            .header-actions .btn {
+                padding: 8px 10px;
+                font-size: 10px;
+                gap: 5px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 6px;
+            }
+
+            .stat-card {
+                padding: 10px;
+                gap: 8px;
+                border-radius: 11px;
+            }
+
+            .stat-icon {
+                width: 32px;
+                height: 32px;
+                font-size: 13px;
+                border-radius: 8px;
+            }
+
+            .stat-content h3 {
+                font-size: 13px;
+            }
+
+            .stat-content p {
+                font-size: 8px;
+            }
+
+            .card-box {
+                padding: 12px;
+                border-radius: 12px;
+            }
+
+            .box-title {
+                font-size: 12px;
+                gap: 6px;
+            }
+
+            .account-card {
+                padding: 12px;
+                border-radius: 12px;
+            }
+
+            .acc-top {
+                gap: 8px;
+                margin-bottom: 10px;
+            }
+
+            .acc-avatar {
+                width: 36px;
+                height: 36px;
+                font-size: 14px;
+                border-radius: 9px;
+            }
+
+            .acc-info h4 {
+                font-size: 12px;
+                gap: 4px;
+            }
+
+            .region-badge {
+                font-size: 8px;
+                padding: 1px 5px;
+                border-radius: 3px;
+            }
+
+            .acc-info span {
+                font-size: 10px;
+            }
+
+            .acc-status {
+                font-size: 9px;
+                padding: 3px 8px;
+                border-radius: 14px;
+            }
+
+            .acc-status .pulse-dot {
+                width: 5px;
+                height: 5px;
+            }
+
+            .exp-box {
+                gap: 6px;
+                padding: 8px 10px;
+                border-radius: 9px;
+                margin-bottom: 10px;
+            }
+
+            .exp-label {
+                font-size: 8px;
+            }
+
+            .exp-val {
+                font-size: 11px;
+            }
+
+            .gained-badge {
+                font-size: 9px;
+                padding: 1px 5px;
+            }
+
+            .acc-stats-row {
+                gap: 5px;
+                margin-bottom: 10px;
+            }
+
+            .stat-badge {
+                font-size: 9px;
+                padding: 3px 8px;
+                border-radius: 6px;
+                gap: 4px;
+            }
+
+            .stat-badge i {
+                font-size: 8px;
+            }
+
+            .acc-actions {
+                font-size: 9px;
+                padding-top: 8px;
+                gap: 6px;
+            }
+
+            .action-btns {
+                gap: 6px;
+            }
+
+            .icon-btn {
+                width: 30px;
+                height: 30px;
+                font-size: 12px;
+                border-radius: 8px;
+            }
+
+            .log-stream {
+                min-height: 200px;
+                max-height: 260px;
+                font-size: 9px;
+                padding: 8px;
+                gap: 5px;
+                border-radius: 9px;
+            }
+
+            .log-time {
+                margin-right: 4px;
+            }
+
+            .modal-card {
+                padding: 16px;
+                border-radius: 12px;
+            }
+
+            .modal-header h3 {
+                font-size: 14px;
+            }
+
+            .form-group label {
+                font-size: 11px;
+            }
+
+            .form-input {
+                padding: 10px 12px;
+                font-size: 12px;
+                border-radius: 8px;
+            }
+
+            .range-value {
+                min-width: 44px;
+                font-size: 12px;
+                padding: 4px 7px;
+                border-radius: 7px;
+            }
+
+            .range-hint {
+                font-size: 9px;
+            }
+
+            .empty-state {
+                padding: 24px 12px;
+            }
+
+            .empty-state i {
+                font-size: 30px;
+            }
+
+            .empty-state p {
+                font-size: 12px;
+            }
+
+            .welcome-card {
+                padding: 18px 14px;
+                border-radius: 16px;
+            }
+
+            .welcome-header h2 {
+                font-size: 16px;
+            }
+
+            .welcome-header p {
+                font-size: 11px;
+            }
+
+            .region-badge-item {
+                font-size: 9px;
+                padding: 3px 8px;
+            }
+
+            .tg-info h4 {
+                font-size: 12px;
             }
 
             .tg-info p {
                 font-size: 10px;
             }
 
-            .notice-footer {
-                padding: 10px 14px 14px;
+            .welcome-btn {
+                padding: 12px;
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .brand-text h1 {
+                font-size: 10px;
             }
 
-            .notice-ok-btn {
-                padding: 11px 16px;
+            .brand-text p {
+                font-size: 8px;
+            }
+
+            .stat-content h3 {
                 font-size: 12px;
-                border-radius: 10px;
+            }
+
+            .stat-content p {
+                font-size: 7px;
+            }
+
+            .acc-info h4 {
+                font-size: 11px;
+            }
+
+            .acc-info span {
+                font-size: 9px;
+            }
+
+            .exp-val {
+                font-size: 10px;
+            }
+
+            .gained-badge {
+                font-size: 8px;
+            }
+
+            .stat-badge {
+                font-size: 8px;
+                padding: 3px 6px;
+            }
+
+            .icon-btn {
+                width: 28px;
+                height: 28px;
+                font-size: 11px;
+            }
+
+            .log-stream {
+                font-size: 8px;
             }
         }
 
-        @media (max-width: 420px) {
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
+        @media (hover: none) and (pointer: coarse) {
+            .btn, .icon-btn, .account-card, .welcome-btn {
+                -webkit-tap-highlight-color: transparent;
             }
-            .brand-text p span:not(.live-tag) {
-                display: none;
+            
+            .btn:active {
+                transform: scale(0.97);
+            }
+            
+            .icon-btn:active {
+                transform: scale(0.92);
+            }
+            
+            .stat-card:active {
+                transform: scale(0.98);
             }
 
-            .region-grid {
-                grid-template-columns: repeat(5, 1fr);
+            .account-card:active {
+                border-color: var(--border-hover);
             }
-        }
 
-        /* ============ SCROLLBAR ============ */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.2);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(0, 242, 254, 0.25);
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(0, 242, 254, 0.45);
+            .welcome-btn:active {
+                transform: scale(0.97);
+            }
         }
     </style>
 </head>
 <body>
 
-    <!-- ============================================================ -->
-    <!-- ============ WELCOME NOTICE MODAL ============ -->
-    <!-- ============================================================ -->
-    <div class="notice-overlay" id="welcome-notice">
-        <div class="notice-card">
-
-            <div class="notice-header">
-                <div class="notice-icon-wrap">
+    <!-- ========================================= -->
+    <!-- WELCOME MODAL (NEW LOGIN OVERLAY)         -->
+    <!-- ========================================= -->
+    <div class="welcome-overlay" id="welcome-modal">
+        <div class="welcome-card">
+            <div class="welcome-header">
+                <div class="welcome-icon">
                     <i class="fa-solid fa-bullhorn"></i>
                 </div>
-                <h2>WELCOME TO CODEX YASIN</h2>
+                <h2>WELCOME TO YASIN BHAI</h2>
                 <p>Free Fire Level Up Bot — Important Notice</p>
             </div>
 
-            <div class="notice-body">
-
-                <!-- SUPPORTED REGIONS -->
-                <div class="notice-section">
-                    <div class="notice-section-title">
-                        <i class="fa-solid fa-circle-check icon-supported"></i>
-                        <span>Supported Regions (Allowed)</span>
-                    </div>
-                    <div class="region-grid">
-                        <div class="region-chip allowed"><i class="fa-solid fa-check"></i> BD</div>
-                        <div class="region-chip allowed"><i class="fa-solid fa-check"></i> IND</div>
-                        <div class="region-chip allowed"><i class="fa-solid fa-check"></i> SG</div>
-                        <div class="region-chip allowed"><i class="fa-solid fa-check"></i> TH</div>
-                        <div class="region-chip allowed"><i class="fa-solid fa-check"></i> PH</div>
-                        <div class="region-chip allowed"><i class="fa-solid fa-check"></i> VN</div>
-                        <div class="region-chip allowed"><i class="fa-solid fa-check"></i> MY</div>
-                        <div class="region-chip allowed"><i class="fa-solid fa-check"></i> ID</div>
-                        <div class="region-chip allowed"><i class="fa-solid fa-check"></i> HK</div>
-                        <div class="region-chip allowed"><i class="fa-solid fa-check"></i> TW</div>
-                    </div>
+            <div class="region-section">
+                <div class="region-title">
+                    <i class="fa-solid fa-circle-check" style="color:var(--accent-green);"></i> Supported Regions (Allowed)
                 </div>
-
-                <!-- UNSUPPORTED REGIONS -->
-                <div class="notice-section">
-                    <div class="notice-section-title">
-                        <i class="fa-solid fa-circle-xmark icon-unsupported"></i>
-                        <span>Unsupported Regions (Not Allowed)</span>
-                    </div>
-                    <div class="region-grid">
-                        <div class="region-chip blocked"><i class="fa-solid fa-xmark"></i> BR</div>
-                        <div class="region-chip blocked"><i class="fa-solid fa-xmark"></i> RU</div>
-                        <div class="region-chip blocked"><i class="fa-solid fa-xmark"></i> US</div>
-                        <div class="region-chip blocked"><i class="fa-solid fa-xmark"></i> EU</div>
-                        <div class="region-chip blocked"><i class="fa-solid fa-xmark"></i> MENA</div>
-                        <div class="region-chip blocked"><i class="fa-solid fa-xmark"></i> SAC</div>
-                    </div>
+                <div class="region-grid">
+                    <span class="region-badge-item allowed"><i class="fa-solid fa-check"></i> BD</span>
+                    <span class="region-badge-item allowed"><i class="fa-solid fa-check"></i> IND</span>
+                    <span class="region-badge-item allowed"><i class="fa-solid fa-check"></i> SG</span>
+                    <span class="region-badge-item allowed"><i class="fa-solid fa-check"></i> TH</span>
+                    <span class="region-badge-item allowed"><i class="fa-solid fa-check"></i> PH</span>
+                    <span class="region-badge-item allowed"><i class="fa-solid fa-check"></i> VN</span>
+                    <span class="region-badge-item allowed"><i class="fa-solid fa-check"></i> MY</span>
+                    <span class="region-badge-item allowed"><i class="fa-solid fa-check"></i> ID</span>
+                    <span class="region-badge-item allowed"><i class="fa-solid fa-check"></i> HK</span>
+                    <span class="region-badge-item allowed"><i class="fa-solid fa-check"></i> TW</span>
                 </div>
+            </div>
 
-                <!-- TELEGRAM CONTACT -->
-                <div class="notice-section">
-                    <div class="notice-section-title">
-                        <i class="fa-solid fa-headset icon-contact"></i>
-                        <span>Contact / New Update</span>
-                    </div>
-                    <a href="https://t.me/freefireob51" target="_blank" rel="noopener noreferrer" class="notice-telegram">
+            <div class="region-section">
+                <div class="region-title">
+                    <i class="fa-solid fa-circle-xmark" style="color:var(--accent-red);"></i> Unsupported Regions (Not Allowed)
+                </div>
+                <div class="region-grid">
+                    <span class="region-badge-item not-allowed"><i class="fa-solid fa-xmark"></i> BR</span>
+                    <span class="region-badge-item not-allowed"><i class="fa-solid fa-xmark"></i> RU</span>
+                    <span class="region-badge-item not-allowed"><i class="fa-solid fa-xmark"></i> US</span>
+                    <span class="region-badge-item not-allowed"><i class="fa-solid fa-xmark"></i> EU</span>
+                    <span class="region-badge-item not-allowed"><i class="fa-solid fa-xmark"></i> MENA</span>
+                    <span class="region-badge-item not-allowed"><i class="fa-solid fa-xmark"></i> SAC</span>
+                </div>
+            </div>
+
+            <div class="contact-section">
+                <div class="contact-title">
+                    <i class="fa-solid fa-headset" style="color:var(--accent-cyan);"></i> Contact / New Update
+                </div>
+                <a href="https://t.me/freefireob51" target="_blank" class="telegram-link">
+                    <div class="tg-left">
                         <div class="tg-icon">
                             <i class="fa-brands fa-telegram"></i>
                         </div>
@@ -1726,48 +1873,49 @@
                             <h4>Telegram Support</h4>
                             <p>https://t.me/freefireob51</p>
                         </div>
-                        <i class="fa-solid fa-arrow-up-right-from-square tg-arrow"></i>
-                    </a>
-                </div>
-
+                    </div>
+                    <div class="tg-right">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    </div>
+                </a>
             </div>
 
-            <div class="notice-footer">
-                <button class="notice-ok-btn" onclick="closeNotice()">
-                    <i class="fa-solid fa-check-circle"></i>
-                    OK, I Understand
-                </button>
-            </div>
-
+            <button class="welcome-btn" onclick="closeWelcomeModal()">
+                <i class="fa-solid fa-circle-check"></i> OK, I UNDERSTAND
+            </button>
         </div>
     </div>
 
+    <!-- ========================================= -->
+    <!-- MAIN DASHBOARD                            -->
+    <!-- ========================================= -->
     <div class="container">
-        <!-- Header -->
         <header>
             <div class="brand">
                 <div class="logo-box">
                     <i class="fa-solid fa-bolt"></i>
                 </div>
                 <div class="brand-text">
-                    <h1>CODEX YASIN <span style="font-weight:400; color:var(--text-muted); font-size:14px;">| AUTO LEVEL UP BOT</span></h1>
+                    <h1>YASIN BHSI | LEVEL UP BOT</h1>
                     <p>
                         <span class="live-tag"><span class="pulse-dot"></span> System Live</span>
-                        <span>• Target Level Auto-Stop Engine</span>
+                        <span class="key-timer" id="key-timer" style="display:none;">
+                            <i class="fa-solid fa-hourglass-half"></i>
+                            <span id="key-timer-text">--:--:--</span>
+                        </span>
                     </p>
                 </div>
             </div>
             <div class="header-actions">
-                <button class="btn btn-secondary" onclick="fetchStats()"><i class="fa-solid fa-rotate"></i> Refresh</button>
-                <button class="btn btn-primary" onclick="openAddModal()"><i class="fa-solid fa-plus"></i> Add Account</button>
-                <button class="btn-logout" onclick="logout()" title="Logout">
-                    <i class="fa-solid fa-right-from-bracket"></i>
-                    <span>Logout</span>
+                <button class="btn btn-secondary" onclick="fetchStats()">
+                    <i class="fa-solid fa-rotate"></i> <span class="btn-label">Refresh</span>
+                </button>
+                <button class="btn btn-primary" onclick="openAddModal()">
+                    <i class="fa-solid fa-plus"></i> <span class="btn-label">Add Account</span>
                 </button>
             </div>
         </header>
 
-        <!-- Stats Bar -->
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-icon cyan"><i class="fa-solid fa-users"></i></div>
@@ -1799,9 +1947,7 @@
             </div>
         </div>
 
-        <!-- Main Dashboard -->
         <div class="dashboard-main">
-            <!-- Accounts List -->
             <div class="card-box">
                 <div class="box-header">
                     <div class="box-title">
@@ -1817,27 +1963,27 @@
                 </div>
             </div>
 
-            <!-- Real-time Logs -->
             <div class="card-box logs-box">
                 <div class="box-header">
                     <div class="box-title">
                         <i class="fa-solid fa-terminal" style="color:var(--accent-green)"></i>
                         <span>Live Match & Bot Logs</span>
                     </div>
-                    <span style="font-size:12px; color:var(--text-muted);">Real-time</span>
+                    <span style="font-size:11px; color:var(--text-muted);">Real-time</span>
                 </div>
                 <div class="log-stream" id="log-stream">
-                    <!-- Logs inserted dynamically -->
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Add Account Modal -->
+    <!-- ========================================= -->
+    <!-- ADD ACCOUNT MODAL                         -->
+    <!-- ========================================= -->
     <div class="modal-overlay" id="add-modal">
         <div class="modal-card">
             <div class="modal-header">
-                <h3><i class="fa-solid fa-user-plus" style="color:var(--accent-cyan); margin-right:8px;"></i> Add New Account</h3>
+                <h3><i class="fa-solid fa-user-plus" style="color:var(--accent-cyan); margin-right:6px;"></i> Add New Account</h3>
                 <button class="icon-btn" onclick="closeAddModal()"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <form id="add-acc-form" onsubmit="submitAddAccount(event)">
@@ -1848,7 +1994,6 @@
                         <option value="token">Access Token</option>
                     </select>
                 </div>
-
                 <div id="guest-fields">
                     <div class="form-group">
                         <label>Guest UID</label>
@@ -1856,10 +2001,9 @@
                     </div>
                     <div class="form-group">
                         <label>Guest Password / Secret</label>
-                        <input type="text" class="form-input" id="acc-password" placeholder="e.g. YASIN_BHAI_6767">
+                        <input type="text" class="form-input" id="acc-password" placeholder="e.g. ZERO_GRAVITY_4NM38">
                     </div>
                 </div>
-
                 <div id="token-fields" style="display:none;">
                     <div class="form-group">
                         <label>Access Token</label>
@@ -1867,85 +2011,71 @@
                     </div>
                 </div>
 
-                <!-- Target Level -->
                 <div class="form-group">
-                    <label><i class="fa-solid fa-bullseye" style="color:var(--accent-amber); margin-right:6px;"></i> Target Level (3 – 100)</label>
-                    <div class="target-level-wrap">
-                        <input type="number" class="target-level-input" id="acc-target-level"
-                               min="3" max="100" value="10" step="1"
-                               onchange="validateTargetLevel(this)"
-                               oninput="validateTargetLevel(this)">
+                    <label><i class="fa-solid fa-bullseye" style="color:var(--accent-cyan); margin-right:4px;"></i> Target Level (৩ - ১০০)</label>
+                    <div class="range-wrapper">
+                        <input type="range" id="acc-target-level" min="3" max="100" value="50" oninput="updateTargetLevelDisplay(this.value)">
+                        <span class="range-value" id="target-level-value">50</span>
                     </div>
-                    <div class="quick-levels">
-                        <button type="button" class="quick-level-btn" data-level="3" onclick="setQuickLevel(3, this)">Lv 3</button>
-                        <button type="button" class="quick-level-btn" data-level="5" onclick="setQuickLevel(5, this)">Lv 5</button>
-                        <button type="button" class="quick-level-btn active" data-level="10" onclick="setQuickLevel(10, this)">Lv 10</button>
-                        <button type="button" class="quick-level-btn" data-level="20" onclick="setQuickLevel(20, this)">Lv 20</button>
-                        <button type="button" class="quick-level-btn" data-level="50" onclick="setQuickLevel(50, this)">Lv 50</button>
-                        <button type="button" class="quick-level-btn" data-level="100" onclick="setQuickLevel(100, this)">Lv 100</button>
-                    </div>
-                    <div class="level-hint">
-                        <i class="fa-solid fa-circle-info"></i>
-                        <span>Bot will auto-stop when the target level is reached. Minimum 3, Maximum 100?</span>
+                    <div class="range-hint">
+                        <span>Min: 3</span>
+                        <span>Max: 100</span>
                     </div>
                 </div>
 
-                <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:24px; flex-wrap:wrap;">
+                <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:16px;">
                     <button type="button" class="btn btn-secondary" onclick="closeAddModal()">Cancel</button>
-                    <button type="submit" class="btn btn-primary"><i class="fa-solid fa-rocket"></i> Save & Start</button>
+                    <button type="submit" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Save & Start</button>
                 </div>
             </form>
         </div>
     </div>
 
     <script>
-        let isFetching = false;
-        let startTime = localStorage.getItem('bot_start_time');
-        if (!startTime) {
-            startTime = Date.now();
-            localStorage.setItem('bot_start_time', startTime);
-        } else {
-            startTime = parseInt(startTime);
-        }
+        let startTime = Date.now();
+        let keyExpiresAt = 0;
+        let redirecting = false;
+        let currentKey = "";
 
-        // ============================================================
-        // 🔥 WELCOME NOTICE LOGIC
-        // ============================================================
-        // Shows on every fresh login, hides after OK click, stays hidden on refresh.
-        // SessionStorage is used so logout → login shows it again, but refresh doesn't.
-        // ============================================================
-        (function initNotice() {
-            const notice = document.getElementById('welcome-notice');
-            const seen = sessionStorage.getItem('welcome_notice_seen');
+        // =========================================
+        // WELCOME MODAL LOGIC
+        // Shows popup EVERY time a key login happens.
+        // After "OK" is clicked, the URL param is removed
+        // so a page refresh won't re-show it. But a new
+        // login (from /login) will always show it again.
+        // =========================================
+        function checkWelcomeModal() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlKey = urlParams.get('key') || "";
+            const isLoginSuccess = urlParams.get('login') === 'success';
+            if (urlKey) currentKey = urlKey;
 
-            if (!seen) {
-                // Slight delay for smooth entry after page paint
-                setTimeout(() => {
-                    notice.classList.add('active');
-                }, 300);
+            // Show popup whenever we arrive here via a fresh login redirect
+            if (isLoginSuccess) {
+                document.getElementById('welcome-modal').classList.add('active');
             }
-        })();
-
-        function closeNotice() {
-            const notice = document.getElementById('welcome-notice');
-            notice.classList.remove('active');
-            sessionStorage.setItem('welcome_notice_seen', '1');
         }
 
-        // ============ LOGOUT ============
-        function logout() {
-            if (!confirm('Are you sure you want to logout?')) return;
-            // 🔥 Clear notice flag so it appears again after next login
-            sessionStorage.removeItem('welcome_notice_seen');
-            window.location.href = '/logout';
+        function closeWelcomeModal() {
+            document.getElementById('welcome-modal').classList.remove('active');
+            // Clean the URL so refresh doesn't re-trigger the popup
+            try {
+                const url = new URL(window.location.href);
+                if (url.searchParams.has('login') || url.searchParams.has('key')) {
+                    url.searchParams.delete('login');
+                    url.searchParams.delete('key');
+                    window.history.replaceState({}, '', url.toString());
+                }
+            } catch(e) {}
         }
 
+        checkWelcomeModal();
+
+        // =========================================
+        // DASHBOARD LOGIC
+        // =========================================
         function openAddModal() {
             document.getElementById('add-modal').classList.add('active');
-            document.querySelectorAll('.quick-level-btn').forEach(b => b.classList.remove('active'));
-            const lv10 = document.querySelector('.quick-level-btn[data-level="10"]');
-            if (lv10) lv10.classList.add('active');
-            document.getElementById('acc-target-level').value = 10;
         }
 
         function closeAddModal() {
@@ -1958,35 +2088,21 @@
             document.getElementById('token-fields').style.display = type === 'token' ? 'block' : 'none';
         }
 
-        function validateTargetLevel(input) {
-            let val = parseInt(input.value);
-            if (isNaN(val)) { input.value = 3; return; }
-            if (val < 3) input.value = 3;
-            else if (val > 100) input.value = 100;
-            else input.value = val;
-
-            document.querySelectorAll('.quick-level-btn').forEach(b => {
-                b.classList.toggle('active', parseInt(b.dataset.level) === parseInt(input.value));
-            });
+        function updateTargetLevelDisplay(val) {
+            document.getElementById('target-level-value').innerText = val;
         }
 
-        function setQuickLevel(level, btn) {
-            document.getElementById('acc-target-level').value = level;
-            document.querySelectorAll('.quick-level-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
+        function goLogin() {
+            if (redirecting) return;
+            redirecting = true;
+            window.location.href = '/login';
         }
 
         async function submitAddAccount(e) {
             e.preventDefault();
             const type = document.getElementById('acc-type').value;
-            const targetLevel = parseInt(document.getElementById('acc-target-level').value) || 10;
-
-            if (targetLevel < 3 || targetLevel > 100) {
-                return alert('টার্গেট লেভেল ৩ থেকে ১০০ এর মধ্যে হতে হবে!');
-            }
-
+            const targetLevel = parseInt(document.getElementById('acc-target-level').value, 10) || 50;
             let payload = { target_level: targetLevel };
-
             if (type === 'guest') {
                 const uid = document.getElementById('acc-uid').value.trim();
                 const password = document.getElementById('acc-password').value.trim();
@@ -2005,14 +2121,13 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
+                if (res.status === 401) { goLogin(); return; }
                 const data = await res.json();
                 if (data.status === 'ok') {
                     closeAddModal();
                     document.getElementById('add-acc-form').reset();
-                    document.getElementById('acc-target-level').value = 10;
-                    document.querySelectorAll('.quick-level-btn').forEach(b => b.classList.remove('active'));
-                    const lv10 = document.querySelector('.quick-level-btn[data-level="10"]');
-                    if (lv10) lv10.classList.add('active');
+                    document.getElementById('acc-target-level').value = 50;
+                    document.getElementById('target-level-value').innerText = '50';
                     fetchStats();
                 } else {
                     alert('Error adding account: ' + (data.error || 'Unknown'));
@@ -2022,18 +2137,15 @@
             }
         }
 
-        async function deleteAccount(uid, token) {
-            const label = uid || (token ? token.substring(0, 10) + '...' : 'this account');
-            if (!confirm('Are you sure you want to delete account ' + label + '?\n\nThe bot will go offline immediately and the account will be permanently removed.')) return;
+        async function deleteAccount(uid) {
+            if (!confirm('Are you sure you want to remove account ' + uid + '?')) return;
             try {
-                const payload = {};
-                if (uid) payload.uid = uid;
-                if (token) payload.token = token;
-                await fetch('/api/account/delete', {
+                const res = await fetch('/api/account/delete', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify({ uid })
                 });
+                if (res.status === 401) { goLogin(); return; }
                 fetchStats();
             } catch (err) {
                 console.error(err);
@@ -2042,44 +2154,74 @@
 
         async function refreshAccountInfo(uid) {
             try {
-                await fetch('/api/account/refresh', {
+                const res = await fetch('/api/account/refresh', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ uid })
                 });
+                if (res.status === 401) { goLogin(); return; }
                 fetchStats();
             } catch (err) {
                 console.error(err);
             }
         }
 
+        function renderKeyTimer() {
+            const wrap = document.getElementById('key-timer');
+            const txt = document.getElementById('key-timer-text');
+            if (!keyExpiresAt) {
+                wrap.style.display = 'none';
+                return;
+            }
+            const now = Math.floor(Date.now() / 1000);
+            const rem = keyExpiresAt - now;
+            if (rem <= 0) {
+                txt.innerText = 'EXPIRED';
+                wrap.className = 'key-timer danger';
+                wrap.style.display = 'inline-flex';
+                goLogin();
+                return;
+            }
+
+            const totalSeconds = Math.floor(rem);
+            const h = Math.floor(totalSeconds / 3600);
+            const m = Math.floor((totalSeconds % 3600) / 60);
+            const s = totalSeconds % 60;
+            let label;
+            if (h > 0) {
+                label = `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+            } else {
+                label = `${m}:${String(s).padStart(2, '0')}`;
+            }
+            txt.innerText = label;
+
+            if (rem <= 300) {
+                wrap.className = 'key-timer danger';
+            } else if (rem <= 3600) {
+                wrap.className = 'key-timer warning';
+            } else {
+                wrap.className = 'key-timer';
+            }
+            wrap.style.display = 'inline-flex';
+        }
+
         async function fetchStats() {
-            if (isFetching) return;
-            isFetching = true;
             try {
                 const res = await fetch('/api/stats');
-                if (res.status === 401) {
-                    window.location.href = '/login';
-                    return;
-                }
+                if (res.status === 401) { goLogin(); return; }
                 const data = await res.json();
 
-                const activeAccounts = data.accounts || [];
+                if (data.key_expires_at) {
+                    keyExpiresAt = data.key_expires_at;
+                    renderKeyTimer();
+                }
 
-                let currentTotalExp = 0;
-                let currentTotalMatches = 0;
-
-                activeAccounts.forEach(acc => {
-                    currentTotalExp += (acc.gained_exp || 0);
-                    currentTotalMatches += (acc.matches_played || 0);
-                });
-
-                document.getElementById('stat-total-accounts').innerText = activeAccounts.length;
-                document.getElementById('stat-total-exp').innerText = '+' + currentTotalExp.toLocaleString() + ' EXP';
-                document.getElementById('stat-total-matches').innerText = currentTotalMatches;
+                document.getElementById('stat-total-accounts').innerText = data.total_accounts;
+                document.getElementById('stat-total-exp').innerText = '+' + data.total_gained_exp.toLocaleString() + ' EXP';
+                document.getElementById('stat-total-matches').innerText = data.total_matches;
 
                 const container = document.getElementById('accounts-container');
-                if (activeAccounts.length === 0) {
+                if (data.accounts.length === 0) {
                     container.innerHTML = `
                         <div class="empty-state">
                             <i class="fa-solid fa-ghost"></i>
@@ -2087,89 +2229,75 @@
                         </div>
                     `;
                 } else {
-                    container.innerHTML = activeAccounts.map(acc => {
+                    container.innerHTML = data.accounts.map(acc => {
                         const gainedExp = acc.gained_exp || 0;
-                        const targetLevel = acc.target_level || 100;
-                        const currentLevel = acc.level || 1;
-                        const levelReached = currentLevel >= targetLevel;
-
                         let statusClass = 'status-online';
-                        let statusText = acc.status || 'ONLINE';
-
-                        if (acc.status === 'COMPLETED' || levelReached) {
-                            statusClass = 'status-complete';
-                            statusText = '✓ Target Reached';
-                        } else if (acc.status === 'IN_MATCH') {
+                        let statusText = acc.status;
+                        if (acc.status === 'IN_MATCH') {
                             statusClass = 'status-match';
-                            statusText = `In Match (${acc.active_matches || 0} active)`;
-                        } else if (acc.status === 'SEARCHING') {
+                            statusText = `In Match (${acc.active_matches} active)`;
+                        } else if (acc.status === 'TARGET_REACHED') {
                             statusClass = 'status-target';
-                            statusText = 'Searching...';
-                        } else if (acc.status === 'ERROR') {
-                            statusClass = 'status-target';
-                            statusText = 'Error';
+                            statusText = '🎯 Target Reached';
                         }
+                        const targetLevel = acc.target_level || 0;
+                        const currentLevel = acc.level || 1;
+                        const matchesPlayed = acc.matches_played || 0;
+                        
+                        const targetBadge = targetLevel > 0
+                            ? `<span class="stat-badge target"><i class="fa-solid fa-bullseye"></i> Target Lv ${targetLevel}</span>`
+                            : `<span class="stat-badge target" style="opacity:0.5;"><i class="fa-solid fa-bullseye"></i> No Target</span>`;
 
-                        const displayProgress = Math.min(100, Math.max(5, (currentLevel / targetLevel) * 100));
-
-                        // 🔥 Pass both uid and token to delete function for token-based accounts
-                        const deleteUid = acc.uid ? acc.uid : '';
-                        const deleteToken = acc.token ? acc.token : '';
+                        const progressPercent = Math.min(100, Math.max(0, (currentLevel / (targetLevel || 100)) * 100));
 
                         return `
-                            <div class="account-card ${levelReached ? 'target-reached' : ''}">
+                            <div class="account-card">
                                 <div class="acc-top">
                                     <div class="acc-profile">
                                         <div class="acc-avatar"><i class="fa-solid fa-user"></i></div>
                                         <div class="acc-info">
-                                            <div class="acc-name-row">
-                                                <h4>${escapeHtml(acc.nickname)}</h4>
-                                            </div>
-                                            <div class="region-badge-row">
-                                                <span class="region-badge">${acc.region || 'BD'}</span>
-                                                <div class="acc-status ${statusClass}">
-                                                    ${!levelReached && acc.status === 'IN_MATCH' ? '<span class="pulse-dot"></span>' : ''}
-                                                    <span>${statusText}</span>
-                                                </div>
-                                            </div>
-                                            <span class="uid-text">UID: ${acc.uid}</span>
+                                            <h4>${escapeHtml(acc.nickname)} <span class="region-badge">${acc.region || 'BD'}</span></h4>
+                                            <span>UID: ${acc.uid}</span>
                                         </div>
+                                    </div>
+                                    <div class="acc-status ${statusClass}">
+                                        <span class="pulse-dot"></span>
+                                        <span>${statusText}</span>
                                     </div>
                                 </div>
 
                                 <div class="exp-box">
                                     <div class="exp-item">
                                         <span class="exp-label">Initial EXP</span>
-                                        <span class="exp-val">${(acc.initial_exp || 0).toLocaleString()}</span>
+                                        <span class="exp-val">${acc.initial_exp.toLocaleString()}</span>
                                     </div>
                                     <div class="exp-item">
                                         <span class="exp-label">Current EXP</span>
-                                        <span class="exp-val">${(acc.current_exp || 0).toLocaleString()}</span>
+                                        <span class="exp-val">${acc.current_exp.toLocaleString()}</span>
                                     </div>
                                     <div class="exp-item">
                                         <span class="exp-label">EXP Gained</span>
                                         <span class="exp-val exp-gained">
-                                            <span class="gained-badge">+${gainedExp.toLocaleString()}</span>
+                                            <span class="gained-badge">+${gainedExp.toLocaleString()} EXP</span>
                                         </span>
                                     </div>
                                 </div>
 
-                                <div class="level-progress">
-                                    <div class="level-labels">
-                                        <span class="level-chip"><i class="fa-solid fa-star"></i> Lv ${currentLevel}</span>
-                                        <span class="target-chip"><i class="fa-solid fa-bullseye"></i> Target Lv ${targetLevel}</span>
-                                        <span class="match-chip"><i class="fa-solid fa-gamepad"></i> Matches: ${acc.matches_played || 0}</span>
-                                    </div>
-                                    <div class="progress-bar-bg">
-                                        <div class="progress-bar-fill" style="width: ${displayProgress}%"></div>
-                                    </div>
+                                <div class="acc-stats-row">
+                                    <span class="stat-badge level"><i class="fa-solid fa-star"></i> Lv ${currentLevel}</span>
+                                    ${targetBadge}
+                                    <span class="stat-badge matches"><i class="fa-solid fa-gamepad"></i> Matches: ${matchesPlayed}</span>
+                                </div>
+
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar-fill" style="width: ${progressPercent}%;"></div>
                                 </div>
 
                                 <div class="acc-actions">
                                     <span>Last match: ${acc.last_match_time || 'Running...'}</span>
                                     <div class="action-btns">
                                         <button class="icon-btn" title="Refresh Profile/EXP" onclick="refreshAccountInfo('${acc.uid}')"><i class="fa-solid fa-rotate"></i></button>
-                                        <button class="icon-btn danger" title="Delete Account" onclick="deleteAccount('${deleteUid}', '${deleteToken}')"><i class="fa-solid fa-trash"></i></button>
+                                        <button class="icon-btn danger" title="Delete Account" onclick="deleteAccount('${acc.uid}')"><i class="fa-solid fa-trash"></i></button>
                                     </div>
                                 </div>
                             </div>
@@ -2179,30 +2307,22 @@
 
                 const logContainer = document.getElementById('log-stream');
                 if (data.logs && data.logs.length > 0) {
-                    const shouldScroll = logContainer.scrollTop + logContainer.clientHeight >= logContainer.scrollHeight - 50;
                     logContainer.innerHTML = data.logs.map(log => {
                         return `<div class="log-item"><span class="log-time">[${log.time}]</span><span class="log-${log.level}">${escapeHtml(log.message)}</span></div>`;
                     }).join('');
-                    if (shouldScroll) {
-                        logContainer.scrollTop = logContainer.scrollHeight;
-                    }
+                } else {
+                    logContainer.innerHTML = `<div class="log-item"><span class="log-info">Waiting for bot activity... Add an account to begin.</span></div>`;
                 }
+                logContainer.scrollTop = logContainer.scrollHeight;
 
             } catch (err) {
                 console.error("Failed to fetch stats:", err);
-            } finally {
-                isFetching = false;
             }
         }
 
         function escapeHtml(text) {
-            if (text === null || text === undefined) return '';
-            return String(text)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#039;');
+            if (!text) return '';
+            return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
         }
 
         setInterval(() => {
@@ -2213,12 +2333,10 @@
             document.getElementById('stat-uptime').innerText = `${h}:${m}:${s}`;
         }, 1000);
 
-        document.getElementById('add-modal').addEventListener('click', function(e) {
-            if (e.target === this) closeAddModal();
-        });
+        setInterval(renderKeyTimer, 1000);
 
         fetchStats();
-        setInterval(fetchStats, 1000);
+        setInterval(fetchStats, 2500);
     </script>
 </body>
 </html>

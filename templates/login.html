@@ -1,628 +1,245 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#060913">
-    <title>CODEX YASIN | Admin Portal Login</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --bg-base: #060913;
-            --bg-card: rgba(13, 19, 36, 0.75);
-            --border-card: rgba(0, 242, 254, 0.18);
-            --accent-cyan: #00f2fe;
-            --accent-blue: #4facfe;
-            --accent-purple: #7f00ff;
-            --accent-pink: #ff2d95;
-            --accent-red: #ff3366;
-            --text-main: #f0f4fc;
-            --text-muted: #8e9bb5;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#060913">
+<title>YASIN BHAI | Login</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root {
+  --bg-base: #060913;
+  --bg-card: rgba(13, 19, 36, 0.75);
+  --border-card: rgba(0, 242, 254, 0.18);
+  --accent-cyan: #00f2fe;
+  --accent-blue: #4facfe;
+  --accent-purple: #7f00ff;
+  --accent-pink: #ff2d95;
+  --accent-red: #ff3366;
+  --accent-green: #00ff88;
+  --accent-amber: #ffaa00;
+  --text-main: #f0f4fc;
+  --text-muted: #8e9bb5;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Outfit', sans-serif; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; overscroll-behavior: none; }
+body {
+  background: var(--bg-base);
+  background-image: radial-gradient(circle at 15% 15%, rgba(127,0,255,0.25) 0%, transparent 45%),
+                    radial-gradient(circle at 85% 85%, rgba(0,242,254,0.2) 0%, transparent 45%);
+  color: var(--text-main);
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background-attachment: fixed;
+  overflow-x: hidden;
+}
+body::before, body::after {
+  content: '';
+  position: absolute;
+  width: 300px; height: 300px;
+  border-radius: 50%;
+  filter: blur(120px);
+  pointer-events: none;
+}
+body::before { background: rgba(0,242,254,0.15); top: 10%; left: 10%; animation: floatOrb 8s ease-in-out infinite; }
+body::after { background: rgba(127,0,255,0.18); bottom: 10%; right: 10%; animation: floatOrb 10s ease-in-out infinite reverse; }
+@keyframes floatOrb { 0%,100% { transform: translate(0,0) scale(1);} 50% { transform: translate(30px,-30px) scale(1.1);} }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Outfit', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: 24px;
+  width: 100%;
+  max-width: 420px;
+  padding: 34px 26px;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.6), 0 0 40px rgba(0,242,254,0.08);
+  position: relative;
+  z-index: 10;
+  overflow: hidden;
+  animation: fadeIn 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(24px);} to { opacity: 1; transform: translateY(0);} }
+.card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple), var(--accent-pink));
+  background-size: 200% 100%;
+  animation: shimmer 4s linear infinite;
+}
+@keyframes shimmer { 0% { background-position: 0% 0; } 100% { background-position: 200% 0; } }
 
-        html, body {
-            height: 100%;
-            overscroll-behavior: none;
-        }
+.brand { text-align: center; margin-bottom: 24px; }
+.logo {
+  width: 64px; height: 64px; margin: 0 auto 14px;
+  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+  border-radius: 18px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px; color: #fff;
+  box-shadow: 0 0 30px rgba(0,242,254,0.45);
+  animation: pulseGlow 3s ease-in-out infinite;
+}
+@keyframes pulseGlow { 0%,100% { box-shadow: 0 0 30px rgba(0,242,254,0.45);} 50% { box-shadow: 0 0 45px rgba(0,242,254,0.7);} }
+.brand h1 {
+  font-size: 24px; font-weight: 800; letter-spacing: 2px;
+  background: linear-gradient(90deg, #fff, var(--accent-cyan), #fff);
+  background-size: 200% auto;
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  animation: textShine 3.5s linear infinite;
+}
+@keyframes textShine { 0% { background-position: 0% center;} 100% { background-position: 200% center;} }
+.brand p { font-size: 13px; color: var(--text-muted); margin-top: 6px; }
 
-        body {
-            background-color: var(--bg-base);
-            background-image: 
-                radial-gradient(circle at 15% 15%, rgba(127, 0, 255, 0.25) 0%, transparent 45%),
-                radial-gradient(circle at 85% 85%, rgba(0, 242, 254, 0.2) 0%, transparent 45%),
-                radial-gradient(circle at 50% 50%, rgba(255, 45, 149, 0.06) 0%, transparent 60%),
-                linear-gradient(180deg, #060913 0%, #0a0e1c 100%);
-            color: var(--text-main);
-            min-height: 100vh;
-            min-height: 100dvh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            padding: max(20px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
-            background-attachment: fixed;
-            position: relative;
-            overflow-x: hidden;
-        }
+.form-group { margin-bottom: 14px; }
+.form-group label {
+  display: block; font-size: 11px; font-weight: 700;
+  color: var(--text-muted); margin-bottom: 6px;
+  text-transform: uppercase; letter-spacing: 0.6px;
+}
+.input-wrap { position: relative; }
+.input-wrap i {
+  position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+  color: var(--text-muted); font-size: 14px; pointer-events: none;
+}
+.input {
+  width: 100%;
+  background: rgba(255,255,255,0.05);
+  border: 1.5px solid rgba(255,255,255,0.09);
+  border-radius: 12px;
+  padding: 13px 14px 13px 40px;
+  color: #fff;
+  font-size: 15px;
+  outline: none;
+  transition: all 0.25s;
+  -webkit-appearance: none;
+}
+.input::placeholder { color: rgba(142,155,181,0.6); font-size: 14px; }
+.input:focus {
+  border-color: var(--accent-cyan);
+  background: rgba(0,242,254,0.05);
+  box-shadow: 0 0 0 4px rgba(0,242,254,0.08);
+}
 
-        body::before {
-            content: '';
-            position: absolute;
-            width: 300px;
-            height: 300px;
-            background: rgba(0, 242, 254, 0.15);
-            filter: blur(120px);
-            border-radius: 50%;
-            top: 10%;
-            left: 10%;
-            pointer-events: none;
-            animation: floatOrb 8s ease-in-out infinite;
-        }
+.btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+  color: #040914;
+  font-size: 15px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 6px 20px rgba(0,242,254,0.35);
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  margin-top: 6px;
+  -webkit-appearance: none;
+}
+.btn:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(0,242,254,0.55); }
+.btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
-        body::after {
-            content: '';
-            position: absolute;
-            width: 300px;
-            height: 300px;
-            background: rgba(127, 0, 255, 0.18);
-            filter: blur(120px);
-            border-radius: 50%;
-            bottom: 10%;
-            right: 10%;
-            pointer-events: none;
-            animation: floatOrb 10s ease-in-out infinite reverse;
-        }
+.alert {
+  background: rgba(255,51,102,0.12);
+  border: 1px solid rgba(255,51,102,0.35);
+  color: var(--accent-red);
+  padding: 11px 13px;
+  border-radius: 11px;
+  font-size: 13px;
+  margin-bottom: 16px;
+  display: none;
+  align-items: center;
+  gap: 9px;
+}
+.alert.show { display: flex; animation: shake 0.4s; }
+.alert.success {
+  background: rgba(0,255,136,0.12);
+  border-color: rgba(0,255,136,0.35);
+  color: var(--accent-green);
+}
+@keyframes shake { 0%,100% { transform: translateX(0);} 20% { transform: translateX(-6px);} 40% { transform: translateX(6px);} 60% { transform: translateX(-4px);} 80% { transform: translateX(4px);} }
 
-        @keyframes floatOrb {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            50% { transform: translate(30px, -30px) scale(1.1); }
-        }
-
-        .grid-overlay {
-            position: fixed;
-            inset: 0;
-            background-image: 
-                linear-gradient(rgba(0, 242, 254, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 242, 254, 0.03) 1px, transparent 1px);
-            background-size: 50px 50px;
-            pointer-events: none;
-            z-index: 1;
-            mask-image: radial-gradient(circle at 50% 50%, black 0%, transparent 80%);
-            -webkit-mask-image: radial-gradient(circle at 50% 50%, black 0%, transparent 80%);
-        }
-
-        .login-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-card);
-            border-radius: 28px;
-            width: 100%;
-            max-width: 420px;
-            padding: 44px 34px;
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            box-shadow: 
-                0 20px 50px rgba(0, 0, 0, 0.6), 
-                0 0 40px rgba(0, 242, 254, 0.08),
-                inset 0 1px 0 rgba(255, 255, 255, 0.06);
-            position: relative;
-            z-index: 10;
-            overflow: hidden;
-            animation: fadeIn 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(24px) scale(0.98); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        .login-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple), var(--accent-pink));
-            background-size: 200% 100%;
-            animation: shimmer 4s linear infinite;
-        }
-
-        @keyframes shimmer {
-            0% { background-position: 0% 0; }
-            100% { background-position: 200% 0; }
-        }
-
-        .login-card::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            width: 100px;
-            height: 100px;
-            background: radial-gradient(circle at bottom right, rgba(0, 242, 254, 0.12), transparent 70%);
-            pointer-events: none;
-        }
-
-        /* ═══════════════════════════════════════════
-           ✨ BRAND BOX & LOGO (IMAGE 2 LAYOUT) ✨
-           ═══════════════════════════════════════════ */
-        .brand-box {
-            text-align: center;
-            margin-bottom: 34px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .logo-icon {
-            width: 68px;
-            height: 68px;
-            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 30px;
-            color: #fff;
-            box-shadow: 
-                0 0 30px rgba(0, 242, 254, 0.45),
-                0 8px 20px rgba(127, 0, 255, 0.3),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3);
-            margin-bottom: 16px;
-            position: relative;
-            animation: pulseGlow 3s ease-in-out infinite;
-        }
-
-        @keyframes pulseGlow {
-            0%, 100% { box-shadow: 0 0 30px rgba(0, 242, 254, 0.45), 0 8px 20px rgba(127, 0, 255, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3); }
-            50% { box-shadow: 0 0 45px rgba(0, 242, 254, 0.7), 0 8px 25px rgba(127, 0, 255, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.3); }
-        }
-
-        .logo-icon::after {
-            content: '';
-            position: absolute;
-            inset: -4px;
-            border-radius: 24px;
-            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
-            opacity: 0.3;
-            filter: blur(12px);
-            z-index: -1;
-        }
-
-        .brand-box h2 {
-            font-size: 26px;
-            font-weight: 800;
-            letter-spacing: 2px;
-            line-height: 1.2;
-            display: block;
-            position: relative;
-            padding: 2px 6px;
-            background: linear-gradient(
-                90deg, 
-                #ffffff 0%, 
-                var(--accent-cyan) 25%, 
-                #ffffff 50%, 
-                var(--accent-cyan) 75%, 
-                #ffffff 100%
-            );
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            color: var(--accent-cyan);
-            animation: 
-                textShine 3.5s linear infinite,
-                nameGlow 3s ease-in-out infinite;
-            will-change: background-position, filter;
-            transform: translateZ(0);
-        }
-
-        @keyframes textShine {
-            0% { background-position: 0% center; }
-            100% { background-position: 200% center; }
-        }
-
-        @keyframes nameGlow {
-            0%, 100% { 
-                filter: drop-shadow(0 0 6px rgba(0, 242, 254, 0.45))
-                        drop-shadow(0 0 12px rgba(127, 0, 255, 0.2));
-            }
-            50% { 
-                filter: drop-shadow(0 0 12px rgba(0, 242, 254, 0.75))
-                        drop-shadow(0 0 22px rgba(127, 0, 255, 0.4));
-            }
-        }
-
-        .brand-box h2::after {
-            content: '';
-            position: absolute;
-            bottom: -6px;
-            left: 50%;
-            transform: translateX(-50%);
-            height: 2px;
-            width: 40%;
-            background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
-            border-radius: 2px;
-            animation: underlinePulse 3s ease-in-out infinite;
-            opacity: 0.7;
-        }
-
-        @keyframes underlinePulse {
-            0%, 100% { width: 30%; opacity: 0.35; }
-            50% { width: 75%; opacity: 1; }
-        }
-
-        .brand-box p {
-            font-size: 13px;
-            color: var(--text-muted);
-            margin-top: 10px;
-            letter-spacing: 0.5px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-            position: relative;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-muted);
-            margin-bottom: 8px;
-            letter-spacing: 0.6px;
-            text-transform: uppercase;
-        }
-
-        .input-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .input-wrapper i {
-            position: absolute;
-            left: 16px;
-            color: var(--text-muted);
-            font-size: 15px;
-            transition: color 0.25s, transform 0.25s;
-            pointer-events: none;
-        }
-
-        .form-input {
-            width: 100%;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1.5px solid rgba(255, 255, 255, 0.08);
-            border-radius: 14px;
-            padding: 15px 16px 15px 46px;
-            color: #fff;
-            font-size: 15px;
-            outline: none;
-            transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
-            -webkit-appearance: none;
-            appearance: none;
-        }
-
-        .form-input::placeholder {
-            color: rgba(142, 155, 181, 0.6);
-            font-size: 14px;
-        }
-
-        .form-input:focus {
-            border-color: var(--accent-cyan);
-            background: rgba(0, 242, 254, 0.05);
-            box-shadow: 
-                0 0 0 4px rgba(0, 242, 254, 0.08),
-                0 0 20px rgba(0, 242, 254, 0.15);
-        }
-
-        .form-input:focus + i {
-            color: var(--accent-cyan);
-            transform: scale(1.1);
-        }
-
-        .form-input:-webkit-autofill,
-        .form-input:-webkit-autofill:hover,
-        .form-input:-webkit-autofill:focus {
-            -webkit-text-fill-color: #fff;
-            -webkit-box-shadow: 0 0 0px 1000px rgba(13, 19, 36, 0.9) inset;
-            transition: background-color 5000s ease-in-out 0s;
-            border-color: var(--accent-cyan);
-        }
-
-        .alert-error {
-            background: rgba(255, 51, 102, 0.12);
-            border: 1px solid rgba(255, 51, 102, 0.35);
-            color: var(--accent-red);
-            padding: 13px 14px;
-            border-radius: 12px;
-            font-size: 13px;
-            font-weight: 500;
-            margin-bottom: 20px;
-            display: none;
-            align-items: center;
-            gap: 10px;
-            animation: shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97);
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20% { transform: translateX(-6px); }
-            40% { transform: translateX(6px); }
-            60% { transform: translateX(-4px); }
-            80% { transform: translateX(4px); }
-        }
-
-        .btn-submit {
-            width: 100%;
-            padding: 16px;
-            border-radius: 14px;
-            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
-            background-size: 200% auto;
-            color: #040914;
-            font-size: 15px;
-            font-weight: 700;
-            letter-spacing: 0.4px;
-            border: none;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-            box-shadow: 
-                0 6px 24px rgba(0, 242, 254, 0.35),
-                inset 0 1px 0 rgba(255, 255, 255, 0.4);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 10px;
-            position: relative;
-            overflow: hidden;
-            -webkit-appearance: none;
-            appearance: none;
-        }
-
-        .btn-submit::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-            transition: left 0.6s;
-        }
-
-        .btn-submit:hover {
-            transform: translateY(-2px);
-            box-shadow: 
-                0 10px 32px rgba(0, 242, 254, 0.55),
-                inset 0 1px 0 rgba(255, 255, 255, 0.4);
-            background-position: right center;
-        }
-
-        .btn-submit:hover::before {
-            left: 100%;
-        }
-
-        .btn-submit:active {
-            transform: translateY(0) scale(0.98);
-        }
-
-        .btn-submit i {
-            transition: transform 0.3s;
-        }
-
-        .btn-submit:hover i {
-            transform: translateX(4px);
-        }
-
-        @media (max-width: 480px) {
-            body {
-                padding: 16px;
-                align-items: center;
-            }
-
-            body::before,
-            body::after {
-                width: 220px;
-                height: 220px;
-                filter: blur(90px);
-            }
-
-            .login-card {
-                padding: 34px 24px;
-                border-radius: 24px;
-                max-width: 100%;
-            }
-
-            .login-card::before {
-                height: 2.5px;
-            }
-
-            .logo-icon {
-                width: 60px;
-                height: 60px;
-                font-size: 26px;
-                border-radius: 18px;
-            }
-
-            .brand-box {
-                margin-bottom: 28px;
-            }
-
-            .brand-box h2 {
-                font-size: 22px;
-                letter-spacing: 1.5px;
-            }
-
-            .brand-box p {
-                font-size: 12px;
-            }
-
-            .form-group {
-                margin-bottom: 18px;
-            }
-
-            .form-input {
-                padding: 14px 14px 14px 44px;
-                font-size: 16px;
-                border-radius: 13px;
-            }
-
-            .input-wrapper i {
-                left: 15px;
-                font-size: 14px;
-            }
-
-            .btn-submit {
-                padding: 15px;
-                font-size: 15px;
-                border-radius: 13px;
-            }
-        }
-
-        @media (max-width: 360px) {
-            .login-card {
-                padding: 28px 20px;
-            }
-
-            .logo-icon {
-                width: 54px;
-                height: 54px;
-                font-size: 22px;
-            }
-
-            .brand-box h2 {
-                font-size: 20px;
-                letter-spacing: 1px;
-            }
-        }
-
-        @media (max-height: 600px) and (orientation: landscape) {
-            body {
-                align-items: flex-start;
-                padding-top: 20px;
-            }
-
-            .login-card {
-                padding: 26px 24px;
-            }
-
-            .brand-box {
-                margin-bottom: 20px;
-            }
-
-            .logo-icon {
-                width: 52px;
-                height: 52px;
-                font-size: 22px;
-                margin-bottom: 12px;
-            }
-
-            .brand-box h2 {
-                font-size: 20px;
-            }
-
-            .form-group {
-                margin-bottom: 14px;
-            }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            *,
-            *::before,
-            *::after {
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.01ms !important;
-            }
-        }
-    </style>
+.admin-link {
+  display: block;
+  text-align: center;
+  margin-top: 18px;
+  font-size: 12px;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.2s;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+}
+.admin-link:hover { color: var(--accent-cyan); }
+.admin-link i { margin-right: 5px; }
+</style>
 </head>
 <body>
 
-    <div class="grid-overlay"></div>
+<div class="card">
+  <div class="brand">
+    <div class="logo"><i class="fa-solid fa-bolt"></i></div>
+    <h1>YASIN BHAI</h1>
+    <p>Level Up Bot — Access Portal</p>
+  </div>
 
-    <div class="login-card">
-        <div class="brand-box">
-            <div class="logo-icon">
-                <i class="fa-solid fa-bolt"></i>
-            </div>
-            <h2>CODEX YASIN</h2>
-            <p>Auto Level-up Bot</p>
-        </div>
-
-        <div class="alert-error" id="error-alert">
-            <i class="fa-solid fa-triangle-exclamation"></i>
-            <span id="error-msg">error text</span>
-        </div>
-
-        <form id="login-form" onsubmit="handleLogin(event)">
-            <div class="form-group">
-                <label>Email Address</label>
-                <div class="input-wrapper">
-                    <input type="email" id="email" class="form-input" placeholder="admin@example.com" required>
-                    <i class="fa-solid fa-envelope"></i>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>Password</label>
-                <div class="input-wrapper">
-                    <input type="password" id="password" class="form-input" placeholder="••••••••" required>
-                    <i class="fa-solid fa-lock"></i>
-                </div>
-            </div>
-
-            <button type="submit" class="btn-submit">
-                <span>Login to Dashboard</span>
-                <i class="fa-solid fa-arrow-right"></i>
-            </button>
-        </form>
+  <div class="alert" id="user-alert"><i class="fa-solid fa-triangle-exclamation"></i><span id="user-alert-msg"></span></div>
+  <form onsubmit="doUserLogin(event)">
+    <div class="form-group">
+      <label>Access Key</label>
+      <div class="input-wrap">
+        <input type="text" class="input" id="user-key" placeholder="Enter your key" autocomplete="off" required>
+        <i class="fa-solid fa-key"></i>
+      </div>
     </div>
+    <button type="submit" class="btn" id="user-login-btn"><span>Login</span><i class="fa-solid fa-arrow-right"></i></button>
+  </form>
 
-    <script>
-        async function handleLogin(e) {
-            e.preventDefault();
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value.trim();
-            const errorAlert = document.getElementById('error-alert');
-            const errorMsg = document.getElementById('error-msg');
+<script>
+function showAlert(msg, success = false) {
+  const el = document.getElementById('user-alert');
+  const msgEl = document.getElementById('user-alert-msg');
+  msgEl.innerText = msg;
+  el.classList.toggle('success', success);
+  el.classList.add('show');
+}
+function hideAlert() {
+  document.getElementById('user-alert').classList.remove('show');
+}
 
-            errorAlert.style.display = 'none';
-
-            try {
-                const res = await fetch('/api/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
-                });
-
-                const data = await res.json();
-
-                if (data.status === 'ok') {
-                    // সফল লগইনের পর ড্যাশবোর্ডে পাঠাবে
-                    window.location.href = '/';
-                } else {
-                    errorMsg.innerText = data.error || 'Login failed';
-                    errorAlert.style.display = 'flex';
-                }
-            } catch (err) {
-                errorMsg.innerText = 'Connection error! Please try again.';
-                errorAlert.style.display = 'flex';
-            }
-        }
-    </script>
+async function doUserLogin(e) {
+  e.preventDefault();
+  const key = document.getElementById('user-key').value.trim().toUpperCase();
+  if (!key) return;
+  const btn = document.getElementById('user-login-btn');
+  btn.disabled = true;
+  hideAlert();
+  try {
+    const res = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key })
+    });
+    const data = await res.json();
+    if (data.status === 'ok') {
+      // Redirect with login=success + key param so index.html knows to show welcome popup
+      window.location.href = '/?login=success&key=' + encodeURIComponent(key);
+    } else {
+      showAlert(data.error || 'Login failed');
+    }
+  } catch (err) {
+    showAlert('Connection error');
+  } finally {
+    btn.disabled = false;
+  }
+}
+</script>
 </body>
 </html>

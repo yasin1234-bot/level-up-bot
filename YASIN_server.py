@@ -26,14 +26,6 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # ==================== ADMIN SAVED ACCOUNTS STORE ====================
 class SavedAccountsStore:
-    """
-    Stores successfully-online accounts for admin panel.
-    - Same UID (guest) never stored twice
-    - Same access token never stored twice
-    - Tracks ONLINE / OFFLINE status per account
-    - Tracks which key owns the account
-    - Users CANNOT see/delete this. Only admin can.
-    """
     def __init__(self, path: str):
         self.path = path
         self.accounts: List[Dict[str, Any]] = []
@@ -61,7 +53,6 @@ class SavedAccountsStore:
             pass
 
     def _find_index_by_key(self, auth_type: str, identifier: str) -> int:
-        """identifier = uid for guest, token for token-type"""
         for i, acc in enumerate(self.accounts):
             if acc.get("auth_type") != auth_type:
                 continue
@@ -72,11 +63,6 @@ class SavedAccountsStore:
         return -1
 
     def add_or_update(self, entry: Dict[str, Any], owner_key: str = "") -> bool:
-        """
-        Add a new saved account. If already exists (same UID or same token), update it.
-        Returns True if newly added, False if updated.
-        Also updates online status.
-        """
         auth_type = entry.get("auth_type", "guest")
         if auth_type == "guest":
             identifier = entry.get("input_uid", "")
@@ -113,7 +99,6 @@ class SavedAccountsStore:
             return True
 
     def set_online_status(self, real_account_id: str, online: bool):
-        """Update online/offline status by real game account id."""
         changed = False
         for acc in self.accounts:
             if str(acc.get("real_account_id", "")) == str(real_account_id):
@@ -134,7 +119,6 @@ class SavedAccountsStore:
             self.save()
 
     def set_offline_by_key(self, owner_key: str) -> int:
-        """Mark ALL accounts owned by a key as OFFLINE. Returns count changed."""
         if not owner_key:
             return 0
         changed = 0
@@ -158,7 +142,6 @@ class SavedAccountsStore:
         return False
 
     def list_all(self) -> List[Dict[str, Any]]:
-        # newest first
         return sorted(self.accounts, key=lambda x: x.get("last_online", 0), reverse=True)
 
 
@@ -255,8 +238,6 @@ class KeyStore:
         if not e:
             return False
         if e.get("revoked"):
-            return False
-        if e.get("used_at") is not None:
             return False
         exp = e.get("expires_at")
         if exp is not None and time.time() > exp:
@@ -358,13 +339,6 @@ session_store = SessionStore(SESSIONS_FILE)
 
 # ==================== BOT STATE ====================
 class BotState:
-    """
-    UPDATED:
-    - account_owners: maps account alias/uid → owner key (so we can filter per-key)
-    - log() now stores owner_key so logs are isolated per session
-    - log() auto-resolves owner_key from uid or message if not given
-    - is_owner_key_expired() helper for auto-stopping bots when key expires
-    """
     def __init__(self):
         self.accounts: Dict[str, Dict[str, Any]] = {}
         self.logs: List[Dict[str, Any]] = []
@@ -375,32 +349,20 @@ class BotState:
         self.account_workers: Dict[str, asyncio.Task] = {}
         self.refresh_callbacks: Dict[str, Any] = {}
         self.account_credentials: Dict[str, Dict[str, Any]] = {}
-        # Target level map: BOTH input UID AND real game account_id → target
         self.account_targets: Dict[str, int] = {}
-        # ownership — every account alias → key that added it
         self.account_owners: Dict[str, str] = {}
 
-    # ---- UID extraction regex for auto-resolving owner from log message ----
     _UID_RE = re.compile(r'\b(\d{6,})\b')
 
     def log(self, message: str, level: str = "info", uid: Optional[str] = None,
             owner_key: Optional[str] = None):
-        """
-        Store a log entry.
-        If owner_key is not given, try to auto-resolve it:
-          1. If uid given → look up owner
-          2. Else, scan message for any UID pattern and try to match known owners
-        """
         resolved_owner = owner_key or ""
-
         if not resolved_owner and uid:
             try:
                 resolved_owner = self.get_owner(str(uid))
             except Exception:
                 resolved_owner = ""
-
         if not resolved_owner and message:
-            # scan every number in message that looks like a UID
             try:
                 candidates = self._UID_RE.findall(message)
                 for c in candidates:
@@ -408,7 +370,6 @@ class BotState:
                     if o:
                         resolved_owner = o
                         break
-                # also try token aliases like tok_XXXXXXXXXX
                 if not resolved_owner:
                     tok_matches = re.findall(r'tok_[A-Za-z0-9_\-]+', message)
                     for t in tok_matches:
@@ -431,18 +392,15 @@ class BotState:
             self.logs.pop(0)
 
     def set_owner(self, alias: str, owner_key: str):
-        """Record which key added this account."""
         if alias and owner_key:
             self.account_owners[str(alias)] = owner_key
 
     def get_owner(self, alias: str) -> str:
-        """Resolve owner key for any alias (uid, real_id, tok_xxx)."""
         if not alias:
             return ""
         alias = str(alias)
         if alias in self.account_owners:
             return self.account_owners[alias]
-        # try via credentials
         cred = self.account_credentials.get(alias)
         if cred:
             for k in (
@@ -453,7 +411,6 @@ class BotState:
             ):
                 if k and k in self.account_owners:
                     return self.account_owners[k]
-        # reverse scan credentials
         for cred_alias, c in self.account_credentials.items():
             try:
                 if str(c.get("account_id", "")) == alias \
@@ -473,7 +430,6 @@ class BotState:
         return ""
 
     def get_all_owners(self, *aliases: str) -> List[str]:
-        """Collect every distinct owner key found for any of the given aliases."""
         owners: List[str] = []
         for a in aliases:
             o = self.get_owner(str(a))
@@ -482,14 +438,9 @@ class BotState:
         return owners
 
     def is_owner_key_expired(self, *aliases: str) -> bool:
-        """
-        Returns True if ANY owner key associated with these aliases is expired/revoked.
-        If no owner is found for any alias → returns False (don't kill unattributed bots).
-        """
         try:
             owners = self.get_all_owners(*aliases)
             if not owners:
-                # also check direct aliases treated as keys
                 for a in aliases:
                     if a and key_store.exists(str(a)):
                         owners.append(str(a))
@@ -499,7 +450,6 @@ class BotState:
             for owner_key in owners:
                 e = key_store.get(owner_key)
                 if not e:
-                    # key was deleted entirely → treat as expired
                     return True
                 if e.get("revoked"):
                     return True
@@ -547,8 +497,6 @@ class BotState:
             if resolved_target > 0:
                 acc["target_level"] = resolved_target
         self.recalc_totals()
-
-        # update saved account online status
         try:
             saved_accounts_store.set_online_status(uid_str, True)
         except Exception:
@@ -610,8 +558,6 @@ class BotState:
                     "success", uid_str, owner
                 )
             self.recalc_totals()
-
-            # update saved account level/exp
             try:
                 for sacc in saved_accounts_store.accounts:
                     if str(sacc.get("real_account_id", "")) == uid_str:
@@ -728,6 +674,10 @@ async def handle_index(request: web.Request) -> web.Response:
 
 
 async def handle_login_page(request: web.Request) -> web.Response:
+    # যদি ইতিমধ্যে লগইন করা থাকে, তবে সোজা ড্যাশবোর্ডে পাঠান
+    key = _get_key_from_request(request)
+    if key:
+        raise web.HTTPFound("/")
     return web.Response(text=_read_html("login.html", "<h1>login.html missing</h1>"),
                         content_type="text/html", charset="utf-8")
 
@@ -740,14 +690,14 @@ async def handle_admin_page(request: web.Request) -> web.Response:
 # ==================== USER AUTH HANDLERS ====================
 async def handle_user_login(request: web.Request) -> web.Response:
     """
-    Single-use key login.
-    - If key already bound to a live session → reject.
-    - If key already used (used_at set) and session gone → also reject.
-    - On success, returns JSON {status: ok} plus sets cookie.
-    - If form-urlencoded (from login.html <form>), also redirects to /?login=success&key=XXX
+    NEW LOGIC:
+    - Key expired হলে লগইন হবে না।
+    - Key revoked হলে লগইন হবে না।
+    - Key অন্য কারো সেশনে অ্যাক্টিভ থাকলে লগইন হবে না (অন্য ডিভাইস)।
+    - আপনি লগআউট করলে বা আপনার ব্রাউজার বন্ধ করলে, সেই কী দিয়ে আবার লগইন করা যাবে।
+    - একই ব্রাউজারে বারবার লগইন করা যাবে যতক্ষণ কী-এর টাইম শেষ না হয়।
     """
     try:
-        # Support both JSON and form-encoded input
         content_type = (request.headers.get("Content-Type", "") or "").lower()
         is_form = "application/x-www-form-urlencoded" in content_type or "multipart/form-data" in content_type
 
@@ -771,48 +721,61 @@ async def handle_user_login(request: web.Request) -> web.Response:
             if is_form:
                 raise web.HTTPFound("/login?error=Invalid+key")
             return web.json_response({"status": "error", "error": "Invalid key"})
+        
+        # ১. কী রিভোক করা থাকলে
         if entry.get("revoked"):
             if is_form:
                 raise web.HTTPFound("/login?error=Key+revoked")
             return web.json_response({"status": "error", "error": "Key revoked"})
 
-        # If already used and still bound to a live session → reject
-        if entry.get("bound_session"):
-            existing = session_store.get(entry["bound_session"])
-            if existing:
-                if is_form:
-                    raise web.HTTPFound("/login?error=Key+already+in+use")
-                return web.json_response({
-                    "status": "error",
-                    "error": "This key is already in use on another device"
-                })
-            # session gone but used_at set → key was already consumed
-            if entry.get("used_at") is not None:
-                if is_form:
-                    raise web.HTTPFound("/login?error=Key+already+used")
-                return web.json_response({
-                    "status": "error",
-                    "error": "This key has already been used"
-                })
-            # session gone but no used_at (rare) → allow rebind
-            entry["bound_session"] = None
-
-        if entry.get("used_at") is not None:
+        # ২. কী-এর টাইম এক্সপায়ার চেক
+        exp = entry.get("expires_at")
+        if exp is not None and time.time() > exp:
             if is_form:
-                raise web.HTTPFound("/login?error=Key+already+used")
-            return web.json_response({
-                "status": "error",
-                "error": "This key has already been used"
-            })
+                raise web.HTTPFound("/login?error=Key+expired")
+            return web.json_response({"status": "error", "error": "This key has expired"})
 
+        # ৩. চেক করুন কী-টি অন্য কোথাও অ্যাক্টিভ আছে কিনা
+        bound_token = entry.get("bound_session")
+        if bound_token:
+            existing = session_store.get(bound_token)
+            if existing:
+                # সেশন এখনো অ্যাক্টিভ
+                # কুকি থেকে বর্তমান ব্রাউজারের টোকেন নিন
+                current_cookie_token = _get_session_token(request)
+                
+                if current_cookie_token and current_cookie_token == bound_token:
+                    # আপনি নিজেই আছেন, লগইন করতে দিন
+                    pass
+                else:
+                    # অন্য ডিভাইসে লগইন আছে
+                    # তবে ৫ মিনিটের বেশি ইনঅ্যাক্টিভ থাকলে সেশনটি ডিলিট করে দিন
+                    last_seen = existing.get("last_seen", 0)
+                    if time.time() - last_seen > 300:  # 5 minutes
+                        session_store.destroy(bound_token)
+                        entry["bound_session"] = None
+                        key_store.save()
+                    else:
+                        if is_form:
+                            raise web.HTTPFound("/login?error=Key+already+in+use")
+                        return web.json_response({
+                            "status": "error",
+                            "error": "This key is already in use on another device"
+                        })
+            else:
+                # সেশনটি ডেড (লগআউট বা টাইমআউট)
+                entry["bound_session"] = None
+                key_store.save()
+
+        # ৪. সফল লগইন
+        if entry.get("expires_at") is None:
+            entry["expires_at"] = time.time() + entry.get("duration_sec", 60)
         entry["used_at"] = time.time()
-        entry["expires_at"] = time.time() + entry.get("duration_sec", 60)
 
         token = session_store.create(key)
         entry["bound_session"] = token
         key_store.save()
 
-        # Form submit → redirect to dashboard with login=success + key param
         if is_form:
             resp = web.HTTPFound(f"/?login=success&key={key}")
             resp.set_cookie(COOKIE_NAME, token,
@@ -869,16 +832,10 @@ async def handle_whoami(request: web.Request) -> web.Response:
 
 # ==================== DASHBOARD DATA HANDLERS ====================
 async def handle_get_stats(request: web.Request) -> web.Response:
-    """
-    Returns ONLY the accounts & logs owned by the requesting key.
-    If key is expired, marks owned accounts offline and returns 401.
-    Log filtering is now robust: matches owner_key OR uid belongs to key's accounts.
-    """
     key = _get_key_from_request(request)
     if not key:
         return web.json_response({"status": "unauthorized"}, status=401)
 
-    # key expiry → mark owned accounts offline immediately
     try:
         e = key_store.get(key) or {}
         exp = e.get("expires_at")
@@ -891,7 +848,6 @@ async def handle_get_stats(request: web.Request) -> web.Response:
     except Exception:
         pass
 
-    # Filter accounts by ownership
     owned_accounts = []
     owned_uids = set()
     for uid, acc in bot_state.accounts.items():
@@ -901,18 +857,15 @@ async def handle_get_stats(request: web.Request) -> web.Response:
             owned_uids.add(str(uid))
     owned_accounts.sort(key=lambda x: x.get("gained_exp", 0), reverse=True)
 
-    # Filter logs by ownership — match owner_key OR message/uid belonging to this key
     owned_logs = []
     for l in bot_state.logs:
         if l.get("owner_key") == key:
             owned_logs.append(l)
             continue
-        # fallback: match by uid
         lu = l.get("uid")
         if lu and str(lu) in owned_uids:
             owned_logs.append(l)
             continue
-        # fallback: scan message for any owned uid / token alias
         msg = l.get("message") or ""
         matched = False
         for ou in owned_uids:
@@ -920,7 +873,6 @@ async def handle_get_stats(request: web.Request) -> web.Response:
                 matched = True
                 break
         if not matched:
-            # try owner mapping for any token alias in message
             try:
                 tok_matches = re.findall(r'tok_[A-Za-z0-9_\-]+', msg)
                 for t in tok_matches:
@@ -932,7 +884,6 @@ async def handle_get_stats(request: web.Request) -> web.Response:
         if matched:
             owned_logs.append(l)
 
-    # Per-key totals
     total_matches = sum(a.get("matches_played", 0) for a in owned_accounts)
     total_gained = sum(a.get("gained_exp", 0) for a in owned_accounts)
 
@@ -955,7 +906,6 @@ async def handle_add_account(request: web.Request) -> web.Response:
     if not key:
         return web.json_response({"status": "error", "error": "Unauthorized"}, status=401)
 
-    # Reject if key already expired
     try:
         e = key_store.get(key) or {}
         exp = e.get("expires_at")
@@ -968,7 +918,6 @@ async def handle_add_account(request: web.Request) -> web.Response:
         data = await request.json()
         target_level = int(data.get("target_level", 0) or 0)
 
-        # Per-key accounts file to keep users isolated
         accounts_file = os.path.join(BASE_DIR, f"accounts_{key}.json")
         existing = []
         if os.path.exists(accounts_file):
@@ -1007,7 +956,6 @@ async def handle_add_account(request: web.Request) -> web.Response:
         with open(accounts_file, "w", encoding="utf-8") as f:
             json.dump(existing, f, indent=2)
 
-        # Pass owner_key so callbacks know who added it
         payload_for_callback = dict(data)
         payload_for_callback["_owner_key"] = key
 
@@ -1020,9 +968,6 @@ async def handle_add_account(request: web.Request) -> web.Response:
 
 
 async def handle_delete_account(request: web.Request) -> web.Response:
-    """
-    Only deletes the account if the requesting key owns it.
-    """
     key = _get_key_from_request(request)
     if not key:
         return web.json_response({"status": "error", "error": "Unauthorized"}, status=401)
@@ -1030,7 +975,6 @@ async def handle_delete_account(request: web.Request) -> web.Response:
         data = await request.json()
         uid = str(data.get("uid")).strip()
 
-        # ownership check
         owner = bot_state.get_owner(uid)
         if owner and owner != key:
             return web.json_response({"status": "error", "error": "Not your account"}, status=403)
@@ -1083,7 +1027,6 @@ async def handle_delete_account(request: web.Request) -> web.Response:
                         w.cancel()
                     del bot_state.account_workers[k]
 
-        # mark saved account offline
         try:
             saved_accounts_store.set_online_by_identifier("guest", uid, False)
             saved_accounts_store.set_online_status(uid, False)
@@ -1200,7 +1143,6 @@ async def handle_admin_revoke(request: web.Request) -> web.Response:
         key = str(data.get("key", "")).strip()
         key_store.revoke(key)
         session_store.destroy_by_key(key)
-        # mark all owned accounts offline
         try:
             saved_accounts_store.set_offline_by_key(key)
         except Exception:
@@ -1217,7 +1159,6 @@ async def handle_admin_delete(request: web.Request) -> web.Response:
             return web.json_response({"status": "error", "error": "Unauthorized"})
         key = str(data.get("key", "")).strip()
         session_store.destroy_by_key(key)
-        # mark all owned accounts offline before deletion
         try:
             saved_accounts_store.set_offline_by_key(key)
         except Exception:
@@ -1230,10 +1171,6 @@ async def handle_admin_delete(request: web.Request) -> web.Response:
 
 # ==================== ADMIN SAVED ACCOUNTS HANDLERS ====================
 async def handle_admin_saved_accounts(request: web.Request) -> web.Response:
-    """
-    ADMIN ONLY. Returns all successfully-online accounts ever logged in.
-    Includes ONLINE / OFFLINE status and owner_key.
-    """
     try:
         data = await request.json()
         if not _check_master(data):
@@ -1247,9 +1184,6 @@ async def handle_admin_saved_accounts(request: web.Request) -> web.Response:
 
 
 async def handle_admin_saved_delete(request: web.Request) -> web.Response:
-    """
-    ADMIN ONLY. Deletes a saved account by its real_account_id.
-    """
     try:
         data = await request.json()
         if not _check_master(data):
@@ -1269,7 +1203,6 @@ async def _session_cleanup_loop():
     while True:
         try:
             session_store.cleanup_expired()
-            # Also mark any accounts whose owner key expired as offline
             try:
                 now = time.time()
                 for k, e in list(key_store.keys.items()):
@@ -1306,7 +1239,6 @@ async def start_web_dashboard(host: str = "0.0.0.0", port: int = 5000):
     app.router.add_post("/api/admin/revoke", handle_admin_revoke)
     app.router.add_post("/api/admin/delete", handle_admin_delete)
 
-    # Saved accounts (admin-only)
     app.router.add_post("/api/admin/saved_accounts", handle_admin_saved_accounts)
     app.router.add_post("/api/admin/saved_delete", handle_admin_saved_delete)
 

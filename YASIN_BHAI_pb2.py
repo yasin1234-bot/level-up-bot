@@ -31,7 +31,7 @@ DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0fthunderFF.prot
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
-_builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'thunderFF_pb2', _globals)
+_builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'YASIN_BHAI_pb2.py', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   DESCRIPTOR._loaded_options = None
   _globals['_MAJORLOGINREQ']._serialized_start=20

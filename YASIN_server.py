@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-FreeFire Level Up Bot - Web Dashboard + Key Auth System
+FreeFire Level Up Bot - Web Dashboard + Password Auth System
 Embedded Async Web Server (aiohttp)
 """
 
@@ -15,9 +15,10 @@ from aiohttp import web
 
 # ==================== CONFIG ====================
 MASTER_PASSWORD = "YASIN2026"
-KEYS_FILE = "keys.json"
+PASSWORDS_FILE = "passwords.json"
 SESSIONS_FILE = "sessions.json"
 SAVED_ACCOUNTS_FILE = "admin_saved_accounts.json"
+ACCOUNTS_FILE = "accounts.json"
 COOKIE_NAME = "sexymods_session"
 SESSION_MAX_AGE = 60 * 60 * 24 * 30  # 30 days cookie lifetime
 
@@ -148,11 +149,90 @@ class SavedAccountsStore:
 saved_accounts_store = SavedAccountsStore(SAVED_ACCOUNTS_FILE)
 
 
-# ==================== KEY STORE ====================
-class KeyStore:
+# ==================== GLOBAL ACCOUNTS FILE HELPERS ====================
+def _load_global_accounts() -> List[Dict[str, Any]]:
+    if not os.path.exists(ACCOUNTS_FILE):
+        return []
+    try:
+        with open(ACCOUNTS_FILE, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            if isinstance(data, list):
+                return data
+            elif isinstance(data, dict):
+                return list(data.values())
+    except Exception:
+        pass
+    return []
+
+
+def _save_global_accounts(accounts: List[Dict[str, Any]]):
+    try:
+        tmp = ACCOUNTS_FILE + ".tmp"
+        with open(tmp, "w", encoding="utf-8") as f:
+            json.dump(accounts, f, indent=2, ensure_ascii=False)
+        os.replace(tmp, ACCOUNTS_FILE)
+    except Exception as e:
+        print(f"[-] Global accounts save error: {e}")
+
+
+def _add_global_account(entry: Dict[str, Any], owner_key: str) -> bool:
+    accounts = _load_global_accounts()
+    entry = dict(entry)
+    entry["_owner_key"] = owner_key
+
+    auth_type = entry.get("auth_type", "guest")
+    if auth_type == "guest":
+        identifier_value = str(entry.get("uid", "")).strip()
+    else:
+        identifier_value = str(entry.get("token", "")).strip()
+
+    is_new = True
+    for i, acc in enumerate(accounts):
+        if auth_type == "guest" and str(acc.get("uid", "")).strip() == identifier_value:
+            accounts[i] = entry
+            is_new = False
+            break
+        elif auth_type == "token" and str(acc.get("token", "")).strip() == identifier_value:
+            accounts[i] = entry
+            is_new = False
+            break
+
+    if is_new:
+        accounts.append(entry)
+
+    _save_global_accounts(accounts)
+    return is_new
+
+
+def _remove_global_account(identifier: str, owner_key: str = "") -> bool:
+    accounts = _load_global_accounts()
+    before = len(accounts)
+
+    def match(acc):
+        if owner_key and str(acc.get("_owner_key", "")) != str(owner_key):
+            return False
+        if str(acc.get("uid", "")).strip() == str(identifier).strip():
+            return True
+        if str(acc.get("token", "")).strip().startswith(str(identifier).strip()):
+            return True
+        return False
+
+    accounts = [a for a in accounts if not match(a)]
+
+    if len(accounts) != before:
+        _save_global_accounts(accounts)
+        return True
+    return False
+
+
+# ==================== PASSWORD STORE ====================
+class PasswordStore:
+    """Single shared admin password that everyone can use to login."""
     def __init__(self, path: str):
         self.path = path
-        self.keys: Dict[str, Dict[str, Any]] = {}
+        self.current_password: str = "YASIN2026"
+        self.created_at: float = time.time()
+        self.updated_at: float = time.time()
         self.load()
 
     def load(self):
@@ -161,104 +241,42 @@ class KeyStore:
                 with open(self.path, "r", encoding="utf-8") as f:
                     data = json.load(f)
                     if isinstance(data, dict):
-                        self.keys = data
+                        self.current_password = str(data.get("password", "YASIN2026"))
+                        self.created_at = float(data.get("created_at", time.time()))
+                        self.updated_at = float(data.get("updated_at", time.time()))
             except Exception:
-                self.keys = {}
+                pass
 
     def save(self):
         try:
             tmp = self.path + ".tmp"
             with open(tmp, "w", encoding="utf-8") as f:
-                json.dump(self.keys, f, indent=2)
+                json.dump({
+                    "password": self.current_password,
+                    "created_at": self.created_at,
+                    "updated_at": self.updated_at,
+                }, f, indent=2)
             os.replace(tmp, self.path)
         except Exception:
             pass
 
-    def generate(self, user_name: str, days: int, hours: int, minutes: int,
-                 custom_key: Optional[str] = None) -> Dict[str, Any]:
-        duration = (max(0, days) * 86400) + (max(0, hours) * 3600) + (max(0, minutes) * 60)
-        if duration <= 0:
-            duration = 60
+    def verify(self, password: str) -> bool:
+        return str(password) == self.current_password
 
-        if custom_key and str(custom_key).strip():
-            key = str(custom_key).strip().upper()
-            is_custom = True
-        else:
-            clean_name = "".join(c for c in (user_name or "USER") if c.isalnum()).upper()
-            clean_name = clean_name[:16] or "USER"
-            key = f"{clean_name}-" + secrets.token_hex(4).upper()
-            is_custom = False
-
-        entry = {
-            "key": key,
-            "user_name": user_name or "User",
-            "days": days,
-            "hours": hours,
-            "minutes": minutes,
-            "duration_sec": duration,
-            "created_at": time.time(),
-            "expires_at": None,
-            "revoked": False,
-            "bound_session": None,
-            "used_at": None,
-            "custom": is_custom,
-        }
-        self.keys[key] = entry
+    def change(self, new_password: str) -> bool:
+        new_password = str(new_password).strip()
+        if not new_password or len(new_password) < 3:
+            return False
+        self.current_password = new_password
+        self.updated_at = time.time()
         self.save()
-        return entry
-
-    def get(self, key: str) -> Optional[Dict[str, Any]]:
-        return self.keys.get(key)
-
-    def exists(self, key: str) -> bool:
-        return key in self.keys
-
-    def revoke(self, key: str):
-        if key in self.keys:
-            self.keys[key]["revoked"] = True
-            self.keys[key]["bound_session"] = None
-            self.save()
-
-    def delete(self, key: str):
-        if key in self.keys:
-            del self.keys[key]
-            self.save()
-
-    def is_expired(self, key: str) -> bool:
-        e = self.keys.get(key)
-        if not e:
-            return True
-        exp = e.get("expires_at")
-        if exp is None:
-            return False
-        return time.time() > exp
-
-    def is_usable(self, key: str) -> bool:
-        e = self.keys.get(key)
-        if not e:
-            return False
-        if e.get("revoked"):
-            return False
-        exp = e.get("expires_at")
-        if exp is not None and time.time() > exp:
-            return False
         return True
 
-    def is_session_alive(self, key: str) -> bool:
-        e = self.keys.get(key)
-        if not e:
-            return False
-        if e.get("revoked"):
-            return False
-        exp = e.get("expires_at")
-        if exp is not None and time.time() > exp:
-            return False
-        if e.get("bound_session"):
-            return True
-        return False
+    def get_current(self) -> str:
+        return self.current_password
 
 
-key_store = KeyStore(KEYS_FILE)
+password_store = PasswordStore(PASSWORDS_FILE)
 
 
 # ==================== SESSION STORE ====================
@@ -287,12 +305,12 @@ class SessionStore:
         except Exception:
             pass
 
-    def create(self, key: str) -> str:
+    def create(self) -> str:
         token = secrets.token_urlsafe(32)
         self.sessions[token] = {
-            "key": key,
             "created_at": time.time(),
             "last_seen": time.time(),
+            "password_used": password_store.current_password,
         }
         self.save()
         return token
@@ -309,25 +327,17 @@ class SessionStore:
             del self.sessions[token]
             self.save()
 
-    def destroy_by_key(self, key: str):
-        dead = [t for t, s in self.sessions.items() if s.get("key") == key]
-        for t in dead:
-            self.sessions.pop(t, None)
-        if dead:
-            self.save()
+    def destroy_all(self):
+        self.sessions = {}
+        self.save()
 
     def cleanup_expired(self):
+        # Only remove sessions older than 90 days of inactivity
         dead = []
+        now = time.time()
         for tok, s in self.sessions.items():
-            k = s.get("key")
-            e = key_store.get(k)
-            if not e:
-                dead.append(tok); continue
-            if e.get("revoked"):
-                dead.append(tok); continue
-            exp = e.get("expires_at")
-            if exp is not None and time.time() > exp:
-                dead.append(tok); continue
+            if now - s.get("last_seen", 0) > 60 * 60 * 24 * 90:
+                dead.append(tok)
         for tok in dead:
             self.sessions.pop(tok, None)
         if dead:
@@ -351,6 +361,13 @@ class BotState:
         self.account_credentials: Dict[str, Dict[str, Any]] = {}
         self.account_targets: Dict[str, int] = {}
         self.account_owners: Dict[str, str] = {}
+        self.paused_accounts: Dict[str, bool] = {}
+
+        self.account_start_times: Dict[str, float] = {}
+        self.account_pause_total: Dict[str, float] = {}
+        self.account_pause_started: Dict[str, float] = {}
+
+        self.current_maps: Dict[str, Optional[str]] = {}
 
     _UID_RE = re.compile(r'\b(\d{6,})\b')
 
@@ -438,31 +455,43 @@ class BotState:
         return owners
 
     def is_owner_key_expired(self, *aliases: str) -> bool:
-        try:
-            owners = self.get_all_owners(*aliases)
-            if not owners:
-                for a in aliases:
-                    if a and key_store.exists(str(a)):
-                        owners.append(str(a))
-            if not owners:
-                return False
+        # ✅ Key expiry disabled — always return False
+        return False
 
-            for owner_key in owners:
-                e = key_store.get(owner_key)
-                if not e:
-                    return True
-                if e.get("revoked"):
-                    return True
-                exp = e.get("expires_at")
-                if exp is not None and time.time() > exp:
-                    return True
-            return False
-        except Exception:
-            return False
+    def _ensure_uptime_entry(self, uid_str: str):
+        if uid_str not in self.account_start_times:
+            self.account_start_times[uid_str] = time.time()
+            self.account_pause_total[uid_str] = 0.0
+            self.account_pause_started[uid_str] = 0.0
+
+    def get_uptime_seconds(self, uid_str: str) -> int:
+        uid_str = str(uid_str)
+        if uid_str not in self.account_start_times:
+            return 0
+        now = time.time()
+        start = self.account_start_times[uid_str]
+        paused_total = self.account_pause_total.get(uid_str, 0.0)
+        pause_started = self.account_pause_started.get(uid_str, 0.0)
+        if pause_started > 0:
+            paused_total += (now - pause_started)
+        elapsed = now - start - paused_total
+        return int(max(0, elapsed))
+
+    def set_current_map(self, uid: str, map_name: Optional[str]):
+        uid_str = str(uid)
+        if map_name:
+            self.current_maps[uid_str] = str(map_name)
+        else:
+            self.current_maps.pop(uid_str, None)
+
+    def get_current_map(self, uid: str) -> Optional[str]:
+        return self.current_maps.get(str(uid))
 
     def register_account(self, uid: str, nickname: str, region: str, level: int, exp: int, likes: int = 0):
         uid_str = str(uid)
         resolved_target = self._resolve_target_for(uid_str)
+
+        self._ensure_uptime_entry(uid_str)
 
         if uid_str not in self.accounts:
             self.accounts[uid_str] = {
@@ -479,7 +508,9 @@ class BotState:
                 "active_matches": 0,
                 "last_match_time": None,
                 "last_updated": time.strftime("%H:%M:%S"),
-                "target_level": resolved_target
+                "target_level": resolved_target,
+                "paused": self.paused_accounts.get(uid_str, False),
+                "current_map": self.current_maps.get(uid_str)
             }
         else:
             acc = self.accounts[uid_str]
@@ -496,6 +527,8 @@ class BotState:
             acc["last_updated"] = time.strftime("%H:%M:%S")
             if resolved_target > 0:
                 acc["target_level"] = resolved_target
+            acc["paused"] = self.paused_accounts.get(uid_str, False)
+            acc["current_map"] = self.current_maps.get(uid_str)
         self.recalc_totals()
         try:
             saved_accounts_store.set_online_status(uid_str, True)
@@ -531,14 +564,28 @@ class BotState:
         return 0
 
     def register_target(self, alias: str, real_account_id: Optional[str], target: int):
-        if target <= 0:
-            return
         if alias:
-            self.account_targets[str(alias)] = target
+            if target > 0:
+                self.account_targets[str(alias)] = target
+            else:
+                self.account_targets.pop(str(alias), None)
         if real_account_id:
-            self.account_targets[str(real_account_id)] = target
-            if str(real_account_id) in self.accounts:
-                self.accounts[str(real_account_id)]["target_level"] = target
+            if target > 0:
+                self.account_targets[str(real_account_id)] = target
+                if str(real_account_id) in self.accounts:
+                    self.accounts[str(real_account_id)]["target_level"] = target
+            else:
+                self.account_targets.pop(str(real_account_id), None)
+                if str(real_account_id) in self.accounts:
+                    self.accounts[str(real_account_id)]["target_level"] = 0
+
+    def clear_target_for_uid(self, uid: str):
+        uid_str = str(uid)
+        self.account_targets.pop(uid_str, None)
+        if uid_str in self.accounts:
+            self.accounts[uid_str]["target_level"] = 0
+            if self.accounts[uid_str].get("status") == "TARGET_REACHED":
+                self.accounts[uid_str]["status"] = "ONLINE"
 
     def update_exp(self, uid: str, current_exp: int, level: Optional[int] = None):
         uid_str = str(uid)
@@ -576,9 +623,13 @@ class BotState:
             if active_matches is not None:
                 self.accounts[uid_str]["active_matches"] = active_matches
             self.accounts[uid_str]["last_updated"] = time.strftime("%H:%M:%S")
+            self.accounts[uid_str]["paused"] = self.paused_accounts.get(uid_str, False)
+            self.accounts[uid_str]["current_map"] = self.current_maps.get(uid_str)
 
     def increment_match(self, uid: str):
         uid_str = str(uid)
+        if self.paused_accounts.get(uid_str, False):
+            return
         self.total_matches += 1
         if uid_str in self.accounts:
             self.accounts[uid_str]["matches_played"] += 1
@@ -615,6 +666,41 @@ class BotState:
             return False
         return acc.get("level", 1) >= target
 
+    def is_paused(self, uid: str) -> bool:
+        return self.paused_accounts.get(str(uid), False)
+
+    def set_paused(self, uid: str, paused: bool):
+        uid_str = str(uid)
+        self._ensure_uptime_entry(uid_str)
+        now = time.time()
+
+        was_paused = self.paused_accounts.get(uid_str, False)
+
+        if paused and not was_paused:
+            self.account_pause_started[uid_str] = now
+        elif not paused and was_paused:
+            started = self.account_pause_started.get(uid_str, 0.0)
+            if started > 0:
+                self.account_pause_total[uid_str] = self.account_pause_total.get(uid_str, 0.0) + (now - started)
+            self.account_pause_started[uid_str] = 0.0
+
+        self.paused_accounts[uid_str] = paused
+        if uid_str in self.accounts:
+            self.accounts[uid_str]["paused"] = paused
+            if paused:
+                self.accounts[uid_str]["status"] = "PAUSED"
+            else:
+                self.accounts[uid_str]["status"] = "ONLINE"
+            self.accounts[uid_str]["last_updated"] = time.strftime("%H:%M:%S")
+
+    def clear_account_uptime(self, uid: str):
+        uid_str = str(uid)
+        self.account_start_times.pop(uid_str, None)
+        self.account_pause_total.pop(uid_str, None)
+        self.account_pause_started.pop(uid_str, None)
+        self.paused_accounts.pop(uid_str, None)
+        self.current_maps.pop(uid_str, None)
+
 
 bot_state = BotState()
 
@@ -638,45 +724,35 @@ def _get_session_token(request: web.Request) -> Optional[str]:
     return request.cookies.get(COOKIE_NAME)
 
 
-def _get_key_from_request(request: web.Request) -> Optional[str]:
+def _check_session(request: web.Request) -> bool:
+    """✅ Session must exist AND password version must match.
+    If admin changes the login password, all old sessions become invalid instantly."""
     tok = _get_session_token(request)
     if not tok:
-        return None
+        return False
     s = session_store.get(tok)
     if not s:
-        return None
-    key = s.get("key")
-    e = key_store.get(key)
-    if not e:
-        session_store.destroy(tok); return None
-    if e.get("revoked"):
-        session_store.destroy(tok); return None
-    exp = e.get("expires_at")
-    if exp is not None and time.time() > exp:
-        session_store.destroy(tok); return None
-    if e.get("bound_session") != tok:
-        session_store.destroy(tok); return None
+        return False
+    # ✅ Invalidate session if the password has been changed since login
+    used_pw = s.get("password_used")
+    if used_pw is not None and used_pw != password_store.current_password:
+        # Password changed → this session is dead
+        session_store.destroy(tok)
+        return False
     session_store.touch(tok)
-    return key
-
-
-def _check_master(data: Dict[str, Any]) -> bool:
-    return str(data.get("master_password", "")) == MASTER_PASSWORD
+    return True
 
 
 # ==================== PAGE HANDLERS ====================
 async def handle_index(request: web.Request) -> web.Response:
-    key = _get_key_from_request(request)
-    if not key:
+    if not _check_session(request):
         raise web.HTTPFound("/login")
     return web.Response(text=_read_html("index.html", "<h1>index.html missing</h1>"),
                         content_type="text/html", charset="utf-8")
 
 
 async def handle_login_page(request: web.Request) -> web.Response:
-    # যদি ইতিমধ্যে লগইন করা থাকে, তবে সোজা ড্যাশবোর্ডে পাঠান
-    key = _get_key_from_request(request)
-    if key:
+    if _check_session(request):
         raise web.HTTPFound("/")
     return web.Response(text=_read_html("login.html", "<h1>login.html missing</h1>"),
                         content_type="text/html", charset="utf-8")
@@ -689,101 +765,41 @@ async def handle_admin_page(request: web.Request) -> web.Response:
 
 # ==================== USER AUTH HANDLERS ====================
 async def handle_user_login(request: web.Request) -> web.Response:
-    """
-    NEW LOGIC:
-    - Key expired হলে লগইন হবে না।
-    - Key revoked হলে লগইন হবে না।
-    - Key অন্য কারো সেশনে অ্যাক্টিভ থাকলে লগইন হবে না (অন্য ডিভাইস)।
-    - আপনি লগআউট করলে বা আপনার ব্রাউজার বন্ধ করলে, সেই কী দিয়ে আবার লগইন করা যাবে।
-    - একই ব্রাউজারে বারবার লগইন করা যাবে যতক্ষণ কী-এর টাইম শেষ না হয়।
-    """
     try:
         content_type = (request.headers.get("Content-Type", "") or "").lower()
         is_form = "application/x-www-form-urlencoded" in content_type or "multipart/form-data" in content_type
 
         if is_form:
             post = await request.post()
-            key = str(post.get("key", "")).strip().upper()
+            password = str(post.get("password", "")).strip()
         else:
             try:
                 data = await request.json()
             except Exception:
                 data = {}
-            key = str(data.get("key", "")).strip().upper()
+            password = str(data.get("password", "")).strip()
 
-        if not key:
+        if not password:
             if is_form:
-                raise web.HTTPFound("/login?error=Key+required")
-            return web.json_response({"status": "error", "error": "Key required"})
+                raise web.HTTPFound("/login?error=Password+required")
+            return web.json_response({"status": "error", "error": "Password required"})
 
-        entry = key_store.get(key)
-        if not entry:
+        if not password_store.verify(password):
             if is_form:
-                raise web.HTTPFound("/login?error=Invalid+key")
-            return web.json_response({"status": "error", "error": "Invalid key"})
-        
-        # ১. কী রিভোক করা থাকলে
-        if entry.get("revoked"):
-            if is_form:
-                raise web.HTTPFound("/login?error=Key+revoked")
-            return web.json_response({"status": "error", "error": "Key revoked"})
+                raise web.HTTPFound("/login?error=Invalid+password")
+            return web.json_response({"status": "error", "error": "Invalid password"})
 
-        # ২. কী-এর টাইম এক্সপায়ার চেক
-        exp = entry.get("expires_at")
-        if exp is not None and time.time() > exp:
-            if is_form:
-                raise web.HTTPFound("/login?error=Key+expired")
-            return web.json_response({"status": "error", "error": "This key has expired"})
-
-        # ৩. চেক করুন কী-টি অন্য কোথাও অ্যাক্টিভ আছে কিনা
-        bound_token = entry.get("bound_session")
-        if bound_token:
-            existing = session_store.get(bound_token)
-            if existing:
-                # সেশন এখনো অ্যাক্টিভ
-                # কুকি থেকে বর্তমান ব্রাউজারের টোকেন নিন
-                current_cookie_token = _get_session_token(request)
-                
-                if current_cookie_token and current_cookie_token == bound_token:
-                    # আপনি নিজেই আছেন, লগইন করতে দিন
-                    pass
-                else:
-                    # অন্য ডিভাইসে লগইন আছে
-                    # তবে ৫ মিনিটের বেশি ইনঅ্যাক্টিভ থাকলে সেশনটি ডিলিট করে দিন
-                    last_seen = existing.get("last_seen", 0)
-                    if time.time() - last_seen > 300:  # 5 minutes
-                        session_store.destroy(bound_token)
-                        entry["bound_session"] = None
-                        key_store.save()
-                    else:
-                        if is_form:
-                            raise web.HTTPFound("/login?error=Key+already+in+use")
-                        return web.json_response({
-                            "status": "error",
-                            "error": "This key is already in use on another device"
-                        })
-            else:
-                # সেশনটি ডেড (লগআউট বা টাইমআউট)
-                entry["bound_session"] = None
-                key_store.save()
-
-        # ৪. সফল লগইন
-        if entry.get("expires_at") is None:
-            entry["expires_at"] = time.time() + entry.get("duration_sec", 60)
-        entry["used_at"] = time.time()
-
-        token = session_store.create(key)
-        entry["bound_session"] = token
-        key_store.save()
+        # ✅ Create session — no binding to specific password string, no single-session limit
+        token = session_store.create()
 
         if is_form:
-            resp = web.HTTPFound(f"/?login=success&key={key}")
+            resp = web.HTTPFound("/?login=success")
             resp.set_cookie(COOKIE_NAME, token,
                             max_age=SESSION_MAX_AGE,
                             httponly=True, samesite="Lax")
             raise resp
 
-        resp = web.json_response({"status": "ok", "key": key})
+        resp = web.json_response({"status": "ok"})
         resp.set_cookie(COOKIE_NAME, token,
                         max_age=SESSION_MAX_AGE,
                         httponly=True, samesite="Lax")
@@ -799,13 +815,6 @@ async def handle_user_login(request: web.Request) -> web.Response:
 async def handle_user_logout(request: web.Request) -> web.Response:
     tok = _get_session_token(request)
     if tok:
-        s = session_store.get(tok)
-        if s:
-            key = s.get("key")
-            e = key_store.get(key)
-            if e and e.get("bound_session") == tok:
-                e["bound_session"] = None
-                key_store.save()
         session_store.destroy(tok)
     resp = web.json_response({"status": "ok"})
     resp.del_cookie(COOKIE_NAME)
@@ -813,154 +822,106 @@ async def handle_user_logout(request: web.Request) -> web.Response:
 
 
 async def handle_whoami(request: web.Request) -> web.Response:
-    key = _get_key_from_request(request)
-    if not key:
+    if not _check_session(request):
         return web.json_response({"status": "unauthorized"}, status=401)
-    e = key_store.get(key) or {}
-    exp = e.get("expires_at")
-    remaining = 0
-    if exp is not None:
-        remaining = max(0, int(exp - time.time()))
     return web.json_response({
         "status": "ok",
-        "key": key,
-        "user_name": e.get("user_name"),
-        "expires_at": exp or 0,
-        "remaining_sec": remaining,
+        "password_version": password_store.updated_at,
     })
 
 
 # ==================== DASHBOARD DATA HANDLERS ====================
 async def handle_get_stats(request: web.Request) -> web.Response:
-    key = _get_key_from_request(request)
-    if not key:
+    if not _check_session(request):
         return web.json_response({"status": "unauthorized"}, status=401)
 
-    try:
-        e = key_store.get(key) or {}
-        exp = e.get("expires_at")
-        if exp is not None and time.time() > exp:
-            try:
-                saved_accounts_store.set_offline_by_key(key)
-            except Exception:
-                pass
-            return web.json_response({"status": "unauthorized", "error": "key expired"}, status=401)
-    except Exception:
-        pass
-
     owned_accounts = []
-    owned_uids = set()
     for uid, acc in bot_state.accounts.items():
-        owner = bot_state.get_owner(uid)
-        if owner == key:
-            owned_accounts.append(acc)
-            owned_uids.add(str(uid))
+        acc_copy = dict(acc)
+        acc_copy["uptime_seconds"] = bot_state.get_uptime_seconds(uid)
+        acc_copy["current_map"] = bot_state.get_current_map(uid)
+        owned_accounts.append(acc_copy)
     owned_accounts.sort(key=lambda x: x.get("gained_exp", 0), reverse=True)
-
-    owned_logs = []
-    for l in bot_state.logs:
-        if l.get("owner_key") == key:
-            owned_logs.append(l)
-            continue
-        lu = l.get("uid")
-        if lu and str(lu) in owned_uids:
-            owned_logs.append(l)
-            continue
-        msg = l.get("message") or ""
-        matched = False
-        for ou in owned_uids:
-            if ou and ou in msg:
-                matched = True
-                break
-        if not matched:
-            try:
-                tok_matches = re.findall(r'tok_[A-Za-z0-9_\-]+', msg)
-                for t in tok_matches:
-                    if bot_state.get_owner(t) == key:
-                        matched = True
-                        break
-            except Exception:
-                pass
-        if matched:
-            owned_logs.append(l)
 
     total_matches = sum(a.get("matches_played", 0) for a in owned_accounts)
     total_gained = sum(a.get("gained_exp", 0) for a in owned_accounts)
 
-    e = key_store.get(key) or {}
-    exp = e.get("expires_at")
     return web.json_response({
         "total_accounts": len(owned_accounts),
         "total_matches": total_matches,
         "total_gained_exp": total_gained,
         "accounts": owned_accounts,
-        "logs": owned_logs[-80:],
+        "logs": bot_state.logs[-80:],
         "uptime": int(time.time() - bot_state.start_time),
-        "key_expires_at": exp or 0,
-        "key_user_name": e.get("user_name", ""),
     })
 
 
 async def handle_add_account(request: web.Request) -> web.Response:
-    key = _get_key_from_request(request)
-    if not key:
+    if not _check_session(request):
         return web.json_response({"status": "error", "error": "Unauthorized"}, status=401)
-
-    try:
-        e = key_store.get(key) or {}
-        exp = e.get("expires_at")
-        if exp is not None and time.time() > exp:
-            return web.json_response({"status": "error", "error": "Key expired"}, status=401)
-    except Exception:
-        pass
 
     try:
         data = await request.json()
         target_level = int(data.get("target_level", 0) or 0)
-
-        accounts_file = os.path.join(BASE_DIR, f"accounts_{key}.json")
-        existing = []
-        if os.path.exists(accounts_file):
-            try:
-                with open(accounts_file, "r", encoding="utf-8") as f:
-                    existing = json.load(f)
-            except Exception:
-                existing = []
 
         if "uid" in data and "password" in data:
             uid = str(data["uid"]).strip()
             pwd = str(data["password"]).strip()
             if not uid or not pwd:
                 return web.json_response({"status": "error", "error": "UID and Password are required"})
-            existing = [acc for acc in existing if str(acc.get("uid")) != uid]
-            existing.append({"uid": uid, "password": pwd, "target_level": target_level})
+
+            try:
+                bot_state.register_target(uid, None, 0)
+                bot_state.clear_account_uptime(uid)
+            except Exception:
+                pass
+
+            _add_global_account({
+                "uid": uid,
+                "password": pwd,
+                "target_level": target_level,
+                "auth_type": "guest",
+            }, owner_key="")
+
             bot_state.register_target(uid, None, target_level)
-            bot_state.set_owner(uid, key)
+            bot_state.set_paused(uid, False)
             bot_state.log(f"New account added: {uid} (Target Level: {target_level})",
-                          "success", uid, key)
+                          "success", uid)
+
+            payload_for_callback = dict(data)
+
+            if "on_account_added" in bot_state.refresh_callbacks:
+                asyncio.create_task(bot_state.refresh_callbacks["on_account_added"](payload_for_callback))
+
         elif "token" in data:
             token = str(data["token"]).strip()
             if not token:
                 return web.json_response({"status": "error", "error": "Token is required"})
-            existing = [acc for acc in existing if acc.get("token") != token]
-            existing.append({"token": token, "target_level": target_level})
+
             alias = f"tok_{token[:10]}"
+            try:
+                bot_state.register_target(alias, None, 0)
+                bot_state.clear_account_uptime(alias)
+            except Exception:
+                pass
+
+            _add_global_account({
+                "token": token,
+                "target_level": target_level,
+                "auth_type": "token",
+            }, owner_key="")
+
             bot_state.register_target(alias, None, target_level)
-            bot_state.set_owner(alias, key)
-            bot_state.set_owner(f"tok_{token[:20]}", key)
+            bot_state.set_paused(alias, False)
             bot_state.log(f"New account added via token (Target Level: {target_level})",
-                          "success", None, key)
+                          "success", None)
+
+            payload_for_callback = dict(data)
+
+            if "on_account_added" in bot_state.refresh_callbacks:
+                asyncio.create_task(bot_state.refresh_callbacks["on_account_added"](payload_for_callback))
         else:
             return web.json_response({"status": "error", "error": "Invalid payload"})
-
-        with open(accounts_file, "w", encoding="utf-8") as f:
-            json.dump(existing, f, indent=2)
-
-        payload_for_callback = dict(data)
-        payload_for_callback["_owner_key"] = key
-
-        if "on_account_added" in bot_state.refresh_callbacks:
-            asyncio.create_task(bot_state.refresh_callbacks["on_account_added"](payload_for_callback))
 
         return web.json_response({"status": "ok"})
     except Exception as e:
@@ -968,25 +929,13 @@ async def handle_add_account(request: web.Request) -> web.Response:
 
 
 async def handle_delete_account(request: web.Request) -> web.Response:
-    key = _get_key_from_request(request)
-    if not key:
+    if not _check_session(request):
         return web.json_response({"status": "error", "error": "Unauthorized"}, status=401)
     try:
         data = await request.json()
         uid = str(data.get("uid")).strip()
 
-        owner = bot_state.get_owner(uid)
-        if owner and owner != key:
-            return web.json_response({"status": "error", "error": "Not your account"}, status=403)
-
-        accounts_file = os.path.join(BASE_DIR, f"accounts_{key}.json")
-        if os.path.exists(accounts_file):
-            with open(accounts_file, "r", encoding="utf-8") as f:
-                existing = json.load(f)
-            existing = [acc for acc in existing
-                        if str(acc.get("uid")) != uid and acc.get("token", "")[:10] != uid]
-            with open(accounts_file, "w", encoding="utf-8") as f:
-                json.dump(existing, f, indent=2)
+        _remove_global_account(uid)
 
         if uid in bot_state.accounts:
             del bot_state.accounts[uid]
@@ -994,19 +943,38 @@ async def handle_delete_account(request: web.Request) -> web.Response:
         if uid in bot_state.account_targets:
             del bot_state.account_targets[uid]
 
+        try:
+            bot_state.clear_account_uptime(uid)
+        except Exception:
+            pass
+
         cred = bot_state.account_credentials.get(uid)
         if cred:
             auth_uid = cred.get("auth_uid")
             if auth_uid and str(auth_uid) in bot_state.account_targets:
                 del bot_state.account_targets[str(auth_uid)]
+            if auth_uid:
+                try:
+                    bot_state.clear_account_uptime(str(auth_uid))
+                except Exception:
+                    pass
             auth_token = cred.get("auth_token")
             if auth_token:
                 alias = f"tok_{auth_token[:10]}"
                 if alias in bot_state.account_targets:
                     del bot_state.account_targets[alias]
+                try:
+                    bot_state.clear_account_uptime(alias)
+                    bot_state.clear_account_uptime(f"tok_{auth_token[:20]}")
+                except Exception:
+                    pass
             real_id = str(cred.get("account_id"))
             if real_id in bot_state.account_targets:
                 del bot_state.account_targets[real_id]
+            try:
+                bot_state.clear_account_uptime(real_id)
+            except Exception:
+                pass
             if real_id in bot_state.account_workers:
                 w = bot_state.account_workers[real_id]
                 if w and not w.done():
@@ -1018,14 +986,6 @@ async def handle_delete_account(request: web.Request) -> web.Response:
             if w and not w.done():
                 w.cancel()
             del bot_state.account_workers[uid]
-
-        for k in list(bot_state.account_workers.keys()):
-            if k.startswith("tok_") and uid.startswith("tok_"):
-                if k == uid:
-                    w = bot_state.account_workers[k]
-                    if w and not w.done():
-                        w.cancel()
-                    del bot_state.account_workers[k]
 
         try:
             saved_accounts_store.set_online_by_identifier("guest", uid, False)
@@ -1039,22 +999,18 @@ async def handle_delete_account(request: web.Request) -> web.Response:
             except Exception:
                 pass
 
-        bot_state.log(f"Account {uid} removed. Bot stopped.", "warning", uid, key)
+        bot_state.log(f"Account {uid} removed. Bot stopped.", "warning", uid)
         return web.json_response({"status": "ok"})
     except Exception as e:
         return web.json_response({"status": "error", "error": str(e)})
 
 
 async def handle_refresh_account(request: web.Request) -> web.Response:
-    key = _get_key_from_request(request)
-    if not key:
+    if not _check_session(request):
         return web.json_response({"status": "error", "error": "Unauthorized"}, status=401)
     try:
         data = await request.json()
         uid = str(data.get("uid")).strip()
-        owner = bot_state.get_owner(uid)
-        if owner and owner != key:
-            return web.json_response({"status": "error", "error": "Not your account"}, status=403)
         if "on_refresh_account" in bot_state.refresh_callbacks:
             asyncio.create_task(bot_state.refresh_callbacks["on_refresh_account"](uid))
         return web.json_response({"status": "ok"})
@@ -1062,7 +1018,55 @@ async def handle_refresh_account(request: web.Request) -> web.Response:
         return web.json_response({"status": "error", "error": str(e)})
 
 
+async def handle_pause_account(request: web.Request) -> web.Response:
+    if not _check_session(request):
+        return web.json_response({"status": "error", "error": "Unauthorized"}, status=401)
+    try:
+        data = await request.json()
+        uid = str(data.get("uid")).strip()
+
+        bot_state.set_paused(uid, True)
+        bot_state.log(f"Account {uid} paused by user. Bot online but not playing matches.",
+                      "warning", uid)
+
+        if "on_account_paused" in bot_state.refresh_callbacks:
+            try:
+                await bot_state.refresh_callbacks["on_account_paused"](uid)
+            except Exception:
+                pass
+
+        return web.json_response({"status": "ok", "paused": True})
+    except Exception as e:
+        return web.json_response({"status": "error", "error": str(e)})
+
+
+async def handle_resume_account(request: web.Request) -> web.Response:
+    if not _check_session(request):
+        return web.json_response({"status": "error", "error": "Unauthorized"}, status=401)
+    try:
+        data = await request.json()
+        uid = str(data.get("uid")).strip()
+
+        bot_state.set_paused(uid, False)
+        bot_state.log(f"Account {uid} resumed by user. Bot will start playing matches.",
+                      "success", uid)
+
+        if "on_account_resumed" in bot_state.refresh_callbacks:
+            try:
+                await bot_state.refresh_callbacks["on_account_resumed"](uid)
+            except Exception:
+                pass
+
+        return web.json_response({"status": "ok", "paused": False})
+    except Exception as e:
+        return web.json_response({"status": "error", "error": str(e)})
+
+
 # ==================== ADMIN HANDLERS ====================
+def _check_master(data: Dict[str, Any]) -> bool:
+    return str(data.get("master_password", "")) == MASTER_PASSWORD
+
+
 async def handle_admin_login(request: web.Request) -> web.Response:
     try:
         data = await request.json()
@@ -1073,97 +1077,61 @@ async def handle_admin_login(request: web.Request) -> web.Response:
         return web.json_response({"status": "error", "error": str(e)})
 
 
-async def handle_admin_generate(request: web.Request) -> web.Response:
+async def handle_admin_get_password(request: web.Request) -> web.Response:
+    """Get current shared login password."""
     try:
         data = await request.json()
         if not _check_master(data):
             return web.json_response({"status": "error", "error": "Unauthorized"})
-        name = str(data.get("user_name", "User")).strip() or "User"
-        days = int(data.get("days", 0) or 0)
-        hours = int(data.get("hours", 0) or 0)
-        minutes = int(data.get("minutes", 0) or 0)
-        custom_key = data.get("custom_key", "")
-
-        if days == 0 and hours == 0 and minutes == 0:
-            return web.json_response({"status": "error", "error": "Set at least 1 minute"})
-
-        if custom_key and str(custom_key).strip():
-            ck = str(custom_key).strip().upper()
-            if key_store.exists(ck):
-                return web.json_response({"status": "error", "error": f"Key '{ck}' already exists"})
-
-        entry = key_store.generate(name, days, hours, minutes, custom_key)
-        return web.json_response({"status": "ok", "key_entry": entry})
+        return web.json_response({
+            "status": "ok",
+            "password": password_store.get_current(),
+            "updated_at": password_store.updated_at,
+        })
     except Exception as e:
         return web.json_response({"status": "error", "error": str(e)})
 
 
-async def handle_admin_keys(request: web.Request) -> web.Response:
+async def handle_admin_change_password(request: web.Request) -> web.Response:
+    """Change shared login password.
+    ✅ All existing user sessions are destroyed instantly → everyone must re-login with new password.
+    ✅ Old password stops working immediately."""
     try:
         data = await request.json()
         if not _check_master(data):
             return web.json_response({"status": "error", "error": "Unauthorized"})
-        now = time.time()
-        keys = []
-        for k, e in key_store.keys.items():
-            used = e.get("used_at") is not None
-            exp = e.get("expires_at")
-            expired = (exp is not None and now > exp)
-            active = bool(e.get("bound_session")) and (not expired) and (not e.get("revoked"))
-            remaining = 0
-            if exp is not None and not expired:
-                remaining = max(0, int(exp - now))
-            keys.append({
-                "key": k,
-                "user_name": e.get("user_name"),
-                "days": e.get("days", 0),
-                "hours": e.get("hours", 0),
-                "minutes": e.get("minutes", 0),
-                "created_at": e.get("created_at"),
-                "expires_at": exp,
-                "revoked": e.get("revoked", False),
-                "used": used,
-                "used_at": e.get("used_at"),
-                "in_use": active,
-                "expired": expired,
-                "remaining_sec": remaining,
-                "custom": e.get("custom", False),
-            })
-        keys.sort(key=lambda x: x.get("created_at", 0), reverse=True)
-        return web.json_response({"status": "ok", "keys": keys})
+        new_password = str(data.get("new_password", "")).strip()
+        if not new_password or len(new_password) < 3:
+            return web.json_response({"status": "error", "error": "Password must be at least 3 characters"})
+
+        old_pw = password_store.get_current()
+        if new_password == old_pw:
+            return web.json_response({"status": "error", "error": "New password is same as old password"})
+
+        ok = password_store.change(new_password)
+        if not ok:
+            return web.json_response({"status": "error", "error": "Failed to change password"})
+
+        # ✅ Force logout every logged-in user
+        session_store.destroy_all()
+
+        return web.json_response({
+            "status": "ok",
+            "password": password_store.get_current(),
+            "updated_at": password_store.updated_at,
+            "sessions_destroyed": True,
+        })
     except Exception as e:
         return web.json_response({"status": "error", "error": str(e)})
 
 
-async def handle_admin_revoke(request: web.Request) -> web.Response:
+async def handle_admin_logout_all(request: web.Request) -> web.Response:
+    """Force all users to re-login (destroy every active session)."""
     try:
         data = await request.json()
         if not _check_master(data):
             return web.json_response({"status": "error", "error": "Unauthorized"})
-        key = str(data.get("key", "")).strip()
-        key_store.revoke(key)
-        session_store.destroy_by_key(key)
-        try:
-            saved_accounts_store.set_offline_by_key(key)
-        except Exception:
-            pass
-        return web.json_response({"status": "ok"})
-    except Exception as e:
-        return web.json_response({"status": "error", "error": str(e)})
-
-
-async def handle_admin_delete(request: web.Request) -> web.Response:
-    try:
-        data = await request.json()
-        if not _check_master(data):
-            return web.json_response({"status": "error", "error": "Unauthorized"})
-        key = str(data.get("key", "")).strip()
-        session_store.destroy_by_key(key)
-        try:
-            saved_accounts_store.set_offline_by_key(key)
-        except Exception:
-            pass
-        key_store.delete(key)
+        session_store.destroy_all()
         return web.json_response({"status": "ok"})
     except Exception as e:
         return web.json_response({"status": "error", "error": str(e)})
@@ -1203,17 +1171,9 @@ async def _session_cleanup_loop():
     while True:
         try:
             session_store.cleanup_expired()
-            try:
-                now = time.time()
-                for k, e in list(key_store.keys.items()):
-                    exp = e.get("expires_at")
-                    if exp is not None and now > exp and not e.get("revoked"):
-                        saved_accounts_store.set_offline_by_key(k)
-            except Exception:
-                pass
         except Exception:
             pass
-        await asyncio.sleep(60)
+        await asyncio.sleep(300)
 
 
 # ==================== SERVER BOOT ====================
@@ -1232,12 +1192,13 @@ async def start_web_dashboard(host: str = "0.0.0.0", port: int = 5000):
     app.router.add_post("/api/account/add", handle_add_account)
     app.router.add_post("/api/account/delete", handle_delete_account)
     app.router.add_post("/api/account/refresh", handle_refresh_account)
+    app.router.add_post("/api/account/pause", handle_pause_account)
+    app.router.add_post("/api/account/resume", handle_resume_account)
 
     app.router.add_post("/api/admin/login", handle_admin_login)
-    app.router.add_post("/api/admin/generate", handle_admin_generate)
-    app.router.add_post("/api/admin/keys", handle_admin_keys)
-    app.router.add_post("/api/admin/revoke", handle_admin_revoke)
-    app.router.add_post("/api/admin/delete", handle_admin_delete)
+    app.router.add_post("/api/admin/get_password", handle_admin_get_password)
+    app.router.add_post("/api/admin/change_password", handle_admin_change_password)
+    app.router.add_post("/api/admin/logout_all", handle_admin_logout_all)
 
     app.router.add_post("/api/admin/saved_accounts", handle_admin_saved_accounts)
     app.router.add_post("/api/admin/saved_delete", handle_admin_saved_delete)
@@ -1251,4 +1212,4 @@ async def start_web_dashboard(host: str = "0.0.0.0", port: int = 5000):
 
     print(f"\033[92m[+] Web Dashboard running on http://localhost:{port}\033[0m")
     print(f"\033[92m[+] Login page:   http://localhost:{port}/login\033[0m")
-    print(f"\033[92m[+] Admin panel:  http://localhost:{port}/admin\033[0m")
+    print(f"\033[92m[+] Admin panel:  http://localhost:{port}/yasin-admin\033[0m")

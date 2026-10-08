@@ -41,14 +41,15 @@ TOKEN_CACHE_FILE = "token_cache.json"
 DEVICES_FILE = "devices.json"
 TOKEN_CACHE_TTL = 1200
 
-# 🔥 Match control
-START_MATCH_INTERVAL = 3.0
-NEW_MATCH_DELAY = 3.0   
-MAX_MATCH_DURATION = 700
-MATCH_IDLE_TIMEOUT = 8.0
+# ---- Timing (tuned for stable UDP handshake) ----
+START_MATCH_INTERVAL = 3.5          
+NEW_MATCH_DELAY = 5.0               
+MAX_MATCH_DURATION = 700          
+MATCH_IDLE_TIMEOUT = 12.0       
 PRIORITY_REGIONS = ["BD"]
 
-MAX_CONSECUTIVE_PARSE_FAILURES = 20
+# ---- Parse failure handling ----
+MAX_CONSECUTIVE_PARSE_FAILURES = 5
 NON_MATCH_RECONNECT_DELAY = 1.0
 
 FALLBACK_UID = ""

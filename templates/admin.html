@@ -104,16 +104,17 @@ body::after { background: rgba(255,45,149,0.18); bottom: 10%; right: 10%; animat
   text-transform: uppercase; letter-spacing: 0.6px;
 }
 .input-wrap { position: relative; }
-.input-wrap i {
+.input-wrap i.lock-icon {
   position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
   color: var(--text-muted); font-size: 14px; pointer-events: none;
+  z-index: 2;
 }
 .input {
   width: 100%;
   background: rgba(255,255,255,0.05);
   border: 1.5px solid rgba(255,255,255,0.09);
   border-radius: 12px;
-  padding: 13px 14px 13px 40px;
+  padding: 13px 44px 13px 40px;
   color: #fff;
   font-size: 15px;
   outline: none;
@@ -126,27 +127,20 @@ body::after { background: rgba(255,45,149,0.18); bottom: 10%; right: 10%; animat
   background: rgba(0,242,254,0.05);
   box-shadow: 0 0 0 4px rgba(0,242,254,0.08);
 }
-
-.name-preview {
-  margin-top: 8px;
-  padding: 10px 12px;
-  background: rgba(0,242,254,0.06);
-  border: 1px dashed rgba(0,242,254,0.35);
-  border-radius: 10px;
-  font-size: 12px;
-  color: var(--text-muted);
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.toggle-pass {
+  position: absolute;
+  right: 8px; top: 50%; transform: translateY(-50%);
+  color: var(--text-muted); font-size: 14px; cursor: pointer;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px;
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0; z-index: 3;
+  transition: color 0.2s, background 0.2s, border-color 0.2s;
 }
-.name-preview i { color: var(--accent-cyan); font-size: 13px; }
-.name-preview .preview-code {
-  font-family: 'JetBrains Mono', monospace;
-  color: var(--accent-cyan);
-  font-weight: 700;
-  letter-spacing: 1px;
-  word-break: break-all;
-}
+.toggle-pass:hover { color: var(--accent-cyan); background: rgba(0,242,254,0.08); border-color: rgba(0,242,254,0.3); }
+.toggle-pass:active { transform: translateY(-50%) scale(0.9); }
 
 .btn {
   width: 100%;
@@ -179,6 +173,12 @@ body::after { background: rgba(255,45,149,0.18); bottom: 10%; right: 10%; animat
   box-shadow: 0 6px 20px rgba(255,51,102,0.35);
 }
 .btn.danger:hover { box-shadow: 0 10px 28px rgba(255,51,102,0.55); }
+.btn.success {
+  background: linear-gradient(135deg, var(--accent-green), #00cc6a);
+  color: #040914;
+  box-shadow: 0 6px 20px rgba(0,255,136,0.35);
+}
+.btn.success:hover { box-shadow: 0 10px 28px rgba(0,255,136,0.55); }
 
 .alert {
   background: rgba(255,51,102,0.12);
@@ -199,124 +199,6 @@ body::after { background: rgba(255,45,149,0.18); bottom: 10%; right: 10%; animat
   color: var(--accent-green);
 }
 @keyframes shake { 0%,100% { transform: translateX(0);} 20% { transform: translateX(-6px);} 40% { transform: translateX(6px);} 60% { transform: translateX(-4px);} 80% { transform: translateX(4px);} }
-
-.time-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
-.time-box label { display: block; font-size: 10px; font-weight: 700; color: var(--text-muted); text-align: center; margin-bottom: 4px; text-transform: uppercase; }
-.time-box input {
-  width: 100%;
-  background: rgba(255,255,255,0.05);
-  border: 1.5px solid rgba(255,255,255,0.09);
-  border-radius: 10px;
-  padding: 10px;
-  color: #fff; font-size: 16px; font-weight: 700; text-align: center;
-  outline: none; font-family: 'JetBrains Mono', monospace;
-  -webkit-appearance: none;
-}
-.time-box input:focus { border-color: var(--accent-cyan); background: rgba(0,242,254,0.05); }
-
-.key-result {
-  background: rgba(0,255,136,0.08);
-  border: 1px solid rgba(0,255,136,0.3);
-  border-radius: 12px;
-  padding: 14px;
-  margin-top: 14px;
-  text-align: center;
-  display: none;
-}
-.key-result.show { display: block; }
-.key-result .key-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px; }
-.key-result .key-value {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 20px;
-  font-weight: 800;
-  color: var(--accent-green);
-  letter-spacing: 2px;
-  word-break: break-all;
-}
-.key-result .copy-btn {
-  margin-top: 10px;
-  background: rgba(0,255,136,0.15);
-  border: 1px solid rgba(0,255,136,0.4);
-  color: var(--accent-green);
-  padding: 8px 16px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: 700;
-  display: inline-flex; align-items: center; gap: 6px;
-}
-.key-result .copy-btn:hover { background: rgba(0,255,136,0.25); }
-
-.keys-list {
-  max-height: 340px;
-  overflow-y: auto;
-  margin-top: 14px;
-  display: none;
-}
-.keys-list.show { display: block; }
-.keys-list::-webkit-scrollbar { width: 5px; }
-.keys-list::-webkit-scrollbar-thumb { background: rgba(0,242,254,0.25); border-radius: 3px; }
-
-.key-item {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.07);
-  border-radius: 10px;
-  padding: 10px 12px;
-  margin-bottom: 8px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-  transition: all 0.2s;
-}
-.key-item:hover { border-color: rgba(0,242,254,0.3); background: rgba(19,27,50,0.7); }
-.key-item .info { min-width: 0; flex: 1; }
-.key-item .key-code {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--accent-cyan);
-  letter-spacing: 1px;
-  word-break: break-all;
-}
-.key-item .key-meta {
-  font-size: 10px;
-  color: var(--text-muted);
-  margin-top: 3px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-.key-item .tag {
-  font-size: 9px;
-  padding: 1px 6px;
-  border-radius: 4px;
-  font-weight: 700;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-.tag.green { background: rgba(0,255,136,0.15); color: var(--accent-green); }
-.tag.red { background: rgba(255,51,102,0.15); color: var(--accent-red); }
-.tag.amber { background: rgba(255,170,0,0.15); color: var(--accent-amber); }
-.tag.cyan { background: rgba(0,242,254,0.15); color: var(--accent-cyan); }
-.tag.purple { background: rgba(127,0,255,0.15); color: #b388ff; }
-
-.key-item .actions { display: flex; gap: 5px; flex-shrink: 0; }
-.key-item .mini-btn {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
-  color: var(--text-muted);
-  width: 30px; height: 30px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 11px;
-  display: flex; align-items: center; justify-content: center;
-  transition: all 0.2s;
-}
-.key-item .mini-btn:hover { color: var(--accent-cyan); border-color: var(--accent-cyan); }
-.key-item .mini-btn.danger:hover { color: var(--accent-red); border-color: var(--accent-red); }
-.key-item.revoked { opacity: 0.5; }
-.key-item.revoked .key-code { color: var(--text-muted); text-decoration: line-through; }
 
 .back-link {
   display: block;
@@ -339,31 +221,6 @@ body::after { background: rgba(255,45,149,0.18); bottom: 10%; right: 10%; animat
   color: var(--text-muted);
 }
 
-.preset-row {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 6px;
-  margin-bottom: 10px;
-}
-.preset-btn {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.09);
-  color: var(--text-muted);
-  font-size: 10px;
-  font-weight: 700;
-  padding: 7px 4px;
-  border-radius: 8px;
-  cursor: pointer;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-  transition: all 0.2s;
-}
-.preset-btn:hover, .preset-btn.active {
-  background: rgba(0,242,254,0.12);
-  border-color: var(--accent-cyan);
-  color: var(--accent-cyan);
-}
-
 /* TABS */
 .tabs {
   display: flex;
@@ -379,15 +236,15 @@ body::after { background: rgba(255,45,149,0.18); bottom: 10%; right: 10%; animat
   background: transparent;
   border: none;
   color: var(--text-muted);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
-  padding: 10px 8px;
+  padding: 10px 6px;
   border-radius: 9px;
   cursor: pointer;
   transition: all 0.25s;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  display: flex; align-items: center; justify-content: center; gap: 6px;
+  letter-spacing: 0.4px;
+  display: flex; align-items: center; justify-content: center; gap: 5px;
 }
 .tab-btn.active {
   background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
@@ -591,14 +448,105 @@ body::after { background: rgba(255,45,149,0.18); bottom: 10%; right: 10%; animat
   font-weight: 700;
 }
 
+/* ============ PASSWORD TAB ============ */
+.pw-card {
+  background: rgba(0,242,254,0.05);
+  border: 1px solid rgba(0,242,254,0.25);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 14px;
+}
+.pw-card .pw-label {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.pw-card .pw-display {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--accent-cyan);
+  letter-spacing: 2px;
+  word-break: break-all;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.pw-card .pw-display .reveal-btn {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--text-muted);
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  display: inline-flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.pw-card .pw-display .reveal-btn:hover { color: var(--accent-cyan); border-color: var(--accent-cyan); }
+.pw-card .pw-copy {
+  background: rgba(0,242,254,0.12);
+  border: 1px solid rgba(0,242,254,0.35);
+  color: var(--accent-cyan);
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 700;
+  display: inline-flex; align-items: center; gap: 5px;
+  flex-shrink: 0;
+}
+.pw-card .pw-copy:hover { background: rgba(0,242,254,0.22); }
+.pw-card .pw-meta {
+  margin-top: 8px;
+  font-size: 10px;
+  color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.pw-warning {
+  background: rgba(255,51,102,0.1);
+  border: 1px solid rgba(255,51,102,0.35);
+  color: var(--accent-red);
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 11px;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  line-height: 1.5;
+}
+.pw-warning i { margin-top: 2px; flex-shrink: 0; }
+
+.pw-success-banner {
+  background: rgba(0,255,136,0.1);
+  border: 1px solid rgba(0,255,136,0.35);
+  color: var(--accent-green);
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 12px;
+  margin-bottom: 14px;
+  display: none;
+  align-items: center;
+  gap: 8px;
+  line-height: 1.5;
+}
+.pw-success-banner.show { display: flex; }
+
 @media (max-width: 480px) {
   body { padding: 10px; }
   .card { padding: 24px 18px; border-radius: 20px; max-width: 100%; }
   .brand h1 { font-size: 19px; }
   .logo { width: 54px; height: 54px; font-size: 22px; }
-  .tab-btn { font-size: 10px; padding: 9px 5px; }
+  .tab-btn { font-size: 10px; padding: 10px 6px; letter-spacing: 0.3px; }
   .tab-btn i { font-size: 11px; }
   .saved-item .nick { font-size: 13px; }
+  .pw-card .pw-display { font-size: 17px; letter-spacing: 1.5px; }
 }
 </style>
 </head>
@@ -608,7 +556,7 @@ body::after { background: rgba(255,45,149,0.18); bottom: 10%; right: 10%; animat
   <div class="brand">
     <div class="logo"><i class="fa-solid fa-shield-halved"></i></div>
     <h1>SECRET ADMIN</h1>
-    <p>YASIN BHAI — Key Generator</p>
+    <p>YASIN BHAI — Control Panel</p>
   </div>
 
   <div class="alert" id="admin-alert"><i class="fa-solid fa-triangle-exclamation"></i><span id="admin-alert-msg"></span></div>
@@ -620,7 +568,10 @@ body::after { background: rgba(255,45,149,0.18); bottom: 10%; right: 10%; animat
         <label>Master Password</label>
         <div class="input-wrap">
           <input type="password" class="input" id="master-pass" placeholder="Enter master password" autocomplete="off" required>
-          <i class="fa-solid fa-lock"></i>
+          <i class="fa-solid fa-lock lock-icon"></i>
+          <button type="button" class="toggle-pass" onclick="toggleMasterVisibility()" tabindex="-1">
+            <i class="fa-solid fa-eye" id="toggle-master-eye"></i>
+          </button>
         </div>
       </div>
       <button type="submit" class="btn" id="admin-login-btn"><span>Unlock Panel</span><i class="fa-solid fa-shield-halved"></i></button>
@@ -632,67 +583,57 @@ body::after { background: rgba(255,45,149,0.18); bottom: 10%; right: 10%; animat
 
     <!-- TABS -->
     <div class="tabs">
-      <button class="tab-btn active" id="tab-generator" onclick="switchTab('generator')"><i class="fa-solid fa-key"></i> Key Gen</button>
-      <button class="tab-btn" id="tab-saved" onclick="switchTab('saved')"><i class="fa-solid fa-database"></i> Saved Accounts</button>
+      <button class="tab-btn active" id="tab-password" onclick="switchTab('password')">
+        <i class="fa-solid fa-lock"></i> <span>Password</span>
+      </button>
+      <button class="tab-btn" id="tab-saved" onclick="switchTab('saved')">
+        <i class="fa-solid fa-database"></i> <span>Saved</span>
+      </button>
     </div>
 
-    <!-- ================== TAB 1: KEY GENERATOR ================== -->
-    <div id="tab-content-generator">
-      <!-- KEY NAME -->
+    <!-- ================== TAB 1: PASSWORD MANAGEMENT ================== -->
+    <div id="tab-content-password">
+      <div class="pw-success-banner" id="pw-success-banner">
+        <i class="fa-solid fa-circle-check"></i>
+        <span id="pw-success-msg">Password changed successfully! All users have been logged out.</span>
+      </div>
+
+      <div class="pw-warning">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <span><b>Warning:</b> পাসওয়ার্ড change করলে <b>সব logged-in user অটোমেটিক log out</b> হয়ে যাবে। পুরাতন password আর কাজ করবে না। শুধু নতুন password দিয়েই সবাই আবার login করতে পারবে।</span>
+      </div>
+
+      <div class="pw-card">
+        <div class="pw-label">🔐 Current Login Password</div>
+        <div class="pw-display">
+          <span id="current-pw-display">••••••••</span>
+          <button type="button" class="reveal-btn" onclick="toggleCurrentPwVisibility()" title="Show/Hide">
+            <i class="fa-solid fa-eye" id="current-pw-eye"></i>
+          </button>
+          <button type="button" class="pw-copy" onclick="copyCurrentPw()">
+            <i class="fa-solid fa-copy"></i> Copy
+          </button>
+        </div>
+        <div class="pw-meta" id="pw-meta">Loading...</div>
+      </div>
+
       <div class="form-group">
-        <label>🔑 Your Key Name</label>
+        <label>🆕 New Login Password</label>
         <div class="input-wrap">
-          <input type="text" class="input" id="gen-custom-key"
-                 placeholder="যেমন: YASIN FF"
-                 autocomplete="off"
-                 style="text-transform:uppercase;letter-spacing:1.5px;font-family:'JetBrains Mono',monospace;font-weight:700;"
-                 oninput="updateKeyPreview()">
-          <i class="fa-solid fa-key"></i>
-        </div>
-        <div class="name-preview" id="name-preview">
-          <i class="fa-solid fa-circle-check"></i>
-          <span>Final Key: <span class="preview-code" id="preview-code">YOUR-KEY-HERE</span></span>
+          <input type="text" class="input" id="new-pw-input" placeholder="Enter new password (min 3 chars)" autocomplete="off" style="padding-left:14px;">
         </div>
       </div>
 
-      <!-- DURATION -->
       <div class="form-group">
-        <label>⏱️ Duration (Days / Hours / Minutes)</label>
-        <div class="preset-row">
-          <button type="button" class="preset-btn" onclick="setPreset(0,1,0)">1 Hour</button>
-          <button type="button" class="preset-btn" onclick="setPreset(0,12,0)">12 Hours</button>
-          <button type="button" class="preset-btn" onclick="setPreset(1,0,0)">1 Day</button>
-          <button type="button" class="preset-btn" onclick="setPreset(7,0,0)">7 Days</button>
-        </div>
-        <div class="time-row">
-          <div class="time-box">
-            <label>Days</label>
-            <input type="number" id="gen-days" min="0" value="0">
-          </div>
-          <div class="time-box">
-            <label>Hours</label>
-            <input type="number" id="gen-hours" min="0" value="0">
-          </div>
-          <div class="time-box">
-            <label>Minutes</label>
-            <input type="number" id="gen-minutes" min="0" value="30">
-          </div>
+        <label>🔁 Confirm New Password</label>
+        <div class="input-wrap">
+          <input type="text" class="input" id="confirm-pw-input" placeholder="Re-enter new password" autocomplete="off" style="padding-left:14px;">
         </div>
       </div>
 
-      <button class="btn" id="gen-btn" onclick="doGenerateKey()"><span>Generate Key</span><i class="fa-solid fa-wand-magic-sparkles"></i></button>
-
-      <div class="key-result" id="key-result">
-        <div class="key-label">Generated Key</div>
-        <div class="key-value" id="generated-key">------</div>
-        <button class="copy-btn" onclick="copyKey()"><i class="fa-solid fa-copy"></i> Copy Key</button>
-      </div>
-
-      <button class="btn secondary" style="margin-top:12px;" onclick="loadKeyList()">
-        <i class="fa-solid fa-list"></i> <span>Show All Keys</span>
+      <button class="btn success" id="pw-change-btn" onclick="doChangePassword()">
+        <i class="fa-solid fa-floppy-disk"></i> <span>Change Password</span>
       </button>
-
-      <div class="keys-list" id="keys-list"></div>
     </div>
 
     <!-- ================== TAB 2: SAVED ACCOUNTS ================== -->
@@ -716,7 +657,9 @@ body::after { background: rgba(255,45,149,0.18); bottom: 10%; right: 10%; animat
 
 <script>
 let currentMasterPass = '';
-let currentTab = 'generator';
+let currentTab = 'password';
+let currentPwPlain = '';
+let currentPwVisible = false;
 
 function showAlert(msg, success = false) {
   const el = document.getElementById('admin-alert');
@@ -732,31 +675,30 @@ function escapeHtml(t) {
   return String(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// ============ KEY PREVIEW ============
-function updateKeyPreview() {
-  const raw = document.getElementById('gen-custom-key').value.trim();
-  const code = document.getElementById('preview-code');
-  code.innerText = raw ? raw.toUpperCase() : 'YOUR-KEY-HERE';
+function toggleMasterVisibility() {
+  const input = document.getElementById('master-pass');
+  const eye = document.getElementById('toggle-master-eye');
+  if (input.type === 'password') {
+    input.type = 'text';
+    eye.classList.remove('fa-eye');
+    eye.classList.add('fa-eye-slash');
+  } else {
+    input.type = 'password';
+    eye.classList.remove('fa-eye-slash');
+    eye.classList.add('fa-eye');
+  }
 }
 
-// ============ DURATION PRESETS ============
-function setPreset(d, h, m) {
-  document.getElementById('gen-days').value = d;
-  document.getElementById('gen-hours').value = h;
-  document.getElementById('gen-minutes').value = m;
-}
-
-// ============ TABS ============
 function switchTab(tab) {
   currentTab = tab;
-  document.getElementById('tab-generator').classList.toggle('active', tab === 'generator');
+  document.getElementById('tab-password').classList.toggle('active', tab === 'password');
   document.getElementById('tab-saved').classList.toggle('active', tab === 'saved');
-  document.getElementById('tab-content-generator').style.display = (tab === 'generator') ? 'block' : 'none';
+  document.getElementById('tab-content-password').style.display = (tab === 'password') ? 'block' : 'none';
   document.getElementById('tab-content-saved').style.display = (tab === 'saved') ? 'block' : 'none';
   if (tab === 'saved') loadSavedAccounts();
+  if (tab === 'password') loadCurrentPassword();
 }
 
-// ============ ADMIN LOGIN ============
 async function doAdminLogin(e) {
   e.preventDefault();
   const password = document.getElementById('master-pass').value;
@@ -775,6 +717,8 @@ async function doAdminLogin(e) {
       currentMasterPass = password;
       document.getElementById('admin-login-step').style.display = 'none';
       document.getElementById('admin-panel-step').style.display = 'block';
+      // ✅ Panel unlock হওয়ার সাথে সাথে Password tab load
+      loadCurrentPassword();
     } else {
       showAlert(data.error || 'Wrong password');
     }
@@ -785,44 +729,100 @@ async function doAdminLogin(e) {
   }
 }
 
-// ============ GENERATE KEY ============
-async function doGenerateKey() {
-  const keyName = document.getElementById('gen-custom-key').value.trim();
-  if (!keyName) {
-    showAlert('Your Key Name লিখুন');
+// ============ PASSWORD MANAGEMENT ============
+async function loadCurrentPassword() {
+  try {
+    const res = await fetch('/api/admin/get_password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ master_password: currentMasterPass })
+    });
+    const data = await res.json();
+    if (data.status === 'ok') {
+      currentPwPlain = data.password || '';
+      renderCurrentPw();
+      const upd = data.updated_at ? new Date(data.updated_at * 1000).toLocaleString() : '-';
+      document.getElementById('pw-meta').innerText = `Last changed: ${upd}`;
+    } else {
+      document.getElementById('pw-meta').innerText = 'Failed to load';
+    }
+  } catch (err) {
+    document.getElementById('pw-meta').innerText = 'Connection error';
+  }
+}
+
+function renderCurrentPw() {
+  const el = document.getElementById('current-pw-display');
+  const eye = document.getElementById('current-pw-eye');
+  if (currentPwVisible) {
+    el.innerText = currentPwPlain || '(empty)';
+    eye.classList.remove('fa-eye');
+    eye.classList.add('fa-eye-slash');
+  } else {
+    el.innerText = '•'.repeat(Math.max(8, currentPwPlain.length));
+    eye.classList.remove('fa-eye-slash');
+    eye.classList.add('fa-eye');
+  }
+}
+
+function toggleCurrentPwVisibility() {
+  currentPwVisible = !currentPwVisible;
+  renderCurrentPw();
+}
+
+function copyCurrentPw() {
+  if (!currentPwPlain) return;
+  navigator.clipboard.writeText(currentPwPlain).then(() => {
+    showAlert('Password copied!', true);
+  });
+}
+
+async function doChangePassword() {
+  const newPw = document.getElementById('new-pw-input').value.trim();
+  const confirmPw = document.getElementById('confirm-pw-input').value.trim();
+
+  if (!newPw || newPw.length < 3) {
+    showAlert('Password must be at least 3 characters');
     return;
   }
-
-  const days = parseInt(document.getElementById('gen-days').value) || 0;
-  const hours = parseInt(document.getElementById('gen-hours').value) || 0;
-  const minutes = parseInt(document.getElementById('gen-minutes').value) || 0;
-
-  if (days === 0 && hours === 0 && minutes === 0) {
-    showAlert('Set at least 1 minute');
+  if (newPw !== confirmPw) {
+    showAlert('Passwords do not match');
     return;
   }
+  if (newPw === currentPwPlain) {
+    showAlert('New password is same as current password');
+    return;
+  }
+  if (!confirm(`Change login password?\n\n⚠️ All logged-in users will be FORCED to log out.\nThey must use the NEW password to log back in.\n\nContinue?`)) return;
 
-  const btn = document.getElementById('gen-btn');
+  const btn = document.getElementById('pw-change-btn');
   btn.disabled = true;
   hideAlert();
+  document.getElementById('pw-success-banner').classList.remove('show');
 
   try {
-    const res = await fetch('/api/admin/generate', {
+    const res = await fetch('/api/admin/change_password', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         master_password: currentMasterPass,
-        user_name: keyName,
-        days, hours, minutes,
-        custom_key: keyName
+        new_password: newPw
       })
     });
     const data = await res.json();
     if (data.status === 'ok') {
-      document.getElementById('generated-key').innerText = data.key_entry.key;
-      document.getElementById('key-result').classList.add('show');
-      const durText = `${days}d ${hours}h ${minutes}m`;
-      showAlert(`Key "${data.key_entry.key}" created (${durText})`, true);
+      currentPwPlain = data.password || newPw;
+      currentPwVisible = true;
+      renderCurrentPw();
+      document.getElementById('new-pw-input').value = '';
+      document.getElementById('confirm-pw-input').value = '';
+      const upd = data.updated_at ? new Date(data.updated_at * 1000).toLocaleString() : '-';
+      document.getElementById('pw-meta').innerText = `Last changed: ${upd}`;
+      const banner = document.getElementById('pw-success-banner');
+      banner.classList.add('show');
+      document.getElementById('pw-success-msg').innerText =
+        `✅ Password changed to "${currentPwPlain}"\nAll users have been logged out automatically.`;
+      showAlert('Password changed & all users logged out!', true);
     } else {
       showAlert(data.error || 'Failed');
     }
@@ -833,112 +833,11 @@ async function doGenerateKey() {
   }
 }
 
-function copyKey() {
-  const key = document.getElementById('generated-key').innerText;
-  navigator.clipboard.writeText(key).then(() => {
-    showAlert('Key copied to clipboard!', true);
-  });
-}
-
-// ============ KEY LIST ============
-async function loadKeyList() {
-  hideAlert();
-  const listEl = document.getElementById('keys-list');
-  try {
-    const res = await fetch('/api/admin/keys', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ master_password: currentMasterPass })
-    });
-    const data = await res.json();
-    if (data.status !== 'ok') {
-      showAlert(data.error || 'Failed');
-      return;
-    }
-    if (!data.keys.length) {
-      listEl.innerHTML = '<div class="empty-msg">No keys yet</div>';
-    } else {
-      listEl.innerHTML = data.keys.map(k => {
-        const dur = `${k.days||0}d ${k.hours||0}h ${k.minutes||0}m`;
-        let tag = '';
-        if (k.revoked) tag = '<span class="tag red">Revoked</span>';
-        else if (k.expired) tag = '<span class="tag amber">Expired</span>';
-        else if (k.in_use) tag = '<span class="tag cyan">In Use</span>';
-        else if (k.used) tag = '<span class="tag red">Used</span>';
-        else tag = '<span class="tag green">Available</span>';
-
-        let remainingText = '';
-        if (!k.revoked && !k.expired) {
-          const sec = k.remaining_sec || 0;
-          const d = Math.floor(sec / 86400);
-          const h = Math.floor((sec % 86400) / 3600);
-          const m = Math.floor((sec % 3600) / 60);
-          remainingText = `<span>⏳ ${d}d ${h}h ${m}m left</span>`;
-        }
-
-        const dead = k.revoked || k.expired;
-        return `
-          <div class="key-item ${dead ? 'revoked' : ''}">
-            <div class="info">
-              <div class="key-code">${escapeHtml(k.key)}</div>
-              <div class="key-meta">
-                <span>⏱️ ${dur}</span>
-                ${remainingText}
-                ${tag}
-              </div>
-            </div>
-            <div class="actions">
-              <button class="mini-btn" title="Copy" onclick="copyText('${k.key}')"><i class="fa-solid fa-copy"></i></button>
-              ${!k.revoked ? `<button class="mini-btn" title="Revoke" onclick="revokeKey('${k.key}')"><i class="fa-solid fa-ban"></i></button>` : ''}
-              <button class="mini-btn danger" title="Delete" onclick="deleteKey('${k.key}')"><i class="fa-solid fa-trash"></i></button>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-    listEl.classList.add('show');
-  } catch (err) {
-    showAlert('Connection error');
-  }
-}
-
-async function revokeKey(key) {
-  if (!confirm('Revoke key ' + key + '?\nAll active sessions using this key will be logged out.')) return;
-  const res = await fetch('/api/admin/revoke', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ master_password: currentMasterPass, key })
-  });
-  const data = await res.json();
-  if (data.status === 'ok') {
-    showAlert('Key revoked', true);
-    loadKeyList();
-  } else {
-    showAlert(data.error || 'Failed');
-  }
-}
-
-async function deleteKey(key) {
-  if (!confirm('Delete key ' + key + ' permanently?')) return;
-  const res = await fetch('/api/admin/delete', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ master_password: currentMasterPass, key })
-  });
-  const data = await res.json();
-  if (data.status === 'ok') {
-    showAlert('Key deleted', true);
-    loadKeyList();
-  } else {
-    showAlert(data.error || 'Failed');
-  }
-}
-
 function copyText(t) {
   navigator.clipboard.writeText(t).then(() => showAlert('Copied: ' + t, true));
 }
 
-// ============ SAVED ACCOUNTS (ADMIN ONLY, with Online/Offline) ============
+// ============ SAVED ACCOUNTS ============
 async function loadSavedAccounts() {
   hideAlert();
   const listEl = document.getElementById('saved-list');
@@ -984,14 +883,14 @@ async function loadSavedAccounts() {
       if (authType === 'token') {
         credsHtml = `
           <div class="detail-row">
-            <div><span class="lbl">Access Token:</span> <span class="val" id="tok-${idx}">${token}</span></div>
+            <div><span class="lbl">Access Token:</span> <span class="val">${token}</span></div>
           </div>
         `;
       } else {
         credsHtml = `
           <div class="detail-row">
             <div><span class="lbl">Input UID:</span> <span class="val">${inputUid}</span></div>
-            <div><span class="lbl">Password:</span> <span class="val" id="pwd-${idx}">${inputPass}</span></div>
+            <div><span class="lbl">Password:</span> <span class="val">${inputPass}</span></div>
           </div>
         `;
       }

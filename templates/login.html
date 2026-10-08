@@ -7,7 +7,7 @@
 <title>YASIN BHAI | Login</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
 :root {
@@ -20,7 +20,6 @@
   --accent-pink: #ff2d95;
   --accent-red: #ff3366;
   --accent-green: #00ff88;
-  --accent-amber: #ffaa00;
   --text-main: #f0f4fc;
   --text-muted: #8e9bb5;
 }
@@ -39,6 +38,7 @@ body {
   padding: 20px;
   background-attachment: fixed;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 body::before, body::after {
   content: '';
@@ -47,10 +47,10 @@ body::before, body::after {
   border-radius: 50%;
   filter: blur(120px);
   pointer-events: none;
+  will-change: transform;
 }
-body::before { background: rgba(0,242,254,0.15); top: 10%; left: 10%; animation: floatOrb 8s ease-in-out infinite; }
-body::after { background: rgba(127,0,255,0.18); bottom: 10%; right: 10%; animation: floatOrb 10s ease-in-out infinite reverse; }
-@keyframes floatOrb { 0%,100% { transform: translate(0,0) scale(1);} 50% { transform: translate(30px,-30px) scale(1.1);} }
+body::before { background: rgba(0,242,254,0.15); top: 10%; left: 10%; }
+body::after { background: rgba(127,0,255,0.18); bottom: 10%; right: 10%; }
 
 .card {
   background: var(--bg-card);
@@ -65,14 +65,13 @@ body::after { background: rgba(127,0,255,0.18); bottom: 10%; right: 10%; animati
   position: relative;
   z-index: 10;
   overflow: hidden;
-  animation: fadeIn 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(24px);} to { opacity: 1; transform: translateY(0);} }
 .card::before {
   content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
   background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple), var(--accent-pink));
   background-size: 200% 100%;
   animation: shimmer 4s linear infinite;
+  will-change: background-position;
 }
 @keyframes shimmer { 0% { background-position: 0% 0; } 100% { background-position: 200% 0; } }
 
@@ -84,15 +83,14 @@ body::after { background: rgba(127,0,255,0.18); bottom: 10%; right: 10%; animati
   display: flex; align-items: center; justify-content: center;
   font-size: 28px; color: #fff;
   box-shadow: 0 0 30px rgba(0,242,254,0.45);
-  animation: pulseGlow 3s ease-in-out infinite;
 }
-@keyframes pulseGlow { 0%,100% { box-shadow: 0 0 30px rgba(0,242,254,0.45);} 50% { box-shadow: 0 0 45px rgba(0,242,254,0.7);} }
 .brand h1 {
   font-size: 24px; font-weight: 800; letter-spacing: 2px;
   background: linear-gradient(90deg, #fff, var(--accent-cyan), #fff);
   background-size: 200% auto;
   -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
-  animation: textShine 3.5s linear infinite;
+  animation: textShine 4s linear infinite;
+  will-change: background-position;
 }
 @keyframes textShine { 0% { background-position: 0% center;} 100% { background-position: 200% center;} }
 .brand p { font-size: 13px; color: var(--text-muted); margin-top: 6px; }
@@ -104,28 +102,56 @@ body::after { background: rgba(127,0,255,0.18); bottom: 10%; right: 10%; animati
   text-transform: uppercase; letter-spacing: 0.6px;
 }
 .input-wrap { position: relative; }
-.input-wrap i {
+.input-wrap > i.lock-icon {
   position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
   color: var(--text-muted); font-size: 14px; pointer-events: none;
+  z-index: 2;
 }
 .input {
   width: 100%;
   background: rgba(255,255,255,0.05);
   border: 1.5px solid rgba(255,255,255,0.09);
   border-radius: 12px;
-  padding: 13px 14px 13px 40px;
+  padding: 13px 44px 13px 40px;
   color: #fff;
   font-size: 15px;
   outline: none;
-  transition: all 0.25s;
+  transition: border-color 0.25s, background 0.25s;
   -webkit-appearance: none;
 }
 .input::placeholder { color: rgba(142,155,181,0.6); font-size: 14px; }
 .input:focus {
   border-color: var(--accent-cyan);
   background: rgba(0,242,254,0.05);
-  box-shadow: 0 0 0 4px rgba(0,242,254,0.08);
 }
+
+/* ✅ Eye toggle moved inside — no more overflow */
+.toggle-pass {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 14px;
+  cursor: pointer;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: color 0.2s, background 0.2s, border-color 0.2s;
+  z-index: 3;
+}
+.toggle-pass:hover {
+  color: var(--accent-cyan);
+  background: rgba(0,242,254,0.08);
+  border-color: rgba(0,242,254,0.3);
+}
+.toggle-pass:active { transform: translateY(-50%) scale(0.9); }
 
 .btn {
   width: 100%;
@@ -137,14 +163,14 @@ body::after { background: rgba(127,0,255,0.18); bottom: 10%; right: 10%; animati
   font-weight: 700;
   border: none;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: transform 0.2s, box-shadow 0.2s;
   box-shadow: 0 6px 20px rgba(0,242,254,0.35);
   display: flex; align-items: center; justify-content: center; gap: 8px;
   margin-top: 6px;
   -webkit-appearance: none;
 }
-.btn:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(0,242,254,0.55); }
-.btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+.btn:active { transform: scale(0.98); }
+.btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
 .alert {
   background: rgba(255,51,102,0.12);
@@ -158,27 +184,79 @@ body::after { background: rgba(127,0,255,0.18); bottom: 10%; right: 10%; animati
   align-items: center;
   gap: 9px;
 }
-.alert.show { display: flex; animation: shake 0.4s; }
+.alert.show { display: flex; }
 .alert.success {
   background: rgba(0,255,136,0.12);
   border-color: rgba(0,255,136,0.35);
   color: var(--accent-green);
 }
-@keyframes shake { 0%,100% { transform: translateX(0);} 20% { transform: translateX(-6px);} 40% { transform: translateX(6px);} 60% { transform: translateX(-4px);} 80% { transform: translateX(4px);} }
 
-.admin-link {
-  display: block;
-  text-align: center;
+/* ✅ Get Key / Get Password link */
+.getkey-section {
   margin-top: 18px;
-  font-size: 12px;
-  color: var(--text-muted);
-  text-decoration: none;
-  transition: color 0.2s;
-  font-weight: 600;
-  letter-spacing: 0.4px;
+  text-align: center;
 }
-.admin-link:hover { color: var(--accent-cyan); }
-.admin-link i { margin-right: 5px; }
+.getkey-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 22px;
+  border-radius: 12px;
+  background: rgba(0, 136, 204, 0.12);
+  border: 1px solid rgba(0, 136, 204, 0.35);
+  color: #4dbeff;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  transition: background 0.25s, border-color 0.25s, transform 0.15s, box-shadow 0.25s;
+  width: 100%;
+  box-shadow: 0 0 12px rgba(0, 136, 204, 0.15);
+}
+.getkey-link:hover {
+  background: rgba(0, 136, 204, 0.22);
+  border-color: rgba(0, 136, 204, 0.6);
+  box-shadow: 0 0 20px rgba(0, 136, 204, 0.35);
+  color: #7ed0ff;
+}
+.getkey-link:active { transform: scale(0.97); }
+.getkey-link i.fa-telegram {
+  font-size: 16px;
+}
+.getkey-link .arrow {
+  font-size: 11px;
+  opacity: 0.7;
+  margin-left: auto;
+}
+
+@media (max-width: 480px) {
+  body { padding: 14px; }
+  .card { padding: 28px 20px; border-radius: 20px; }
+  .logo { width: 56px; height: 56px; font-size: 24px; border-radius: 16px; }
+  .brand h1 { font-size: 20px; letter-spacing: 1.5px; }
+  .brand p { font-size: 12px; }
+  .input { padding: 12px 42px 12px 38px; font-size: 14px; }
+  .btn { padding: 13px; font-size: 14px; }
+  .toggle-pass { width: 30px; height: 30px; right: 7px; font-size: 13px; }
+  .getkey-link { font-size: 12px; padding: 11px 18px; }
+}
+
+@media (max-width: 360px) {
+  .card { padding: 24px 16px; }
+  .brand h1 { font-size: 18px; }
+  .input { font-size: 13px; padding: 11px 40px 11px 36px; }
+  .toggle-pass { width: 28px; height: 28px; right: 6px; font-size: 12px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
 </style>
 </head>
 <body>
@@ -193,14 +271,27 @@ body::after { background: rgba(127,0,255,0.18); bottom: 10%; right: 10%; animati
   <div class="alert" id="user-alert"><i class="fa-solid fa-triangle-exclamation"></i><span id="user-alert-msg"></span></div>
   <form onsubmit="doUserLogin(event)">
     <div class="form-group">
-      <label>Access Key</label>
+      <label>Access Password</label>
       <div class="input-wrap">
-        <input type="text" class="input" id="user-key" placeholder="Enter your key" autocomplete="off" required>
-        <i class="fa-solid fa-key"></i>
+        <input type="password" class="input" id="user-password" placeholder="Enter password" autocomplete="current-password" required>
+        <i class="fa-solid fa-lock lock-icon"></i>
+        <button type="button" class="toggle-pass" onclick="togglePasswordVisibility()" tabindex="-1" aria-label="Toggle password visibility">
+          <i class="fa-solid fa-eye" id="toggle-eye"></i>
+        </button>
       </div>
     </div>
     <button type="submit" class="btn" id="user-login-btn"><span>Login</span><i class="fa-solid fa-arrow-right"></i></button>
   </form>
+
+  <!-- ✅ Get Key / Get Password via Telegram -->
+  <div class="getkey-section">
+    <a href="https://t.me/freefireob51" target="_blank" rel="noopener" class="getkey-link">
+      <i class="fa-brands fa-telegram"></i>
+      <span>Get Password</span>
+      <i class="fa-solid fa-arrow-up-right-from-square arrow"></i>
+    </a>
+  </div>
+</div>
 
 <script>
 function showAlert(msg, success = false) {
@@ -214,10 +305,24 @@ function hideAlert() {
   document.getElementById('user-alert').classList.remove('show');
 }
 
+function togglePasswordVisibility() {
+  const input = document.getElementById('user-password');
+  const eye = document.getElementById('toggle-eye');
+  if (input.type === 'password') {
+    input.type = 'text';
+    eye.classList.remove('fa-eye');
+    eye.classList.add('fa-eye-slash');
+  } else {
+    input.type = 'password';
+    eye.classList.remove('fa-eye-slash');
+    eye.classList.add('fa-eye');
+  }
+}
+
 async function doUserLogin(e) {
   e.preventDefault();
-  const key = document.getElementById('user-key').value.trim().toUpperCase();
-  if (!key) return;
+  const password = document.getElementById('user-password').value;
+  if (!password) return;
   const btn = document.getElementById('user-login-btn');
   btn.disabled = true;
   hideAlert();
@@ -225,12 +330,11 @@ async function doUserLogin(e) {
     const res = await fetch('/api/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ key })
+      body: JSON.stringify({ password })
     });
     const data = await res.json();
     if (data.status === 'ok') {
-      // Redirect with login=success + key param so index.html knows to show welcome popup
-      window.location.href = '/?login=success&key=' + encodeURIComponent(key);
+      window.location.href = '/?login=success';
     } else {
       showAlert(data.error || 'Login failed');
     }

@@ -41,22 +41,15 @@ TOKEN_CACHE_FILE = "token_cache.json"
 DEVICES_FILE = "devices.json"
 TOKEN_CACHE_TTL = 1200
 
-# 🔥 Match control - FAST MODE
-START_MATCH_INTERVAL = 1.2      # ⚡ দ্রুত StartMatch
-NEW_MATCH_DELAY = 1.0           # ⚡ ম্যাচ শেষে দ্রুত নতুন ম্যাচ
-MAX_MATCH_DURATION = 400        # ⚡ ম্যাচ দ্রুত শেষ
-MATCH_IDLE_TIMEOUT = 5.0        # ⚡ দ্রুত আইডল ডিটেকশন
-PRIORITY_REGIONS = ["BD","IND", "SG", "TH", "PH", "VN", "MY", "ID", "HK", "TW"]
+# 🔥 Match control
+START_MATCH_INTERVAL = 3.0
+NEW_MATCH_DELAY = 3.0   
+MAX_MATCH_DURATION = 700
+MATCH_IDLE_TIMEOUT = 8.0
+PRIORITY_REGIONS = ["BD"]
 
-# 🔥 Anti-AFK
-ANTI_AFK_ENABLED = True
-ANTI_AFK_MIN_INTERVAL = 2.5
-ANTI_AFK_MAX_INTERVAL = 4.5
-ANTI_AFK_FIRE_CHANCE = 0.5
-
-# 🔥 Cache invalidation thresholds
 MAX_CONSECUTIVE_PARSE_FAILURES = 20
-NON_MATCH_RECONNECT_DELAY = 0.5  # ⚡ দ্রুত রিকানেক্ট
+NON_MATCH_RECONNECT_DELAY = 1.0
 
 FALLBACK_UID = ""
 FALLBACK_PASSWORD = ""

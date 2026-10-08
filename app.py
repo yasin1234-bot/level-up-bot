@@ -86,6 +86,35 @@ def get_map_name(map_id) -> str:
 _stop_flags: Dict[str, bool] = {}
 _stop_flags_lock = asyncio.Lock()
 
+# ✅ NEW: Login failure tracking (max 2 attempts per account add)
+_login_failed_accounts: Dict[str, int] = {}
+_login_failed_lock = asyncio.Lock()
+MAX_LOGIN_ATTEMPTS = 2
+
+
+async def _mark_login_failed(identifier: str) -> int:
+    """Increment failure count for an account. Returns new count."""
+    async with _login_failed_lock:
+        _login_failed_accounts[identifier] = _login_failed_accounts.get(identifier, 0) + 1
+        return _login_failed_accounts[identifier]
+
+
+async def _reset_login_failed(identifier: str):
+    """Reset failure count (called on successful login or when account re-added)."""
+    async with _login_failed_lock:
+        _login_failed_accounts.pop(identifier, None)
+
+
+async def _get_login_failed_count(identifier: str) -> int:
+    async with _login_failed_lock:
+        return _login_failed_accounts.get(identifier, 0)
+
+
+async def _is_login_blocked(identifier: str) -> bool:
+    """Check if account has reached max login attempts."""
+    count = await _get_login_failed_count(identifier)
+    return count >= MAX_LOGIN_ATTEMPTS
+
 
 async def _mark_stopped(*identifiers: str):
     async with _stop_flags_lock:
@@ -2518,23 +2547,26 @@ async def run_account_worker(account_data: Dict, label: str):
 
 
 async def account_loop_guest(uid: str, password: str):
+    """✅ MODIFIED: Stops retrying after MAX_LOGIN_ATTEMPTS consecutive failures.
+    Failure counter resets when account is re-added from dashboard."""
+    identifier = str(uid)
     while True:
-        if _is_stopped(str(uid)):
+        if _is_stopped(identifier):
             print_warning(f"[ACCOUNT-LOOP] Stop flag detected for UID {uid} → worker exiting", uid)
             try:
-                bot_state.update_status(str(uid), "OFFLINE")
+                bot_state.update_status(identifier, "OFFLINE")
             except Exception:
                 pass
             break
 
         try:
-            if bot_state.is_owner_key_expired(str(uid)):
+            if bot_state.is_owner_key_expired(identifier):
                 print_warning(
                     f"🔒 [KEY EXPIRED] Owner key expired for UID {uid} → worker exiting permanently",
                     uid
                 )
                 try:
-                    bot_state.update_status(str(uid), "OFFLINE")
+                    bot_state.update_status(identifier, "OFFLINE")
                 except Exception:
                     pass
                 break
@@ -2542,33 +2574,56 @@ async def account_loop_guest(uid: str, password: str):
             pass
 
         try:
-            if bot_state.is_target_reached(str(uid)):
+            if bot_state.is_target_reached(identifier):
                 print_success(f"🎯 [TARGET REACHED] UID {uid} already at target. Worker stopping.", uid)
                 try:
-                    bot_state.update_status(str(uid), "TARGET_REACHED")
+                    bot_state.update_status(identifier, "TARGET_REACHED")
                 except Exception:
                     pass
                 break
         except Exception:
             pass
+
+        # ✅ Check if login is blocked due to max failures
+        if await _is_login_blocked(identifier):
+            count = await _get_login_failed_count(identifier)
+            print_warning(
+                f"[LOGIN-BLOCKED] UID {uid} failed {count} times. "
+                f"Login requests stopped. Re-add account to retry.",
+                uid
+            )
+            try:
+                bot_state.update_status(identifier, "LOGIN_FAILED")
+            except Exception:
+                pass
+            # Stay alive but don't send login requests
+            await asyncio.sleep(30)
+            continue
 
         try:
             print_info(f"[LOGIN] Starting login for Guest UID: {uid}...", uid)
             try:
-                bot_state.update_status(str(uid), "CONNECTING")
+                bot_state.update_status(identifier, "CONNECTING")
             except Exception:
                 pass
             account_data = await process_account_uid_pass(uid, password)
             if not account_data:
-                print_error(f"Login failed for UID: {uid}. Retrying in 15 seconds...", uid)
+                fail_count = await _mark_login_failed(identifier)
+                print_error(
+                    f"Login failed for UID: {uid} (attempt {fail_count}/{MAX_LOGIN_ATTEMPTS}). "
+                    f"Retrying in 15 seconds...", uid
+                )
                 try:
-                    bot_state.update_status(str(uid), "ERROR")
+                    bot_state.update_status(identifier, "ERROR")
                 except Exception:
                     pass
                 await asyncio.sleep(15)
                 continue
 
-            aliases = _all_aliases_for(account_data, str(uid))
+            # ✅ Successful login → reset failure counter
+            await _reset_login_failed(identifier)
+
+            aliases = _all_aliases_for(account_data, identifier)
             if _is_stopped(*aliases):
                 print_warning(f"[ACCOUNT-LOOP] Stop flag detected after login for {uid} → exiting", uid)
                 break
@@ -2580,7 +2635,7 @@ async def account_loop_guest(uid: str, password: str):
                         uid
                     )
                     try:
-                        bot_state.update_status(str(uid), "OFFLINE")
+                        bot_state.update_status(identifier, "OFFLINE")
                     except Exception:
                         pass
                     break
@@ -2600,14 +2655,14 @@ async def account_loop_guest(uid: str, password: str):
                         uid
                     )
                     try:
-                        bot_state.update_status(str(uid), "OFFLINE")
+                        bot_state.update_status(identifier, "OFFLINE")
                     except Exception:
                         pass
                     break
             except Exception:
                 pass
 
-            if bot_state.is_target_reached(account_data['account_id']) or bot_state.is_target_reached(str(uid)):
+            if bot_state.is_target_reached(account_data['account_id']) or bot_state.is_target_reached(identifier):
                 print_success(f"🎯 UID {account_data['account_id']} target reached. Bot fully stopped.", uid)
                 break
 
@@ -2616,7 +2671,7 @@ async def account_loop_guest(uid: str, password: str):
         except asyncio.CancelledError:
             print_warning(f"Worker for {uid} stopped.", uid)
             try:
-                bot_state.update_status(str(uid), "OFFLINE")
+                bot_state.update_status(identifier, "OFFLINE")
             except Exception:
                 pass
             break
@@ -2626,8 +2681,11 @@ async def account_loop_guest(uid: str, password: str):
 
 
 async def account_loop_token(token: str):
+    """✅ MODIFIED: Stops retrying after MAX_LOGIN_ATTEMPTS consecutive failures.
+    Failure counter resets when account is re-added from dashboard."""
     token_label = token[:10]
     token_key = f"tok_{token[:10]}"
+    identifier = token_key
     while True:
         if _is_stopped(token_key) or _is_stopped(f"tok_{token[:20]}"):
             print_warning(f"[ACCOUNT-LOOP] Stop flag detected for token {token_label} → worker exiting")
@@ -2649,13 +2707,34 @@ async def account_loop_token(token: str):
         except Exception:
             pass
 
+        # ✅ Check if login is blocked due to max failures
+        if await _is_login_blocked(identifier):
+            count = await _get_login_failed_count(identifier)
+            print_warning(
+                f"[LOGIN-BLOCKED] Token {token_label} failed {count} times. "
+                f"Login requests stopped. Re-add account to retry."
+            )
+            try:
+                bot_state.update_status(token_key, "LOGIN_FAILED")
+            except Exception:
+                pass
+            await asyncio.sleep(30)
+            continue
+
         try:
             print_info("[LOGIN] Starting login with Access Token...")
             account_data = await process_account_token(token)
             if not account_data:
-                print_error("Login failed for Token. Retrying in 15 seconds...")
+                fail_count = await _mark_login_failed(identifier)
+                print_error(
+                    f"Login failed for Token (attempt {fail_count}/{MAX_LOGIN_ATTEMPTS}). "
+                    f"Retrying in 15 seconds..."
+                )
                 await asyncio.sleep(15)
                 continue
+
+            # ✅ Successful login → reset failure counter
+            await _reset_login_failed(identifier)
 
             acc_id = str(account_data['account_id'])
             aliases = _all_aliases_for(account_data, token_key)
@@ -2837,6 +2916,7 @@ async def main():
     print_info("✅ BAN-SAFE LOGIN: ENABLED (app.py compatible payload)")
     print_info("✅ REGION: BD (Bangladesh)")
     print_info("✅ FAST MODE: ENABLED ⚡ (multiple bots run simultaneously, no lag)")
+    print_info(f"✅ LOGIN RETRY LIMIT: {MAX_LOGIN_ATTEMPTS} attempts per account add")
     print_colored("=" * 60, Colors.CYAN)
 
     try:
@@ -2846,11 +2926,15 @@ async def main():
         print_error(f"Could not start web dashboard: {e}")
 
     async def on_account_added_handler(data):
-        """✅ FIXED: Clears ALL stop flags + resets target state so a new run can begin."""
+        """✅ FIXED: Clears ALL stop flags + resets target state + resets login failure counter
+        so a new run can begin with fresh MAX_LOGIN_ATTEMPTS."""
         target_level = int(data.get("target_level", 0) or 0)
         owner_key = data.get("_owner_key", "")
         if "token" in data and data["token"]:
             t = str(data["token"]).strip()
+            # ✅ Reset login failure counter for this token
+            await _reset_login_failed(f"tok_{t[:10]}")
+            await _reset_login_failed(f"tok_{t[:20]}")
             # Clear stop flags for all relevant aliases
             await _clear_stopped(
                 f"tok_{t[:10]}",
@@ -2872,6 +2956,15 @@ async def main():
         elif "uid" in data and "password" in data:
             u = str(data["uid"]).strip()
             p = str(data["password"]).strip()
+            # ✅ Reset login failure counter for this UID
+            await _reset_login_failed(u)
+            # Also reset for any cached account_id of this UID
+            try:
+                cached = cache_get(u)
+                if cached:
+                    await _reset_login_failed(str(cached.get("account_id", "")))
+            except Exception:
+                pass
             # Clear ALL possible aliases for this UID (uid itself + any cached account_id)
             aliases_to_clear = [u]
             try:
